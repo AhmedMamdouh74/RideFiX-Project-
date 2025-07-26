@@ -170,8 +170,7 @@ namespace Service.CoreServices
             {
                 throw new EmergencyNullException();
             }
-            var spec = new EmergencyRequestTotalSpecification(requestId);
-            var emergencyTechnician = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
+            var emergencyTechnician = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
             if (emergencyTechnician == null)
             {
                 throw new RequestNotFoundException();

@@ -18,6 +18,7 @@ namespace Service.Specification_Implementation
             AddInclude(e => e.TechReverseRequests);
             AddInclude(e => e.category);
             AddInclude(e => e.CarOwner);
+            AddInclude(e => e.Technician);
             AddInclude(e => e.CarOwner.ApplicationUser);
 
         }
