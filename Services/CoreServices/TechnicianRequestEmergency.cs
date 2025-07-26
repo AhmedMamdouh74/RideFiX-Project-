@@ -108,6 +108,16 @@ namespace Service.CoreServices.TechniciansServices
 
 			return mapper.Map<EmergencyRequestDetailsDTO>(joinEntry);
 		}
+		public async Task<List<TechReverseRequestDTO>> GetTechAllAppliedRequestsAsync(int techId)
+		{
+			var repo = unitOfWork.GetRepository<TechReverseRequest, int>();
+			var spec = new TechReverseRequestSpec(techId);
+			var techRequests = await repo.GetAllAsync(spec);
+			if (techRequests == null || !techRequests.Any())
+				return null;
+			else
+				return mapper.Map<List<TechReverseRequestDTO>>(techRequests);
+		}
 
         public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergencyRequestDTO dto)
         {
