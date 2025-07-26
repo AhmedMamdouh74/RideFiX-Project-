@@ -54,7 +54,12 @@ namespace Service.AutoMapperProfile
             ////  .ForMember(dest => dest.TechnicianId, opt => opt.MapFrom(src => src.TechnicianId));
 
 
-
+            CreateMap<TechReverseRequest, TechReverseRequestDTO>()
+				.ForMember(dest => dest.ReverseRequestId, opt => opt.MapFrom(src => src.Id))
+				.ForMember(dest => dest.TechnicianId, opt => opt.MapFrom(src => src.TechnicianId))
+				.ForMember(dest => dest.TimeStamp, opt => opt.MapFrom(src => src.TimeStamp))
+				.ForMember(dest => dest.CarOwnerRequestId, opt => opt.MapFrom(src => src.EmergencyRequestId))
+				.ReverseMap();
 
 		}
 

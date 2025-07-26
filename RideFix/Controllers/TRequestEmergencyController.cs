@@ -120,7 +120,7 @@ namespace RideFix.Controllers
 
 				var requests = await serviceManager.technicianRequestEmergency.GetTechAllAppliedRequestsAsync(techId);
 				if (requests == null || !requests.Any())
-					return NotFound(ApiResponse<string>.FailResponse("No applied requests found for this technician"));
+					return BadRequest(ApiResponse<string>.FailResponse("No applied requests found for this technician"));
 
 				return Ok(ApiResponse<List<TechReverseRequestDTO>>.SuccessResponse(requests, "Applied requests found"));
 			}
