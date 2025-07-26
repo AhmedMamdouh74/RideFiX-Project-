@@ -8,6 +8,7 @@ using Domain.Contracts;
 using Service.CoreServices.TechniciansServices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 
 namespace Services
 {
@@ -21,13 +22,14 @@ namespace Services
         public IReviewService reviewService { get; }
         public ICarOwnerService carOwnerService { get; }
 
+        public IUserProfileService userProfileService { get; }
 
         public ServiceManager(IRequestServices requestServices,
                     ITechnicianService technicianService, 
                     ITechnicianRequestEmergency _tech,
                     ICategoryService categoryService,
                     IReviewService reviewService,
-                    ICarOwnerService carOwnerService)
+                    ICarOwnerService carOwnerService,IUserProfileService _userProfile)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -35,6 +37,7 @@ namespace Services
             this.categoryService = categoryService;
             this.carOwnerService = carOwnerService;
             this.reviewService = reviewService;
+            userProfileService = _userProfile;
         }
 
 

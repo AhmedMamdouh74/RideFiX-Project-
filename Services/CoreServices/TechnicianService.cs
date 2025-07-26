@@ -91,7 +91,7 @@ namespace Service.CoreServices
             var filteredTechnicians = await unitOfWork.GetRepository<Technician, int>()
                 .GetAllAsync(spec);
 
-            var mappedTechnicians = mapper.Map<IEnumerable<Technician>, IEnumerable<FilteredTechniciansDTO>>(filteredTechnicians).ToList();
+                var mappedTechnicians = mapper.Map<IEnumerable<Technician>, IEnumerable<FilteredTechniciansDTO>>(filteredTechnicians).ToList();
             if (mappedTechnicians.Count != 0)
                 return mappedTechnicians;
             else

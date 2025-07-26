@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Service.Exception_Implementation.ArgumantNullException;
+using Service.Specification_Implementation;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ReviewsDTOs;
 using System;
@@ -33,7 +34,9 @@ namespace Service.CoreServices
                 throw new ReviewNullException();
             }
 
-            var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(addReview.RequestId);
+            var spec = new EmergencyRequestTotalSpecification(addReview.RequestId);
+
+            var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
             var technician = await requestServices.EmergencyTechnicianID(emergencyRequest.Id);
             addReview.TechnicianId = technician.TechnicianID;
 

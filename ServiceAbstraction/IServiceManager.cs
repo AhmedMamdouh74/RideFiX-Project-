@@ -1,4 +1,5 @@
 ﻿using ServiceAbstraction.CoreServicesAbstractions;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace ServiceAbstraction
         IReviewService reviewService { get; }
 
         ICarOwnerService carOwnerService { get; }
+        IUserProfileService userProfileService { get; }
 
 
     }
