@@ -18,6 +18,9 @@ namespace SharedData.DTOs.TechnicianEmergencyRequestDTOs
         public string FaceImageUrl {  get; set; }
 
         // From EmergencyRequestTechnicians (technician-specific state)
-       public RequestState? RequestState { get; set; }
+        public RequestState? RequestState { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public DateTime? EndTimeStamp { get; set; }
+        public string Category {  get; set; }
     }
 }
