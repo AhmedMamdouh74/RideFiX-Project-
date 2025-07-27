@@ -149,7 +149,13 @@ namespace Service.CoreServices.TechniciansServices
             // 4. Technician is accepting
             if (dto.RequestState == RequestState.Answered)
             {
-                // Make sure no one else has accepted
+                // Check if technician already has 2 active accepted requests
+                var Answeredspec = new TechnicianActiveAnsweredRequestsSpec(dto.TechnicianId);
+                var activeRequests = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(Answeredspec);
+                if (activeRequests.Count() >= 2)
+                    return false;
+
+                // Make sure no one else has accepted this request
                 bool alreadyAccepted = request.EmergencyRequestTechnicians
                     .Any(e => e.CallStatus == RequestState.Answered);
                 if (alreadyAccepted) return false;
@@ -166,20 +172,18 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-               
                 request.EndTimeStamp = DateTime.UtcNow;
             }
             // 5. Technician is rejecting
             else if (dto.RequestState == RequestState.Rejected)
             {
                 targetLink.CallStatus = RequestState.Rejected;
-
-               
             }
 
             await unitOfWork.SaveChangesAsync();
             return true;
         }
+
 
 
 
