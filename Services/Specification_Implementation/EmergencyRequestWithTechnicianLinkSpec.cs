@@ -14,6 +14,7 @@ namespace Service.Specification_Implementation
         {
             AddInclude(req => req.EmergencyRequestTechnicians);
             AddInclude(req => req.category);
+            AddInclude(req => req.CarOwner);
             AddInclude(req => req.TechReverseRequests);
             AddInclude(req => req.CarOwner.ApplicationUser);
             

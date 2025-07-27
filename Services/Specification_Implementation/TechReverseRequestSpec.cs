@@ -12,12 +12,14 @@ namespace Service.Specification_Implementation
 		{
 			AddInclude(r => r.EmergencyRequest);
 			AddInclude(r => r.Technician);
+		
 		}
 		public TechReverseRequestSpec(int requestId, int techId) : base(r => (r.TechnicianId == techId) && (r.EmergencyRequestId == requestId))
 		{
 			AddInclude(r => r.EmergencyRequest);
 			AddInclude(r => r.Technician);
+        
 
-		}
+        }
 	}
 }
