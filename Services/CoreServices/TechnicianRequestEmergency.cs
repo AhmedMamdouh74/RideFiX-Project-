@@ -77,7 +77,18 @@ namespace Service.CoreServices.TechniciansServices
 
 		}
 
-		public async Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId)
+        public async Task<List<EmergencyRequestDetailsDTO>> GetAllCompletedRequestsAsync(int technicianId)
+        {
+            var spec = new EmergencyRequestWithTechnicianLinkSpec(technicianId, true);
+			var requests=unitOfWork.GetRepository<EmergencyRequest, int>();
+			var completedRequests= await requests.GetAllAsync(spec);
+			if (completedRequests == null || !completedRequests.Any()) return new List<EmergencyRequestDetailsDTO>();
+			var result = mapper.Map<List<EmergencyRequestDetailsDTO>>(completedRequests);
+			return result;
+
+        }
+
+        public async Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId)
 		{
 			var spec = new EmergencyRequestTechniciansAssignedToTechSpec(technicianId, RequestState.Waiting);
 
@@ -98,13 +109,12 @@ namespace Service.CoreServices.TechniciansServices
 				.GetRepository<EmergencyRequestTechnicians, int>()
 				.GetByIdAsync(spec);
 
-			if (joinEntry == null)
-			{
-				Console.WriteLine("join entry null");
-				return null;
-			}
 
-
+            if (joinEntry == null) {
+                Console.WriteLine("join entry null");
+                return new EmergencyRequestDetailsDTO();
+            }
+              
 
 			return mapper.Map<EmergencyRequestDetailsDTO>(joinEntry);
 		}
@@ -156,8 +166,7 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-                // Mark the request as completed
-                request.IsCompleted = true;
+               
                 request.EndTimeStamp = DateTime.UtcNow;
             }
             // 5. Technician is rejecting

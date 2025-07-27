@@ -11,6 +11,7 @@ namespace Service.Specification_Implementation
             ert.CallStatus == requestState)
         {
             AddInclude(ert => ert.EmergencyRequests);
+            AddInclude(ert => ert.EmergencyRequests.category);
             AddInclude(ert => ert.EmergencyRequests.CarOwner);
             AddInclude(ert => ert.EmergencyRequests.CarOwner.ApplicationUser);
         }

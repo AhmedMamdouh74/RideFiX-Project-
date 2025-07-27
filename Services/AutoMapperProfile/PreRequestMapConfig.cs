@@ -18,8 +18,10 @@ namespace Service.AutoMapperProfile
 
             CreateMap<EmergencyRequest, EmergencyRequestDetailsDTO>()
              .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Id))
+             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.category.Name))
              .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.CarOwner.ApplicationUser.Name))
              .ForMember(dest => dest.FaceImageUrl, opt => opt.MapFrom(src => src.CarOwner.ApplicationUser.FaceImageUrl))
+             
              .ForMember(dest => dest.RequestState, opt => opt.MapFrom((src, dest, destMember, context) =>
              {
                  // Resolve technicianId from context.Items
