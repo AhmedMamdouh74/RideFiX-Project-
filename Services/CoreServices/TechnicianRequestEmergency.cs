@@ -109,14 +109,24 @@ namespace Service.CoreServices.TechniciansServices
 				.GetRepository<EmergencyRequestTechnicians, int>()
 				.GetByIdAsync(spec);
 
+
             if (joinEntry == null) {
                 Console.WriteLine("join entry null");
                 return new EmergencyRequestDetailsDTO();
             }
-               
-            
+              
 
 			return mapper.Map<EmergencyRequestDetailsDTO>(joinEntry);
+		}
+		public async Task<List<TechReverseRequestDTO>> GetTechAllAppliedRequestsAsync(int techId)
+		{
+			var repo = unitOfWork.GetRepository<TechReverseRequest, int>();
+			var spec = new TechReverseRequestSpec(techId);
+			var techRequests = await repo.GetAllAsync(spec);
+			if (techRequests == null || !techRequests.Any())
+				return null;
+			else
+				return mapper.Map<List<TechReverseRequestDTO>>(techRequests);
 		}
 
         public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergencyRequestDTO dto)
@@ -156,8 +166,7 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-                // Mark the request as completed
-                request.IsCompleted = true;
+               
                 request.EndTimeStamp = DateTime.UtcNow;
             }
             // 5. Technician is rejecting

@@ -5,16 +5,16 @@ using SharedData.DTOs.TechnicianEmergencyRequestDTOs;
 
 namespace Service.AutoMapperProfile
 {
-    public class PreRequestMapConfig : Profile
-    {
-        public PreRequestMapConfig()
-        {
+	public class PreRequestMapConfig : Profile
+	{
+		public PreRequestMapConfig()
+		{
 
-            CreateMap<CreatePreRequestDTO, EmergencyRequest>().ReverseMap();
+			CreateMap<CreatePreRequestDTO, EmergencyRequest>().ReverseMap();
 
 
-            //CreateMap<CreatePreRequestDTO, EmergencyRequest>()
-            //    .ForMember(des => des.CarOwner.ApplicationUser.PIN, opt => opt.MapFrom(src => src.PIN));
+			//CreateMap<CreatePreRequestDTO, EmergencyRequest>()
+			//    .ForMember(des => des.CarOwner.ApplicationUser.PIN, opt => opt.MapFrom(src => src.PIN));
 
             CreateMap<EmergencyRequest, EmergencyRequestDetailsDTO>()
              .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Id))
@@ -56,10 +56,15 @@ namespace Service.AutoMapperProfile
             ////  .ForMember(dest => dest.TechnicianId, opt => opt.MapFrom(src => src.TechnicianId));
 
 
+            CreateMap<TechReverseRequest, TechReverseRequestDTO>()
+				.ForMember(dest => dest.ReverseRequestId, opt => opt.MapFrom(src => src.Id))
+				.ForMember(dest => dest.TechnicianId, opt => opt.MapFrom(src => src.TechnicianId))
+				.ForMember(dest => dest.TimeStamp, opt => opt.MapFrom(src => src.TimeStamp))
+				.ForMember(dest => dest.CarOwnerRequestId, opt => opt.MapFrom(src => src.EmergencyRequestId))
+				.ReverseMap();
+
+		}
 
 
-        }
-
-
-    }
+	}
 }
