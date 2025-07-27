@@ -77,9 +77,15 @@ namespace Service.CoreServices.TechniciansServices
 
 		}
 
-        public Task<List<EmergencyRequestDetailsDTO>> GetAllCompletedRequests(int technicianId)
+        public async Task<List<EmergencyRequestDetailsDTO>> GetAllCompletedRequestsAsync(int technicianId)
         {
-            throw new NotImplementedException();
+            var spec = new EmergencyRequestWithTechnicianLinkSpec(technicianId, true);
+			var requests=unitOfWork.GetRepository<EmergencyRequest, int>();
+			var completedRequests= await requests.GetAllAsync(spec);
+			if (completedRequests == null || !completedRequests.Any()) return new List<EmergencyRequestDetailsDTO>();
+			var result = mapper.Map<List<EmergencyRequestDetailsDTO>>(completedRequests);
+			return result;
+
         }
 
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId)
@@ -105,7 +111,7 @@ namespace Service.CoreServices.TechniciansServices
 
             if (joinEntry == null) {
                 Console.WriteLine("join entry null");
-                return null;
+                return new EmergencyRequestDetailsDTO();
             }
                
             

@@ -107,6 +107,18 @@ namespace RideFix.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Added successfully"));
         }
+        [HttpGet("completed/{technicianId}")]
+        [EndpointSummary("get completed requests for history")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse<EmergencyRequestDetailsDTO>))]
+        [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
+
+        public async Task<IActionResult> GetAllCompletedRequests(int technicianId)
+        {
+         var result=await   serviceManager.technicianRequestEmergency.GetAllCompletedRequests(technicianId);
+            if(result==null|| result.Count()==0)
+                return NotFound(ApiResponse<string>.FailResponse("you don't have completed requests"));
+            return Ok(ApiResponse<List<EmergencyRequestDetailsDTO>>.SuccessResponse(result, "technician have Completed requests"));
+        }
 
     }
 }
