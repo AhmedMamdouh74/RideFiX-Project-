@@ -116,41 +116,11 @@ namespace RideFix.Controllers
 
         public async Task<IActionResult> GetAllCompletedRequests(int technicianId)
         {
-         var result=await   serviceManager.technicianRequestEmergency.GetAllCompletedRequests(technicianId);
+         var result=await   serviceManager.technicianRequestEmergency.GetAllCompletedRequestsAsync(technicianId);
             if(result==null|| result.Count()==0)
                 return NotFound(ApiResponse<string>.FailResponse("you don't have completed requests"));
             return Ok(ApiResponse<List<EmergencyRequestDetailsDTO>>.SuccessResponse(result, "technician have Completed requests"));
         }
-
-    }
-
-		
-		}
-		[HttpPut]
-		[EndpointSummary("Accept or Reject Emergency Request By Technician")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400, Type = typeof(ApiResponse<string>))]
-		public async Task<IActionResult> UpdateRequestFromCarOwnerAsync([FromBody] TechnicianUpdateEmergencyRequestDTO dto)
-		{
-			var result = await serviceManager.technicianRequestEmergency.UpdateRequestFromCarOwnerAsync(dto);
-			if (!result)
-				return BadRequest(ApiResponse<string>.FailResponse("Invalid technician, PIN, or request"));
-
-			return Ok(ApiResponse<string>.SuccessResponse("", "Updated successfully"));
-		}
-
-		[HttpPost]
-		[EndpointSummary("Apply request from technical home page")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400, Type = typeof(ApiResponse<string>))]
-		public async Task<IActionResult> ApplyRequestFromHomePage([FromBody] TechnicianApplyEmergencyRequestDTO dto)
-		{
-			var result = await serviceManager.technicianRequestEmergency.ApplyRequestFromHomePage(dto);
-			if (!result)
-				return BadRequest(ApiResponse<string>.FailResponse("Invalid technician, PIN, or request"));
-
-			return Ok(ApiResponse<bool>.SuccessResponse(true, "Added successfully"));
-		}
 
 		[HttpGet("applied/{techId}")]
 		[EndpointSummary("Get all applied requests by technician")]
