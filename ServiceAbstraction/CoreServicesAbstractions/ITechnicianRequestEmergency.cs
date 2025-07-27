@@ -11,6 +11,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions
         Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergencyRequestDTO emergencyRequestDTO); // accept or reject
         Task<bool> ApplyRequestFromHomePage(TechnicianApplyEmergencyRequestDTO emergencyRequestDTO);
         Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId);
+        Task<List<EmergencyRequestDetailsDTO>> GetAllCompletedRequests(int technicianId);
 
 
 

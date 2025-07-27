@@ -77,7 +77,12 @@ namespace Service.CoreServices.TechniciansServices
 
 		}
 
-		public async Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId)
+        public Task<List<EmergencyRequestDetailsDTO>> GetAllCompletedRequests(int technicianId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<EmergencyRequestDetailsDTO>> GetAllRequestsAssignedToTechnicianAsync(int technicianId)
 		{
 			var spec = new EmergencyRequestTechniciansAssignedToTechSpec(technicianId, RequestState.Waiting);
 
