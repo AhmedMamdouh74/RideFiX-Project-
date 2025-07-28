@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
@@ -56,6 +57,13 @@ namespace RideFix.Controllers
 
             return Ok(new { token });
         }
+        [HttpGet("check-email")]
+        public async Task<IActionResult> CheckEmailExists(string email)
+        {
+            var isEmailExists = await _authService.CheckEmailExists(email);
+            return Ok(isEmailExists);
+        } 
+
         [HttpGet("technicianDetails/{technicianId}")]
         public async Task<IActionResult> GetTechnicianDetailsAsync(int technicianId)
         {
