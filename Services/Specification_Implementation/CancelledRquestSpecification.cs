@@ -13,7 +13,7 @@ namespace Service.Specification_Implementation
     {
         public CancelledRquestSpecification(int CarOwnerID) : base(e => e.EmergencyRequests.CarOwnerId == CarOwnerID)
         {
-            AddInclude(e => e.EmergencyRequests);           
+            AddInclude(e => e.EmergencyRequests);    
         }
     }
 }

@@ -108,6 +108,8 @@ namespace RideFix
             });
             #endregion
 
+            
+
 
             var app = builder.Build();
             app.UseCors("AllowAll");

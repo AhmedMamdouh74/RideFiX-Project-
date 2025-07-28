@@ -9,6 +9,7 @@ namespace SharedData.DTOs.RequestsDTOs
 {
     public class RealRequestDTO
     {
+        
         public HashSet<int> TechnicianIDs { get; set; }
         public string Description { get; set; }
         public HashSet<string>? ImageUrl { get; set; }

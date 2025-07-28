@@ -1,4 +1,5 @@
 ﻿using RideFix.ErrorModels;
+using Service.Exception_Implementation.AlreadyFound;
 
 namespace RideFix.CustomMiddlewares
 {
@@ -36,6 +37,10 @@ namespace RideFix.CustomMiddlewares
                 case Domain.Exceptions.BadRequestException badRequestException:
                     _logger.LogError(ex, "BadRequest Exception: {Message}", ex.Message);
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    break;
+                case RequestAlreadyFoundException alreadyFoundException:
+                    _logger.LogError(ex, "Request Already Found Exception: {Message}", ex.Message);
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
                     break;
                 default:
                     _logger.LogError(ex, "An unexpected error occurred: {Message}", ex.Message);
