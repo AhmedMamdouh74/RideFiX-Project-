@@ -27,7 +27,7 @@ namespace Service.CoreServices.Account
         public string generateToken(ApplicationUser user, IList<string> roles  ,int roleEntityId)
         {
             var claims = new List<Claim>() {
-
+                new Claim("userId" , user.Id),
                new Claim("Id", roleEntityId.ToString()),
                 new Claim("Email" , user.Email) , 
                 new Claim ("Name" , user.Name) ,
