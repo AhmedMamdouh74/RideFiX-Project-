@@ -11,9 +11,6 @@
     <ProjectReference Include="..\ServiceAbstraction\ServiceAbstraction.csproj" />
     <ProjectReference Include="..\Services\Service.csproj" />
 
-	  
-	  <ProjectReference Include="..\Services\Service.csproj" />
-
   </ItemGroup>
 
   <ItemGroup>

@@ -13,6 +13,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Account
         Task<IdentityResult> RegisterStep1Async(RegisterStep1Dto dto);
         Task<IdentityResult> RegisterStep2Async(RegisterStep2Dto dto);
         Task<string> LoginAsync(LoginDto dto);
+        Task<bool>CheckEmailExists(string email);
 
     }
 }
