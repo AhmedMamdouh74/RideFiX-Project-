@@ -162,7 +162,7 @@ namespace Service.CoreServices.TechniciansServices
             // 3. Find link between this technician and the request
             var targetLink = request.EmergencyRequestTechnicians
                 .FirstOrDefault(e => e.TechnicianId == dto.TechnicianId);
-            if (targetLink == null) 
+            if (targetLink == null) return false;
 
             // 4. Technician is accepting
             if (dto.RequestState == RequestState.Answered)
@@ -190,7 +190,7 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-                request.EndTimeStamp = DateTime.UtcNow;
+               
             }
             // 5. Technician is rejecting
             else if (dto.RequestState == RequestState.Rejected)
