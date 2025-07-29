@@ -9,7 +9,6 @@ namespace Presentation.Hubs
 {
     public class ChatHub : Hub
     {
-        private Dictionary<string,string> keyValuePairs = new Dictionary<string,string>();
         public ChatHub() 
         {
 
