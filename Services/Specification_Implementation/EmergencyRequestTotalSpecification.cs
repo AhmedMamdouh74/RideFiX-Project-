@@ -14,12 +14,8 @@ namespace Service.Specification_Implementation
         public EmergencyRequestTotalSpecification(int id) : base(
             e => e.Id == id)
         {
-            AddInclude(e => e.EmergencyRequestTechnicians);
-            AddInclude(e => e.TechReverseRequests);
-            AddInclude(e => e.category);
-            AddInclude(e => e.CarOwner);
+
             AddInclude(e => e.Technician);
-            AddInclude(e => e.CarOwner.ApplicationUser);
 
         }
     }

@@ -8,6 +8,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,12 @@ namespace Service.CoreServices.Account
             this._jwtService = jwtService;
             _unitOfWork = unitOfWork;
 
+        }
+
+        public async Task<bool> CheckEmailExists(string email)
+        {
+            var Email = await _userManager.FindByEmailAsync(email);
+            return (Email != null);
         }
 
         public async Task<string> LoginAsync(LoginDto dto )
@@ -154,6 +161,7 @@ namespace Service.CoreServices.Account
                     Description = "Face doesn't match ID image."
                 });
             }
+
             var user = _mapper.Map<ApplicationUser>(step1Dto);
             user.IdentityImageUrl = identityImageUrl;
             user.FaceImageUrl = faceImageUrl;
@@ -176,9 +184,21 @@ namespace Service.CoreServices.Account
             {
                 await _userManager.AddToRoleAsync(user, Roles.Technician);
 
+                //TimeOnly? start = null, end = null;
+
+                //if (TimeOnly.TryParse(step1Dto.StartWorking, out var s))
+                //    start = s;
+
+                //if (TimeOnly.TryParse(step1Dto.EndWorking, out var e))
+                //    end = e;
+
+
                 var tech = new Technician
                 {
+
                     ApplicationUserId = user.Id,
+                    //StartWorking = start ?? default,
+                    //EndWorking = end ?? default,
                     StartWorking = step1Dto.StartWorking.Value,
                     EndWorking = step1Dto.EndWorking.Value,
                     Description = step1Dto.Description
