@@ -1,4 +1,4 @@
-
+﻿
 using System.Text;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +20,9 @@ using Presistence;
 using Presistence.Data;
 using RideFix.CustomMiddlewares;
 using Services;
+using Domain.Entities.CoreEntites.EmergencyEntities;
+using SharedData.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace RideFix
 {
@@ -132,6 +135,27 @@ namespace RideFix
 
 
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                var insertSql = @"
+        INSERT INTO TechnicianCategory (TechnicianId, TCategoryId)
+        SELECT number, 1
+        FROM master.dbo.spt_values
+        WHERE type = 'P' AND number BETWEEN 1 AND 50
+        AND NOT EXISTS (
+            SELECT 1 FROM TechnicianCategory
+            WHERE TechnicianId = number AND TCategoryId = 1
+        )";
+
+                await db.Database.ExecuteSqlRawAsync(insertSql);
+            }
+
+
+
+
 
             app.Run();
         }
