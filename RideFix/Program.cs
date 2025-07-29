@@ -23,6 +23,7 @@ using Services;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using SharedData.Enums;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Hubs;
 
 namespace RideFix
 {
@@ -41,7 +42,8 @@ namespace RideFix
                     {
                         policy.AllowAnyOrigin()
                               .AllowAnyMethod()
-                              .AllowAnyHeader();
+                              .AllowAnyHeader()
+                              .SetIsOriginAllowed(origin => true);
                     });
             });
 
@@ -49,6 +51,10 @@ namespace RideFix
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            builder.Services.AddSignalR(); // Add SignalR services
+
 
             #region Services Configurations
             builder.Services.AddPresistenceConfig(builder.Configuration); // Custom extension method to add persistence layer configurations
@@ -116,6 +122,11 @@ namespace RideFix
 
             var app = builder.Build();
             app.UseCors("AllowAll");
+
+            //notification hub configuration
+            app.MapHub<NotificationHub>("/notificationhub");
+            app.MapHub<ChatHub>("/chathub");
+
 
 
             #region Exception Handler Middleware Configuration
