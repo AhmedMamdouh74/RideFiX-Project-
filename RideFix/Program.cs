@@ -159,21 +159,59 @@ namespace RideFix
 
             using (var scope = app.Services.CreateScope())
             {
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var insertSql = @"
-        INSERT INTO TechnicianCategory (TechnicianId, TCategoryId)
-        SELECT number, 1
-        FROM master.dbo.spt_values
-        WHERE type = 'P' AND number BETWEEN 1 AND 50
-        AND NOT EXISTS (
-            SELECT 1 FROM TechnicianCategory
-            WHERE TechnicianId = number AND TCategoryId = 1
-        )";
+                // بيانات الفنيين مع الـ ApplicationId
+                var technicians = new List<(int TechnicianId, Guid ApplicationId)>
+    {
+        (3, Guid.Parse("24179d1b-4f50-482b-b383-9ac5e80cf0fd")),
+        (7, Guid.Parse("23ea8c83-56ca-4156-877e-a22650d9a966")),
+        (9, Guid.Parse("245246d4-9521-4d8d-9c42-c41349a7a035")),
+        (6, Guid.Parse("5f685ed9-38af-4705-802c-6266caf3155f"))
+    };
 
-                await db.Database.ExecuteSqlRawAsync(insertSql);
+                var carOwnerId = 1;
+                var carOwnerAppId = Guid.Parse("28f9a14d-f846-427e-836f-760c87577cc7");
+
+                foreach (var tech in technicians)
+                {
+                    var start = DateTime.UtcNow.AddMinutes(-15);
+                    var end = start.AddMinutes(5);
+
+                    var session = new ChatSession
+                    {
+                        StartAt = start,
+                        EndAt = end,
+                        IsClosed = true,
+                        CarOwnerId = carOwnerId,
+                        TechnicianId = tech.TechnicianId
+                    };
+
+                    context.chatSessions.Add(session);
+                    await context.SaveChangesAsync();
+
+                    var message1 = new Message
+                    {
+                        Text = $"مساء الخير، محتاجة حد يشوف العربية ضروري 🌟",
+                        SentAt = start.AddMinutes(1),
+                        IsSeen = true,
+                        ChatSessionId = session.Id,
+                        ApplicationId = carOwnerAppId.ToString()
+                    };
+
+                    var message2 = new Message
+                    {
+                        Text = $"أنا تحت أمرك يا فندم، فين مكانك؟",
+                        SentAt = start.AddMinutes(2),
+                        IsSeen = true,
+                        ChatSessionId = session.Id,
+                        ApplicationId = tech.ApplicationId.ToString()
+                    };
+
+                    context.messages.AddRange(message1, message2);
+                    await context.SaveChangesAsync();
+                }
             }
-
 
 
 

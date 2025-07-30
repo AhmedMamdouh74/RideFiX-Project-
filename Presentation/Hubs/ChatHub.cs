@@ -14,18 +14,21 @@ namespace Presentation.Hubs
         {
 
         }
+        
 
         // user go in room
         public async Task JoinRoom(string roomId)
         {
-            if (!UserRoom.ContainsKey(Context.ConnectionId))
+            if (UserRoom.TryGetValue(Context.ConnectionId, out var oldRoom))
             {
-                UserRoom.Add(Context.ConnectionId, roomId);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, oldRoom);
+                UserRoom[Context.ConnectionId] = roomId;
             }
             else
             {
-                UserRoom[Context.ConnectionId] = roomId;
+                UserRoom.Add(Context.ConnectionId, roomId);
             }
+
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
         // send massage 
