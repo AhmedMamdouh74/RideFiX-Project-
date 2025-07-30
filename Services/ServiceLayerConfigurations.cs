@@ -37,9 +37,10 @@ namespace Services
             Services.AddScoped<IReviewService, ReviewService>();
             Services.AddScoped<IUserProfileService, UserProfileService>();
             Services.AddAutoMapper(typeof(UserProfileMapConfig));
-
             Services.AddAutoMapper(typeof(PreRequestMapConfig));
             Services.AddScoped<ICarOwnerService, CarOwnerService>();
+            Services.AddScoped<IMessegeService, MessegeService>();
+            Services.AddScoped<IChatService, ChatService>();
             return Services;
         }
     }

@@ -24,12 +24,16 @@ namespace Services
 
         public IUserProfileService userProfileService { get; }
 
+        public IChatService ChatService { get; }
+
+        public IMessegeService messegeService { get; }
+
         public ServiceManager(IRequestServices requestServices,
-                    ITechnicianService technicianService, 
+                    ITechnicianService technicianService,
                     ITechnicianRequestEmergency _tech,
                     ICategoryService categoryService,
                     IReviewService reviewService,
-                    ICarOwnerService carOwnerService,IUserProfileService _userProfile)
+                    ICarOwnerService carOwnerService, IUserProfileService _userProfile, IChatService chatservice, IMessegeService messegeService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -38,9 +42,8 @@ namespace Services
             this.carOwnerService = carOwnerService;
             this.reviewService = reviewService;
             userProfileService = _userProfile;
+            this.ChatService = chatservice;
+            this.messegeService = messegeService;
         }
-
-
-
     }
 }
