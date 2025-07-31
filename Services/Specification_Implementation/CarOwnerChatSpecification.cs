@@ -15,6 +15,7 @@ namespace Service.Specification_Implementation
         {
             AddInclude(s => s.CarOwner);
             AddInclude(s => s.massages);
+            AddInclude(s => s.CarOwner.ApplicationUser);
         }
     }
 }

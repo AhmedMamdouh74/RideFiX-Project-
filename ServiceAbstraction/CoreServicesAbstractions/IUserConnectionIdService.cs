@@ -11,11 +11,11 @@ namespace ServiceAbstraction.CoreServicesAbstractions
     public interface IUserConnectionIdService
     {
         Task AddAsync(UserConnectionIdDto dto);
-        Task<UserConnectionIdDto?> GetByIdsAsync(UserConnectionIdDto keyDto);
-        Task<UserConnectionIdDto?> GetBySpecIdAsync(IUserConnectionIdsSpecification spec);
+
         Task DeleteAsync(UserConnectionIdDto keyDto);
-        Task<IEnumerable<UserConnectionIdDto>> GetAllAsync();
-        Task<IEnumerable<UserConnectionIdDto>> GetAllAsync(IUserConnectionIdsSpecification spec);
-        Task UpdateAsync(UserConnectionIdDto dto);
+
+        public  Task<List<UserConnectionIdDto>> SearchByTechnichanId(int EntityId);
+        public Task<List<UserConnectionIdDto>> SearchByCarOwnerId(int EntityId);
+
     }
 }

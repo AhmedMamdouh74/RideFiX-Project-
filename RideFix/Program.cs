@@ -37,15 +37,17 @@ namespace RideFix
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
+                options.AddPolicy("AllowAngularOrigin",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://localhost:4200")  // السماح فقط لواجهة Angular
                               .AllowAnyMethod()
                               .AllowAnyHeader()
-                              .SetIsOriginAllowed(origin => true);
+                              .AllowCredentials();  // السماح بالـ credentials (مثل الكوكيز أو التوكنات)
                     });
             });
+
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -61,6 +63,7 @@ namespace RideFix
             builder.Services.AddServiceConfig();// Custom extension method to add service layer configurations
             #endregion
 
+            #region Authentication And Security
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
@@ -79,22 +82,82 @@ namespace RideFix
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(options =>
-                            {
-                                var config = builder.Configuration;
-                                options.TokenValidationParameters = new TokenValidationParameters
-                                {
-                                    ValidateIssuer = true,
-                                    ValidateAudience = true,
-                                    ValidateLifetime = true,
-                                    ValidateIssuerSigningKey = true,
-                                    ValidIssuer = config["JWT:Issuer"],
-                                    ValidAudience = config["JWT:Audience"],
-                                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
-                                };
-                            });
+            });
+                //.AddJwtBearer(options =>
+                //            {
+                //                var config = builder.Configuration;
+                //                options.TokenValidationParameters = new TokenValidationParameters
+                //                {
+                //                    ValidateIssuer = true,
+                //                    ValidateAudience = true,
+                //                    ValidateLifetime = true,
+                //                    ValidateIssuerSigningKey = true,
+                //                    ValidIssuer = config["JWT:Issuer"],
+                //                    ValidAudience = config["JWT:Audience"],
+                //                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+                //                };
+                //            });
 
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+            .AddJwtBearer(options =>
+            {
+                var config = builder.Configuration;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = config["JWT:Issuer"],
+                    ValidAudience = config["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            statusCode = 401,
+                            message = "Unauthorized: Token is missing or invalid"
+                        });
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            statusCode = 403,
+                            message = "Forbidden: You are not allowed to access this resource"
+                        });
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/requestWatchDogHub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+
+            });
+            #endregion
 
             #region Invalid Model State Response Factory Configuration
             builder.Services.Configure<ApiBehaviorOptions>(ApiBehaviorOptions =>
@@ -117,15 +180,19 @@ namespace RideFix
             });
             #endregion
 
-            
+
 
 
             var app = builder.Build();
-            app.UseCors("AllowAll");
+            app.UseCors("AllowAngularOrigin");
+
 
             //notification hub configuration
+            // التسجيل الصحيح للـ Hub
             app.MapHub<NotificationHub>("/notificationhub");
             app.MapHub<ChatHub>("/chathub");
+            app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
+
 
 
 
@@ -147,74 +214,14 @@ namespace RideFix
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
-         //   }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-                // بيانات الفنيين مع الـ ApplicationId
-                var technicians = new List<(int TechnicianId, Guid ApplicationId)>
-    {
-        (3, Guid.Parse("24179d1b-4f50-482b-b383-9ac5e80cf0fd")),
-        (7, Guid.Parse("23ea8c83-56ca-4156-877e-a22650d9a966")),
-        (9, Guid.Parse("245246d4-9521-4d8d-9c42-c41349a7a035")),
-        (6, Guid.Parse("5f685ed9-38af-4705-802c-6266caf3155f"))
-    };
-
-                var carOwnerId = 1;
-                var carOwnerAppId = Guid.Parse("28f9a14d-f846-427e-836f-760c87577cc7");
-
-                foreach (var tech in technicians)
-                {
-                    var start = DateTime.UtcNow.AddMinutes(-15);
-                    var end = start.AddMinutes(5);
-
-                    var session = new ChatSession
-                    {
-                        StartAt = start,
-                        EndAt = end,
-                        IsClosed = true,
-                        CarOwnerId = carOwnerId,
-                        TechnicianId = tech.TechnicianId
-                    };
-
-                    context.chatSessions.Add(session);
-                    await context.SaveChangesAsync();
-
-                    var message1 = new Message
-                    {
-                        Text = $"مساء الخير، محتاجة حد يشوف العربية ضروري 🌟",
-                        SentAt = start.AddMinutes(1),
-                        IsSeen = true,
-                        ChatSessionId = session.Id,
-                        ApplicationId = carOwnerAppId.ToString()
-                    };
-
-                    var message2 = new Message
-                    {
-                        Text = $"أنا تحت أمرك يا فندم، فين مكانك؟",
-                        SentAt = start.AddMinutes(2),
-                        IsSeen = true,
-                        ChatSessionId = session.Id,
-                        ApplicationId = tech.ApplicationId.ToString()
-                    };
-
-                    context.messages.AddRange(message1, message2);
-                    await context.SaveChangesAsync();
-                }
-            }
-
-
-
 
             app.Run();
         }
