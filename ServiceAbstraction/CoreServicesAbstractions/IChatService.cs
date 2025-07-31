@@ -9,6 +9,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
 {
     public interface IChatService
     {
-        //public Task<List<ChatBreifDTO>> GetAllChatsAsync(string userId);
+        public Task<List<ChatBreifDTO>> GetAllChatsAsync();
     }
 }

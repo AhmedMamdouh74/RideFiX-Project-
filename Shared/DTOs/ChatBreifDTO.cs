@@ -11,7 +11,7 @@ namespace SharedData.DTOs
         public string lastmessage { get; set; }
         public string name { get; set; }
         public string imgurl { get; set; }
-        public int chatsessionid { get; set; }
+        public int? chatsessionid { get; set; }
 
     }
 }
