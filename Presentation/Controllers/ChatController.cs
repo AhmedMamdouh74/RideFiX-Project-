@@ -31,7 +31,7 @@ namespace Presentation.Controllers
         public IActionResult GetAllChhat()
         {
             var chats = serviceManager.ChatService.GetAllChatsAsync();
-            if (chats == null || !chats.Result.Any())
+            if (chats == null || chats.Result == null)
             {
                 return NotFound();
             }

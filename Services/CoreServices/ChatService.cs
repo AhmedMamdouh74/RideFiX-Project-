@@ -47,7 +47,13 @@ namespace Service.CoreServices
             // Determine if the user is a Car Owner or Technician
             var userRole = user.User.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
             var ApplicationUser = user.User.Claims.FirstOrDefault(s => s.Type == "userId")?.Value;
-            var entityId = int.Parse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value);
+            int entityId;
+            bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
+            if (!isValid)
+            {
+                return null;
+            }
+
             if (string.IsNullOrEmpty(userRole))
             {
                 throw new UnauthorizedAccessException("User role is not specified.");
