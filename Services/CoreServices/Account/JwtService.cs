@@ -24,7 +24,7 @@ namespace Service.CoreServices.Account
         {
             this._configuration = configuration;
         }
-        public string generateToken(ApplicationUser user, IList<string> roles  ,int roleEntityId)
+        public string generateToken( JwtTokenDto user, IList<string> roles  ,int roleEntityId)
         {
             var claims = new List<Claim>() {
                 new Claim("userId" , user.Id),
