@@ -13,7 +13,8 @@ namespace Domain.Contracts
     {
         IGenericRepository<T, TK> GetRepository<T, TK>() where T : BaseEntity<TK>;
         IEmergencyRequestReposatory EmergencyRequestRepository { get; }
-
+        
+        IConnectionIdsRepository ConnectionIdsRepository { get; }
         public Task<int> SaveChangesAsync();
     }
 }

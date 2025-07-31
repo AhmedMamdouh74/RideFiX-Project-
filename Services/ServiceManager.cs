@@ -14,6 +14,7 @@ namespace Services
 {
     public class ServiceManager : IServiceManager
     {
+        #region services abstraction
         public IRequestServices requestServices { get; }
         public ITechnicianService technicianService { get; }
 
@@ -27,13 +28,21 @@ namespace Services
         public IChatService ChatService { get; }
 
         public IMessegeService messegeService { get; }
+        public IUserConnectionIdService userConnectionIdService { get; }
 
-        public ServiceManager(IRequestServices requestServices,
+        #endregion
+
+        public ServiceManager(
+                    IRequestServices requestServices,
                     ITechnicianService technicianService,
                     ITechnicianRequestEmergency _tech,
                     ICategoryService categoryService,
                     IReviewService reviewService,
-                    ICarOwnerService carOwnerService, IUserProfileService _userProfile, IChatService chatservice, IMessegeService messegeService)
+                    ICarOwnerService carOwnerService,
+                    IUserProfileService _userProfile,
+                    IChatService chatservice,
+                    IMessegeService messegeService,
+                    IUserConnectionIdService userConnectionIdService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -41,9 +50,10 @@ namespace Services
             this.categoryService = categoryService;
             this.carOwnerService = carOwnerService;
             this.reviewService = reviewService;
-            userProfileService = _userProfile;
+            this.userProfileService = _userProfile;
             this.ChatService = chatservice;
             this.messegeService = messegeService;
+            this.userConnectionIdService = userConnectionIdService;
         }
     }
 }
