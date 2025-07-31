@@ -11,11 +11,20 @@ namespace Service.Specification_Implementation
 {
     public class CarOwnerChatSpecification : Specification<ChatSession, int>
     {
-        public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid)
+        public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid )
         {
             AddInclude(s => s.CarOwner);
-            AddInclude(s => s.massages);
+            AddInclude(s => s.massages );
             AddInclude(s => s.CarOwner.ApplicationUser);
+
+
+            
+        }
+        public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)
+        {
+            return query
+                .OrderByDescending(s => s.StartAt)
+                .ThenByDescending(s => s.massages.Max(m => m.SentAt));
         }
     }
 }

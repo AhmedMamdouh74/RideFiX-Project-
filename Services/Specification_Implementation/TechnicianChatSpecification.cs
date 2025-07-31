@@ -15,7 +15,14 @@ namespace Service.Specification_Implementation
         {
             AddInclude(t => t.Technician);
             AddInclude(t => t.massages);
-            AddInclude(s => s.Technician.ApplicationUser);
+            AddInclude(s => s.CarOwner.ApplicationUser);
+
+        }
+        public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)
+        {
+            return query
+                .OrderByDescending(s => s.StartAt)
+                .ThenByDescending(s => s.massages.Max(m => m.SentAt));
         }
 
     }
