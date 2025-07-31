@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using SharedData.DTOs.Account;
+using SharedData.Wrapper;
 
 namespace RideFix.Controllers
 {
@@ -12,10 +14,12 @@ namespace RideFix.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IServiceManager serviceManager;
 
-        public AccountController(IAuthService authService)
+        public AccountController(IAuthService authService, IServiceManager _serviceManager)
         {
             this._authService = authService;
+            serviceManager = _serviceManager;
         }
         [HttpPost("register-step1")]
 
@@ -60,6 +64,14 @@ namespace RideFix.Controllers
             return Ok(isEmailExists);
         } 
 
+        [HttpGet("technicianDetails/{technicianId}")]
+        public async Task<IActionResult> GetTechnicianDetailsAsync(int technicianId)
+        {
+            var request = await serviceManager.userProfileService.GetTechnicianDetailsAsync(technicianId);
+            if (request == null)
+                return NotFound(ApiResponse<string>.FailResponse("Request details not found for this technician and request"));
+            return Ok(ApiResponse<ReadUserDetailsDTO>.SuccessResponse(request, "User details"));
+        }
 
 
     }

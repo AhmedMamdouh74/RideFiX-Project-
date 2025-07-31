@@ -28,6 +28,11 @@ namespace Presistence.Data.Configurations
                    .WithMany(r=>r.reviews)
                    .HasForeignKey(r => r.TechnicianId)
                    .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(r => r.EmergencyRequest)
+                     .WithOne(er => er.Review)
+                     .HasForeignKey<Review>(r => r.EmergencyRequestId)
+                     .OnDelete(DeleteBehavior.NoAction)
+                     .IsRequired(false);
         }
 
     }

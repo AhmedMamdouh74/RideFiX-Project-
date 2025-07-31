@@ -16,6 +16,7 @@ namespace Service.Specification_Implementation
                 ert.TechnicianId == technicianId)
         {
             AddInclude(ert => ert.EmergencyRequests);
+            AddInclude(ert => ert.EmergencyRequests.category);
             AddInclude(ert => ert.EmergencyRequests.CarOwner);
             AddInclude(ert => ert.EmergencyRequests.CarOwner.ApplicationUser);
         }

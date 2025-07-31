@@ -15,6 +15,9 @@ namespace Service.Specification_Implementation
         {
             AddInclude(x => x.EmergencyRequestTechnicians);
             AddInclude(x => x.TechReverseRequests);
+            AddInclude(x => x.category);
+            AddInclude(x => x.Technician);
+            AddInclude(x => x.Technician.ApplicationUser);
         }
     }
 }

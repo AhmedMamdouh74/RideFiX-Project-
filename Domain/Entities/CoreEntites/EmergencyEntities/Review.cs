@@ -17,6 +17,11 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public int CarOwnerId { get; set; }
         public CarOwner CarOwner { get; set; }
 
+        public EmergencyRequest EmergencyRequest { get; set; }
+        [ForeignKey("EmergencyRequest")]
+        public int? EmergencyRequestId { get; set; }
+
+
 
         [ForeignKey("Technician")]
         public int TechnicianId { get; set; }

@@ -25,27 +25,35 @@ namespace Service.CoreServices
             mapper = _mapper;
         }
 
-        public async Task<int> IsRequested(int Id)
+        public async Task<RequestBreifDTO> IsRequested(int Id)
         {
-            var Repo = unitOfWork.GetRepository<EmergencyRequest,int>();
+            var Repo = unitOfWork.GetRepository<EmergencyRequest, int>();
             var spec = new NotCompletedRequestSpecification(Id);
             var notCompletedRequests = await Repo.GetAllAsync(spec);
             if (notCompletedRequests.Any())
             {
                 foreach (var request in notCompletedRequests)
                 {
-                    foreach (var tech in request.EmergencyRequestTechnicians)
+                    if (request.EmergencyRequestTechnicians != null)
                     {
-                        if (tech.CallStatus != RequestState.Rejected)
+                        foreach (var tech in request.EmergencyRequestTechnicians)
                         {
-                            return request.Id;
+                            var flag = false;
+                            if (tech.CallStatus == RequestState.Answered || tech.CallStatus == RequestState.Waiting)
+                            {
+                                return mapper.Map<RequestBreifDTO>(request);
+                            }
                         }
                     }
-                    foreach (var rev in request.TechReverseRequests)
+
+                    if (request.TechReverseRequests != null)
                     {
-                        if (rev.CallState == RequestState.Answered)
+                        foreach (var rev in request.TechReverseRequests)
                         {
-                            return request.Id;
+                            if (rev.CallState == RequestState.Answered)
+                            {
+                                return mapper.Map<RequestBreifDTO>(request);
+                            }
                         }
                     }
                 }
@@ -53,18 +61,5 @@ namespace Service.CoreServices
             throw new RequestNotFoundException();
         }
 
-        //public async Task<bool> ConfirmPIN(ConfirmPIN_DTO PinRequest)
-        //{
-        //    var user = await unitOfWork.GetRepository<CarOwner, int>().GetByIdAsync(PinRequest.CarOwnerId);
-        //    if (user == null)
-        //    {
-        //        throw new ArgumentException("Car Owner not found");
-        //    }else if (user.ApplicationUser.PIN != PinRequest.PIN)
-        //    {
-        //        throw new ArgumentException("Invalid PIN provided for the Car Owner");
-        //    }
-        //    return true;
-
-        //}
     }
 }

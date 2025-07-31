@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ServiceAbstraction;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
@@ -42,5 +43,62 @@ namespace Presentation.Controllers
             await serviceManager.requestServices.CancelAll(CarOwnerID);
             return Ok(ApiResponse<string>.SuccessResponse(null, "All requests cancelled successfully."));
         }
+
+        [HttpGet("RequestBreifDTOs/{carOwnerID}")]
+        public async Task<IActionResult> GetRequestBreifDTOs(int carOwnerID)
+        {
+            if (carOwnerID <= 0)
+            {
+                return BadRequest("Invalid Car Owner ID.");
+            }
+            var requests = await serviceManager.requestServices.RequestBreifDTOs(carOwnerID);
+            if (requests == null || !requests.Any())
+            {
+                return NotFound("No requests found for the specified Car Owner ID.");
+            }
+            return Ok(ApiResponse<List<RequestBreifDTO>>.SuccessResponse(requests, "Requests retrieved successfully."));
+        }
+
+        [HttpGet("RequestDetails/{requestId}")]
+        public async Task<IActionResult> GetRequestDetails(int requestId)
+        {
+            if (requestId <= 0)
+            {
+                return BadRequest("Invalid Request ID.");
+            }
+            var requestDetails = await serviceManager.requestServices.RequestDetailsDTOs(requestId);
+            if (requestDetails == null)
+            {
+                return NotFound("Request not found.");
+            }
+            return Ok(ApiResponse<RequestDetailsDTO>.SuccessResponse(requestDetails, "Request details retrieved successfully."));
+        }
+
+        [HttpPost("CompleteRequest/{requestId}")]
+        public async Task<IActionResult> CompleteRequest(int requestId)
+        {
+            if (requestId <= 0)
+            {
+                return BadRequest("Invalid Request ID.");
+            }
+            await serviceManager.requestServices.CompleteRequest(requestId);
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Request completed successfully."));
+
+        }
+
+        //[HttpGet("request/{id}")]
+        //public async Task<IActionResult> IsPresentRequest(int id)
+        //{
+        //    if (id <= 0)
+        //    {
+        //        return BadRequest("Invalid Request ID.");
+        //    }
+        //    var request = await serviceManager.requestServices.GetRequestById(id);
+        //    if (request == null)
+        //    {
+        //        return NotFound("Request not found.");
+        //    }
+        //    return Ok(ApiResponse<RealRequestDTO>.SuccessResponse(request, "Request retrieved successfully."));
+        //}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ServiceAbstraction.CoreServicesAbstractions;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,10 @@ namespace ServiceAbstraction
         IRequestServices requestServices { get; }
         ITechnicianRequestEmergency technicianRequestEmergency { get; }
         ICategoryService categoryService { get; }
+        IReviewService reviewService { get; }
+
+        ICarOwnerService carOwnerService { get; }
+        IUserProfileService userProfileService { get; }
 
 
     }

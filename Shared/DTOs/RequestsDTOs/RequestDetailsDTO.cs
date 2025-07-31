@@ -12,6 +12,7 @@ namespace SharedData.DTOs.RequestsDTOs
         public string Description { get; set; }
         public string TechnicianName { get; set; }
         public int Rate { get; set; }
+        public string Comment { get; set; }
         public string CategoryName { get; set; }
         public DateOnly RequestDate { get; set; }
     }

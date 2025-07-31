@@ -22,6 +22,8 @@ namespace Service.Specification_Implementation
         {
             AddInclude(r => r.Technician);
             AddInclude(r => r.EmergencyRequests);
+            AddInclude(r => r.EmergencyRequests.CarOwner.ApplicationUser);
+            AddInclude(r => r.EmergencyRequests.category);
 
         }
     }
