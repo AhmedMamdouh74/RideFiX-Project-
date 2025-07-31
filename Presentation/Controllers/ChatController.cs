@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs;
@@ -11,6 +12,7 @@ using SharedData.Wrapper;
 
 namespace Presentation.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ChatController : ControllerBase
@@ -21,17 +23,11 @@ namespace Presentation.Controllers
             serviceManager = _serviceManager;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllChats(int Id)
-        //{
-
-        //    return Ok(ApiResponse<RequestBreifDTO>.SuccessResponse(Request, "Has a Request"));
-        //}
         [HttpGet("GetAllChats")]
         public IActionResult GetAllChhat()
         {
             var chats = serviceManager.ChatService.GetAllChatsAsync();
-            if (chats == null || !chats.Result.Any())
+            if (chats == null || chats.Result == null)
             {
                 return NotFound();
             }
