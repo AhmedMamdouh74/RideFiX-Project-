@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
@@ -29,7 +30,6 @@ namespace RideFix.Controllers
             return Ok(new { message = "Step 1 completed successfully. Proceed to Step 2." });
 
         }
-
         [HttpPost("register-step2")]
 
         public async Task<IActionResult> registerStep2([FromForm] RegisterStep2Dto step2Dto)

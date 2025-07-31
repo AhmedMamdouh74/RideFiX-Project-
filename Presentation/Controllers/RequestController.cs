@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
@@ -20,7 +21,6 @@ namespace Presentation.Controllers
         {
             serviceManager = _serviceManager;
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateRequest(RealRequestDTO request)
         {
