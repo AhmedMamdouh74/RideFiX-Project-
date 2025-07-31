@@ -59,11 +59,10 @@ namespace Service.CoreServices
                 throw new UnauthorizedAccessException("User role is not specified.");
             }
           
-            var CarSpec = new CarOwnerChatSpecification(entityId);
-            var TechSpec = new TechnicianChatSpecification(entityId);
 
             if (userRole == "CarOwner")
             {             
+            var CarSpec = new CarOwnerChatSpecification(entityId);
                 var carOwnerChat = await unitOfWork.GetRepository<ChatSession, int>().GetAllAsync(CarSpec);
                 if (carOwnerChat == null)
                 {
@@ -73,6 +72,7 @@ namespace Service.CoreServices
             }
             else if (userRole == "Technician")
             {
+            var TechSpec = new TechnicianChatSpecification(entityId);
                 var technicianChat = await unitOfWork.GetRepository<ChatSession, int>().GetAllAsync(TechSpec);
                 if (technicianChat == null)
                 {
@@ -92,15 +92,11 @@ namespace Service.CoreServices
             List<ChatBreifDTO> chatBreifDTOs = new List<ChatBreifDTO>();
             foreach (var chat in userChats)
             {
-                var allmessege = await messegeService.GetAllMessegesAsync(chat.Id);
-                if (allmessege == null || !allmessege.Any())
+                if(chat.massages == null || !chat.massages.Any())
                 {
-                    lastmessege = "No messages yet";
+                    continue; 
                 }
-                else
-                {
-                    lastmessege = allmessege.FirstOrDefault().Text;
-                }
+                lastmessege = chat.massages?.FirstOrDefault().Text;
                 var chatBreifDTO = new ChatBreifDTO()
                 {
                     name = chat.CarOwner.ApplicationUser.Name,
