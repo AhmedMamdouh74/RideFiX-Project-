@@ -26,8 +26,8 @@ namespace Service.CoreServices
         private readonly IMessegeService messegeService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-      
-        public ChatService(IUnitOfWork unitOfWork, IMapper mapper, 
+
+        public ChatService(IUnitOfWork unitOfWork, IMapper mapper,
             IMessegeService messegeService,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -39,7 +39,7 @@ namespace Service.CoreServices
 
 
         public async Task<List<ChatBreifDTO>> GetAllChatsAsync()
-        {       
+        {
             string lastmessege = string.Empty;
             var userChats = new List<ChatSession>();
             var user = httpContextAccessor.HttpContext;
@@ -87,7 +87,7 @@ namespace Service.CoreServices
             {
                 throw new UnauthorizedAccessException("User is not authorized to access this resource.");
             }
-          
+
             if (userChats == null || !userChats.Any())
             {
                 return null;

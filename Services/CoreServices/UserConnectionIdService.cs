@@ -8,6 +8,8 @@ using Domain.Contracts;
 using Domain.Contracts.ReposatoriesContract;
 using Domain.Contracts.SpecificationContracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Service.Specification_Implementation.ConnectionIdsSpecification;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ConnectionDtos;
 
@@ -30,43 +32,50 @@ namespace Service.CoreServices
             await UnitOfWork.ConnectionIdsRepository.AddAsync(entity);
             await UnitOfWork.SaveChangesAsync();
         }
-
-        public async Task<UserConnectionIdDto?> GetByIdsAsync(UserConnectionIdDto keyDto)
-        {
-            var entity = await UnitOfWork.ConnectionIdsRepository.GetByIdsAsync(keyDto.ConnectionId, keyDto.ApplicationUserId);
-            return entity is null ? null : _mapper.Map<UserConnectionIdDto>(entity);
-        }
-
-        public async Task<UserConnectionIdDto?> GetBySpecIdAsync(IUserConnectionIdsSpecification spec)
-        {
-            var entity = await UnitOfWork.ConnectionIdsRepository.GetBySpecIdAsync(spec);
-            return entity is null ? null : _mapper.Map<UserConnectionIdDto>(entity);
-        }
-
         public async Task DeleteAsync(UserConnectionIdDto keyDto)
         {
             await UnitOfWork.ConnectionIdsRepository.DeleteAsync(keyDto.ConnectionId, keyDto.ApplicationUserId);
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<UserConnectionIdDto>> GetAllAsync()
+        public async Task<List<UserConnectionIdDto>> SearchByCarOwnerId(int EntityId)
         {
-            var list = await UnitOfWork.ConnectionIdsRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<UserConnectionIdDto>>(list);
+            var Repo = UnitOfWork.GetRepository<CarOwner, int>();
+            var owner = await Repo.GetByIdAsync(EntityId);
+            if (owner == null)
+            {
+                throw new ArgumentException("Notfound");
+            }
+            List<UserConnectionIdDto> users = await GetByUserId(owner.ApplicationUserId);
+            return users;
         }
 
-        public async Task<IEnumerable<UserConnectionIdDto>> GetAllAsync(IUserConnectionIdsSpecification spec)
+        public async Task<List<UserConnectionIdDto>> SearchByTechnichanId(int EntityId)
         {
-            var list = await UnitOfWork.ConnectionIdsRepository.GetAllAsync(spec);
-            return _mapper.Map<IEnumerable<UserConnectionIdDto>>(list);
+            var Repo = UnitOfWork.GetRepository<Technician, int>();
+            var owner = await Repo.GetByIdAsync(EntityId);
+            if (owner == null)
+            {
+                throw new ArgumentException("Notfound");
+            }
+            List<UserConnectionIdDto> users = await GetByUserId(owner.ApplicationUserId);
+            return users;
         }
 
-        public async Task UpdateAsync(UserConnectionIdDto dto)
+        private async Task<List<UserConnectionIdDto>> GetByUserId(string _userId)
         {
-            var entity = _mapper.Map<UserConnectionIds>(dto);
-            await UnitOfWork.ConnectionIdsRepository.UpdateAsync(entity);
-            await UnitOfWork.SaveChangesAsync();
+            var spec = new SearchByUserIdSpecification(_userId);
+            var userConn = await UnitOfWork.ConnectionIdsRepository.GetAllAsync();
+            List<UserConnectionIdDto> users = new List<UserConnectionIdDto>();
+            foreach (var item in userConn)
+            {
+                users.Add(new UserConnectionIdDto()
+                {
+                    ApplicationUserId = item.ApplicationUserId,
+                    ConnectionId = item.ConnectionId,
+                });
+            }
+            return users;
         }
     }
-
 }

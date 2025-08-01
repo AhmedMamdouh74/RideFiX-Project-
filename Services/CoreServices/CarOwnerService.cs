@@ -10,6 +10,7 @@ using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs;
+using SharedData.DTOs.CarOwnerDTOs;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.Enums;
 
@@ -61,5 +62,15 @@ namespace Service.CoreServices
             throw new RequestNotFoundException();
         }
 
+        public async Task<CarOwnerDto> GetById(int Id)
+        {
+            var Repo = unitOfWork.GetRepository<CarOwner, int>();
+            var carOwner = await Repo.GetByIdAsync(Id);
+            return new CarOwnerDto()
+            {
+                CarOwnerId = carOwner.Id,
+                UserId = carOwner.ApplicationUserId
+            };
+        }
     }
 }
