@@ -72,9 +72,9 @@ namespace Service.CoreServices.TechniciansServices
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllActiveRequestsAsync(int tecId)
         {
            // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
-            var requests = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
+            var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             // var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
-            var spec = new EmergencyRequestTechnicanSpecefication(tecId, RequestState.Waiting);
+            var spec = new ActiveRequestsForTechnicianSpec(tecId);
             var activeRequests = await requests.GetAllAsync(spec);
             if (activeRequests == null || !activeRequests.Any())
                 return new List<EmergencyRequestDetailsDTO>();
