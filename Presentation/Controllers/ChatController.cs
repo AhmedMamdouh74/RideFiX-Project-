@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
-using SharedData.DTOs;
+using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.Wrapper;
 
@@ -20,13 +20,6 @@ namespace Presentation.Controllers
         {
             serviceManager = _serviceManager;
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllChats(int Id)
-        //{
-
-        //    return Ok(ApiResponse<RequestBreifDTO>.SuccessResponse(Request, "Has a Request"));
-        //}
         [HttpGet("GetAllChats")]
         public IActionResult GetAllChhat()
         {
@@ -37,7 +30,22 @@ namespace Presentation.Controllers
             }
             return Ok(ApiResponse<List<ChatBreifDTO>>.SuccessResponse(chats.Result, "Chats retrieved successfully"));
         }
-        
+
+        [HttpGet("GetChatById")]
+        public IActionResult GetChatById([FromQuery] ChatBreifDTO chatBreif)
+        {
+            if (chatBreif == null || chatBreif.chatsessionid <= 0)
+            {
+                return BadRequest(ApiResponse<ChatDetailsDTO>.FailResponse("Invalid chat ID"));
+            }
+            var chat = serviceManager.ChatService.GetChatByIdAsync(chatBreif);
+            if (chat == null || chat.Result == null)
+            {
+                return NotFound(ApiResponse<ChatDetailsDTO>.FailResponse("Chat not found"));
+            }
+            return Ok(ApiResponse<ChatDetailsDTO>.SuccessResponse(chat.Result, "Chat retrieved successfully"));
+        }
+
 
     }
 }

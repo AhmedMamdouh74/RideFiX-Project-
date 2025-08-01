@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.CoreEntites.EmergencyEntities;
-using SharedData.DTOs;
+using SharedData.DTOs.ChatDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
