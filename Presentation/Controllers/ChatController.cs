@@ -22,6 +22,7 @@ namespace Presentation.Controllers
         {
             serviceManager = _serviceManager;
         }
+        [Authorize]
         [HttpGet("GetAllChats")]
         public IActionResult GetAllChhat()
         {
