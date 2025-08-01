@@ -61,14 +61,16 @@ namespace Service.CoreServices.TechniciansServices
         {
 
             var requestTechRepo = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
-            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered }));
+            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered, IsCompleted=false}));
             return mapper.Map<List<EmergencyRequestDetailsDTO>>(joinEntries);
         }
 
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllActiveRequestsAsync(int tecId)
         {
-            var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
-            var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
+           // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
+            var requests = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
+            // var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
+            var spec = new EmergencyRequestTechnicanSpecefication(tecId, RequestState.Waiting);
             var activeRequests = await requests.GetAllAsync(spec);
             if (activeRequests == null || !activeRequests.Any())
                 return new List<EmergencyRequestDetailsDTO>();
@@ -87,7 +89,6 @@ namespace Service.CoreServices.TechniciansServices
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             var completedRequests = await requests.GetAllAsync(spec);
             if (completedRequests == null || !completedRequests.Any()) throw new CompletedRequestNotFoundException();
-
             var result = mapper.Map<List<EmergencyRequestDetailsDTO>>(completedRequests);
             return result;
 
@@ -180,6 +181,7 @@ namespace Service.CoreServices.TechniciansServices
 
                 // Mark this technician as accepted
                 targetLink.CallStatus = RequestState.Answered;
+                request.TechnicianId = dto.TechnicianId;
 
                 // Mark all other technicians as rejected
                 foreach (var link in request.EmergencyRequestTechnicians)

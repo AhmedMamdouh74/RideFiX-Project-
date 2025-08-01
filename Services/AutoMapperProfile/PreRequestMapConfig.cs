@@ -18,6 +18,9 @@ namespace Service.AutoMapperProfile
               .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.EmergencyRequestId))
               .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.EmergencyRequests.category.Name))
               .ForMember(dest => dest.CarOwnerId, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwnerId))
+              .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.EmergencyRequests.Latitude))
+              .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.EmergencyRequests.Longitude))
+             
               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.EmergencyRequests.Description))
               .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.Name))
               .ForMember(dest => dest.FaceImageUrl, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.FaceImageUrl))
