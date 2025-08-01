@@ -3,9 +3,12 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
 using ServiceAbstraction.CoreServicesAbstractions;
-using SharedData.DTOs;
+using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.MessegeDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +112,32 @@ namespace Service.CoreServices
             return chatBreifDTOs;
         }
 
+        public async Task<ChatDetailsDTO> GetChatByIdAsync(ChatBreifDTO ChatBreif)
+        {
+            if (ChatBreif == null || ChatBreif.chatsessionid <= 0)
+            {
+                return null;
+            }
+            var spec = new ChatDetailsSpecification(ChatBreif.chatsessionid);
+            var chatSession = await unitOfWork.GetRepository<ChatSession, int>().GetByIdAsync(spec);
+        
+            if (chatSession == null)
+            {
+                throw new ChatNotFoundException();
+            }
+            var messages = chatSession.massages.ToList();
+            var mappedMessages = mapper.Map<List<MessegeDTO>>(messages);
+            var chatDetails = new ChatDetailsDTO()
+            {
+                name = ChatBreif.name,
+                imgurl = ChatBreif.imgurl,
+                messages = mappedMessages
 
+            };
+
+
+            return chatDetails;
+
+        }
     }
 }

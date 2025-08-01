@@ -1,4 +1,4 @@
-﻿using SharedData.DTOs;
+﻿using SharedData.DTOs.ChatDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +10,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
     public interface IChatService
     {
         public Task<List<ChatBreifDTO>> GetAllChatsAsync();
+        public Task<ChatDetailsDTO> GetChatByIdAsync(ChatBreifDTO ChatBreif);
     }
 }
