@@ -31,9 +31,12 @@ namespace Presistence
             {
                 query = query.Skip(specification.Skip).Take(specification.Take ?? 10);
             }
-            foreach (var include in specification.Includes)
+            if (specification.Includes != null)
             {
-                query = query.Include(include);
+                foreach (var include in specification.Includes)
+                {
+                    query = query.Include(include);
+                }
             }
             return query;
         }

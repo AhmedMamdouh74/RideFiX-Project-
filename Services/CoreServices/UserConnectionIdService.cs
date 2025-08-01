@@ -65,7 +65,7 @@ namespace Service.CoreServices
         private async Task<List<UserConnectionIdDto>> GetByUserId(string _userId)
         {
             var spec = new SearchByUserIdSpecification(_userId);
-            var userConn = await UnitOfWork.ConnectionIdsRepository.GetAllAsync();
+            var userConn = await UnitOfWork.ConnectionIdsRepository.GetAllAsync(spec);
             List<UserConnectionIdDto> users = new List<UserConnectionIdDto>();
             foreach (var item in userConn)
             {
