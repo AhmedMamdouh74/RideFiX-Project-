@@ -15,7 +15,9 @@ namespace Service.Specification_Implementation
         public EmergencyRequestTechnicanSpecefication(RequestQueryData requestQueryData)
         : base(r =>
  (!requestQueryData.CallState.HasValue || r.CallStatus == requestQueryData.CallState) &&
- (!requestQueryData.TechnicainId.HasValue || r.TechnicianId == requestQueryData.TechnicainId)
+ (!requestQueryData.TechnicainId.HasValue || r.TechnicianId == requestQueryData.TechnicainId) && 
+ (!requestQueryData.IsCompleted.HasValue || r.EmergencyRequests.IsCompleted == requestQueryData.IsCompleted)
+
 
 )
 
@@ -24,6 +26,14 @@ namespace Service.Specification_Implementation
             AddInclude(r => r.EmergencyRequests);
             AddInclude(r => r.EmergencyRequests.CarOwner.ApplicationUser);
             AddInclude(r => r.EmergencyRequests.category);
+
+        }
+        public EmergencyRequestTechnicanSpecefication(int technicianId, RequestState requestState) : base(req => req.TechnicianId != technicianId && req.CallStatus == requestState)
+        {
+            AddInclude(req => req.Technician);
+            AddInclude(req => req.EmergencyRequests);
+            AddInclude(req => req.EmergencyRequests.CarOwner.ApplicationUser);
+            AddInclude(req => req.EmergencyRequests.category);
 
         }
     }
