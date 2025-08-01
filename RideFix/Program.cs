@@ -23,6 +23,7 @@ using Services;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using SharedData.Enums;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Hubs;
 
 namespace RideFix
 {
@@ -36,25 +37,33 @@ namespace RideFix
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
+                options.AddPolicy("AllowAngularOrigin",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://localhost:4200")  // السماح فقط لواجهة Angular
                               .AllowAnyMethod()
-                              .AllowAnyHeader();
+                              .AllowAnyHeader()
+                              .AllowCredentials();  // السماح بالـ credentials (مثل الكوكيز أو التوكنات)
                     });
             });
+
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+            builder.Services.AddSignalR(); // Add SignalR services
+
+
             #region Services Configurations
             builder.Services.AddPresistenceConfig(builder.Configuration); // Custom extension method to add persistence layer configurations
             builder.Services.AddServiceConfig();// Custom extension method to add service layer configurations
             #endregion
 
+            #region Authentication And Security
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
@@ -73,22 +82,82 @@ namespace RideFix
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(options =>
-                            {
-                                var config = builder.Configuration;
-                                options.TokenValidationParameters = new TokenValidationParameters
-                                {
-                                    ValidateIssuer = true,
-                                    ValidateAudience = true,
-                                    ValidateLifetime = true,
-                                    ValidateIssuerSigningKey = true,
-                                    ValidIssuer = config["JWT:Issuer"],
-                                    ValidAudience = config["JWT:Audience"],
-                                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
-                                };
-                            });
+            });
+                //.AddJwtBearer(options =>
+                //            {
+                //                var config = builder.Configuration;
+                //                options.TokenValidationParameters = new TokenValidationParameters
+                //                {
+                //                    ValidateIssuer = true,
+                //                    ValidateAudience = true,
+                //                    ValidateLifetime = true,
+                //                    ValidateIssuerSigningKey = true,
+                //                    ValidIssuer = config["JWT:Issuer"],
+                //                    ValidAudience = config["JWT:Audience"],
+                //                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+                //                };
+                //            });
 
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+            .AddJwtBearer(options =>
+            {
+                var config = builder.Configuration;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = config["JWT:Issuer"],
+                    ValidAudience = config["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            statusCode = 401,
+                            message = "Unauthorized: Token is missing or invalid"
+                        });
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            statusCode = 403,
+                            message = "Forbidden: You are not allowed to access this resource"
+                        });
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/requestWatchDogHub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+
+            });
+            #endregion
 
             #region Invalid Model State Response Factory Configuration
             builder.Services.Configure<ApiBehaviorOptions>(ApiBehaviorOptions =>
@@ -111,11 +180,20 @@ namespace RideFix
             });
             #endregion
 
-            
+
 
 
             var app = builder.Build();
-            app.UseCors("AllowAll");
+            app.UseCors("AllowAngularOrigin");
+
+
+            //notification hub configuration
+            // التسجيل الصحيح للـ Hub
+            app.MapHub<NotificationHub>("/notificationhub");
+            app.MapHub<ChatHub>("/chathub");
+            app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
+
+
 
 
             #region Exception Handler Middleware Configuration
@@ -136,36 +214,14 @@ namespace RideFix
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
-         //   }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-                var insertSql = @"
-        INSERT INTO TechnicianCategory (TechnicianId, TCategoryId)
-        SELECT number, 1
-        FROM master.dbo.spt_values
-        WHERE type = 'P' AND number BETWEEN 1 AND 50
-        AND NOT EXISTS (
-            SELECT 1 FROM TechnicianCategory
-            WHERE TechnicianId = number AND TCategoryId = 1
-        )";
-
-                await db.Database.ExecuteSqlRawAsync(insertSql);
-            }
-
-
-
-
 
             app.Run();
         }

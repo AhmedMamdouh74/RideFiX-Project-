@@ -9,21 +9,56 @@ namespace Presentation.Hubs
 {
     public class ChatHub : Hub
     {
+        private static Dictionary<string, string> UserRoom = new();
         public ChatHub() 
         {
 
         }
-        public async Task sendmessage(string message)
+        
+
+        // user go in room
+        public async Task JoinRoom(string roomId)
         {
-            await Clients.All.SendAsync("recievemessage", message);
+            if (UserRoom.TryGetValue(Context.ConnectionId, out var oldRoom))
+            {
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, oldRoom);
+                UserRoom[Context.ConnectionId] = roomId;
+            }
+            else
+            {
+                UserRoom.Add(Context.ConnectionId, roomId);
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
-        public override Task OnConnectedAsync()
+        // send massage 
+        public async Task SendMessage(string message, string senderId)
         {
-            return base.OnConnectedAsync();
+            var roomId = UserRoom[Context.ConnectionId];
+            await Clients.Group(roomId).SendAsync("ReceiveMessage", new
+            {
+                Message = message,
+                SenderId = senderId,
+                RoomId = roomId
+            });
         }
-        public override Task OnDisconnectedAsync(Exception? exception)
+        // disconnect
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            return base.OnDisconnectedAsync(exception);
+
         }
+
+        //public async Task sendmessage(string message)
+        //{
+        //    await Clients.All.SendAsync("recievemessage", message);
+        //}
+        //public override Task OnConnectedAsync()
+        //{
+        //    return base.OnConnectedAsync();
+        //}
+        //public override Task OnDisconnectedAsync(Exception? exception)
+        //{
+        //    return base.OnDisconnectedAsync(exception);
+        //}
     }
 }

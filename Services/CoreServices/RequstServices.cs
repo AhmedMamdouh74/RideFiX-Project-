@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation;
 using Service.Exception_Implementation.AlreadyFound;
 using Service.Exception_Implementation.ArgumantNullException;
@@ -228,7 +229,7 @@ namespace Service.CoreServices
                 TechnicianName = emergencyRequest.Technician.ApplicationUser.Name,
                 CategoryName = emergencyRequest.category.Name,
                 RequestDate = emergencyRequest.CompeletRequestDate ?? DateOnly.FromDateTime(DateTime.UtcNow),
-                Rate = emergencyRequest.Review?.Rate,
+                Rate = emergencyRequest.Review.Rate,
                 Comment = emergencyRequest.Review?.Comment,
             };
             return mappedRequest;

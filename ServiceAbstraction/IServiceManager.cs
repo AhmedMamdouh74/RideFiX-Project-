@@ -10,7 +10,7 @@ namespace ServiceAbstraction
 {
     public interface IServiceManager
     {
-
+        IChatService ChatService { get; }
         ITechnicianService technicianService { get; }
         IRequestServices requestServices { get; }
         ITechnicianRequestEmergency technicianRequestEmergency { get; }
@@ -19,6 +19,8 @@ namespace ServiceAbstraction
 
         ICarOwnerService carOwnerService { get; }
         IUserProfileService userProfileService { get; }
+        IUserConnectionIdService userConnectionIdService { get; }
+
 
 
     }

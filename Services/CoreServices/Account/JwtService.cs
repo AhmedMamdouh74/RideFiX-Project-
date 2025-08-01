@@ -28,7 +28,7 @@ namespace Service.CoreServices.Account
         {
             var claims = new List<Claim>() {
                 new Claim("userId" , user.Id),
-               new Claim("Id", roleEntityId.ToString()),
+                new Claim("Id", roleEntityId.ToString()),
                 new Claim("Email" , user.Email) , 
                 new Claim ("Name" , user.Name) ,
             };
