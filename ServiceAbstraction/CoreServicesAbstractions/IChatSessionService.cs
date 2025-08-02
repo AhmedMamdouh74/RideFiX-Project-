@@ -1,4 +1,5 @@
 ﻿using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
 {
     public interface IChatSessionService
     {
-        public Task<ChatDetailsDTO> GetChatById(int chatSessionId);
+        public Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId);
     }
 }

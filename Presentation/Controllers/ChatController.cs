@@ -34,14 +34,15 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<List<ChatBreifDTO>>.SuccessResponse(chats.Result, "Chats retrieved successfully"));
         }
 
+        [Authorize]
         [HttpGet("GetChatById")]
-        public IActionResult GetChatById([FromQuery] ChatBreifDTO chatBreif)
+        public IActionResult GetChatById([FromQuery] int chatsessionid)
         {
-            if (chatBreif == null || chatBreif.chatsessionid <= 0)
+            if (chatsessionid <= 0)
             {
                 return BadRequest(ApiResponse<ChatDetailsDTO>.FailResponse("Invalid chat ID"));
             }
-            var chat = serviceManager.ChatService.GetChatByIdAsync(chatBreif);
+            var chat = serviceManager.ChatService.GetChatByIdAsync(chatsessionid);
             if (chat == null || chat.Result == null)
             {
                 return NotFound(ApiResponse<ChatDetailsDTO>.FailResponse("Chat not found"));

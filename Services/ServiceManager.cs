@@ -29,6 +29,7 @@ namespace Services
 
         public IMessegeService messegeService { get; }
         public IUserConnectionIdService userConnectionIdService { get; }
+        public IChatSessionService chatSessionService { get; }
 
         #endregion
 
@@ -42,7 +43,8 @@ namespace Services
                     IUserProfileService _userProfile,
                     IChatService chatservice,
                     IMessegeService messegeService,
-                    IUserConnectionIdService userConnectionIdService)
+                    IUserConnectionIdService userConnectionIdService,
+                    IChatSessionService chatSessionService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -54,6 +56,7 @@ namespace Services
             this.ChatService = chatservice;
             this.messegeService = messegeService;
             this.userConnectionIdService = userConnectionIdService;
+            this.chatSessionService = chatSessionService;
         }
     }
 }

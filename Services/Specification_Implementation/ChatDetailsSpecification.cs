@@ -11,11 +11,14 @@ namespace Service.Specification_Implementation
 {
     public class ChatDetailsSpecification : Specification<ChatSession, int>
     {
-        public ChatDetailsSpecification(int chatSession) : base(s => s.Id == chatSession)
+        public ChatDetailsSpecification(int chatSession)
+       : base(s => s.Id == chatSession)
         {
-            AddInclude(s => s.massages.OrderByDescending(m => m.SentAt));
-            AddInclude(s => s.CarOwner.ApplicationUser);
+            AddInclude(s => s.massages.OrderBy(s=>s.SentAt));
             AddInclude(s => s.CarOwner);
+            AddInclude(s => s.CarOwner.ApplicationUser);
+            AddInclude(s => s.Technician);
+            AddInclude(s => s.Technician.ApplicationUser);
         }
     }
 }
