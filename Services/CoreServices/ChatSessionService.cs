@@ -18,7 +18,7 @@ namespace Service.CoreServices
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
 
-        public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId , int CarOwnerId)
+        public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId)
         {
             var spec = new ChatSessionAllSpecification(CarOwnerId, technicianId);
             var chatSessions = await unitOfWork.GetRepository<ChatSession, int>().GetAllAsync(spec);
@@ -30,5 +30,20 @@ namespace Service.CoreServices
             return mapper.Map<ChatSessionAllDTO>(chatsession);
         }
 
+        public async Task<ChatSessionAllDTO> GetChatSessions(int ChatSessionId)
+        {
+            if (ChatSessionId <= 0)
+            {
+                throw new ArgumentException("ChatSessionId must be greater than zero.", nameof(ChatSessionId));
+            }
+
+            var chatSession = await unitOfWork.GetRepository<ChatSession, int>().GetByIdAsync(ChatSessionId);
+            if (chatSession == null )
+            {
+                return null;
+            }
+            return mapper.Map<ChatSessionAllDTO>(chatSession);
+
+        }
     }
 }

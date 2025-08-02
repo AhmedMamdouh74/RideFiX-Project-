@@ -40,7 +40,7 @@ namespace RideFix
                 options.AddPolicy("AllowAngularOrigin",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:4200")  // السماح فقط لواجهة Angular
+                        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:5500")  // السماح فقط لواجهة Angular
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .AllowCredentials();  // السماح بالـ credentials (مثل الكوكيز أو التوكنات)
@@ -190,7 +190,7 @@ namespace RideFix
             //notification hub configuration
             // التسجيل الصحيح للـ Hub
             app.MapHub<NotificationHub>("/notificationhub");
-            //app.MapHub<ChatHub>("/chathub");
+            app.MapHub<ChatHub>("/chathub");//http://localhost:5038/chathub
             app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
 
 

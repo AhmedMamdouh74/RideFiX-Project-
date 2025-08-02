@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Service.Exception_Implementation.ArgumantNullException;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.MessegeDTOs;
 using System;
@@ -21,17 +22,35 @@ namespace Service.CoreServices
             this.mapper = mapper;
         }
 
-        public async Task<List<MessegeDTO>> GetAllMessegesAsync(int chatSessionId)
+        public async Task AddMessegeAsync(MessegeAllDTO messegeDTO)
         {
-            var messages = await unitOfWork.GetRepository<Message, int>().GetAllAsync();
-            var chatMessages = messages.Where(m => m.ChatSessionId == chatSessionId).ToList().OrderByDescending(m => m.SentAt);
-            if (chatMessages == null || !chatMessages.Any())
+            if (messegeDTO == null)
             {
-                return new List<MessegeDTO>();
+                throw new MessegeNullException();
             }
-            var messegeDTOs = mapper.Map<List<MessegeDTO>>(chatMessages);
-            return messegeDTOs;
+            var message = new Message
+            {
+
+                ChatSessionId = messegeDTO.ChatSessionId,
+                Text = messegeDTO.Text,
+                SentAt = DateTime.UtcNow,
+                ApplicationId = messegeDTO.ApplicationId
+            };
+            await unitOfWork.GetRepository<Message, int>().AddAsync(message);
+            await unitOfWork.SaveChangesAsync();
         }
+
+        //public async Task<List<MessegeDTO>> GetAllMessegesAsync(int chatSessionId)
+        //{
+        //    var messages = await unitOfWork.GetRepository<Message, int>().GetAllAsync();
+        //    var chatMessages = messages.Where(m => m.ChatSessionId == chatSessionId).ToList().OrderByDescending(m => m.SentAt);
+        //    if (chatMessages == null || !chatMessages.Any())
+        //    {
+        //        return new List<MessegeDTO>();
+        //    }
+        //    var messegeDTOs = mapper.Map<List<MessegeDTO>>(chatMessages);
+        //    return messegeDTOs;
+        //}
 
 
     }

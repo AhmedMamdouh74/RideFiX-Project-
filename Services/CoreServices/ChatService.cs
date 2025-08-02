@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.MessegeDTOs;
@@ -23,17 +24,14 @@ namespace Service.CoreServices
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly IMessegeService messegeService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
 
         public ChatService(IUnitOfWork unitOfWork, IMapper mapper,
-            IMessegeService messegeService,
             IHttpContextAccessor httpContextAccessor)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.messegeService = messegeService;
             this.httpContextAccessor = httpContextAccessor;
         }
 

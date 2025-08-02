@@ -24,8 +24,7 @@ namespace Presentation.Hubs
         public async override Task OnConnectedAsync()
         {
             var user = httpContextAccessor.HttpContext;
-            //var userId = Context.User?.Claims
-            //    .FirstOrDefault(c => c.Type == "userId")?.Value;
+           
             var userId = user.User.Claims.FirstOrDefault(s => s.Type == "userId")?.Value;
 
             var connDto = new UserConnectionIdDto()

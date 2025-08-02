@@ -21,8 +21,7 @@ namespace ServiceAbstraction
         IUserProfileService userProfileService { get; }
         IUserConnectionIdService userConnectionIdService { get; }
         IChatSessionService chatSessionService { get; }
-
-
-
-    }
+        IMessegeService messegeService { get; }
+        
+        }
 }
