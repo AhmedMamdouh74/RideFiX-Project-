@@ -48,6 +48,10 @@ namespace SharedData.DTOs.Account
 
         [StringLength(300, ErrorMessage = "Description must be less than 300 characters")]
         public string? Description { get; set; }
+
+        [MinLength(1, ErrorMessage = "At least one category is required for technician")]
+        public List<string>? Categories { get; set; }
+
     }
 }
     

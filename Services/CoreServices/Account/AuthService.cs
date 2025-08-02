@@ -70,8 +70,13 @@ namespace Service.CoreServices.Account
                     .GetFirstOrDefaultAsync(predicate: t => t.ApplicationUserId == user.Id);
                 if (technician != null) roleEntityId = technician.Id;
             }
-
-            return _jwtService.generateToken(user , roles , roleEntityId);
+            var newUser = new JwtTokenDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Name = user.Name
+            };
+            return _jwtService.generateToken(newUser, roles , roleEntityId);
         }
 
         public async Task<IdentityResult> RegisterStep1Async(RegisterStep1Dto dto)
@@ -104,12 +109,21 @@ namespace Service.CoreServices.Account
 
                 if (string.IsNullOrWhiteSpace(dto.Description))
                     errors.Add(new IdentityError { Code = "DescriptionRequired", Description = "Description is required for technicians." });
+                if (dto.Categories == null || !dto.Categories.Any())
+                {
+                    errors.Add(new IdentityError
+                    {
+                        Code = "CategoryRequired",
+                        Description = "At least one category is required for technicians."
+                    });
+                }
+
 
                 if (errors.Any())
                     return IdentityResult.Failed(errors.ToArray());
 
             }
-            _memoryCache.Set($"register_{dto.Email}", dto, TimeSpan.FromMinutes(10));
+            _memoryCache.Set($"register_{dto.Email}", dto, TimeSpan.FromMinutes(40));
 
             return IdentityResult.Success;
 
@@ -184,13 +198,19 @@ namespace Service.CoreServices.Account
             {
                 await _userManager.AddToRoleAsync(user, Roles.Technician);
 
-                //TimeOnly? start = null, end = null;
+                //var categoryRepo = _unitOfWork.GetRepository<TCategory, int>();
 
-                //if (TimeOnly.TryParse(step1Dto.StartWorking, out var s))
-                //    start = s;
+                //var categories = await categoryRepo
+                //    .GetAllAsync(c => step1Dto.Categories.Contains(c.Name));
 
-                //if (TimeOnly.TryParse(step1Dto.EndWorking, out var e))
-                //    end = e;
+                //if (categories == null || !categories.Any())
+                //{
+                //    return IdentityResult.Failed(new IdentityError
+                //    {
+                //        Code = "InvalidCategories",
+                //        Description = "One or more selected categories are invalid."
+                //    });
+                //}
 
 
                 var tech = new Technician
@@ -201,7 +221,9 @@ namespace Service.CoreServices.Account
                     //EndWorking = end ?? default,
                     StartWorking = step1Dto.StartWorking.Value,
                     EndWorking = step1Dto.EndWorking.Value,
-                    Description = step1Dto.Description
+                    Description = step1Dto.Description,
+                    //TCategories = categories.ToList()
+
                 };
                 //add in database
                 await _unitOfWork.GetRepository<Technician, int>().AddAsync(tech);

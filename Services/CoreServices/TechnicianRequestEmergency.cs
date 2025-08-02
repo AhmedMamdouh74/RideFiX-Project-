@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
@@ -15,10 +16,13 @@ namespace Service.CoreServices.TechniciansServices
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper)
+       // private readonly IHubContext<ChatHub> hubContext;
+        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper/* , IHubContext<ChatHub> _hubContext*/)
         {
             unitOfWork = _unitOfWork;
             mapper = _mapper;
+            //hubContext = _hubContext;
+
         }
         public async Task<bool> ApplyRequestFromHomePage(TechnicianApplyEmergencyRequestDTO emergencyRequestDTO)
         {
@@ -61,14 +65,16 @@ namespace Service.CoreServices.TechniciansServices
         {
 
             var requestTechRepo = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
-            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered }));
+            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered, IsCompleted=false}));
             return mapper.Map<List<EmergencyRequestDetailsDTO>>(joinEntries);
         }
 
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllActiveRequestsAsync(int tecId)
         {
+           // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
-            var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
+            // var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
+            var spec = new ActiveRequestsForTechnicianSpec(tecId);
             var activeRequests = await requests.GetAllAsync(spec);
             if (activeRequests == null || !activeRequests.Any())
                 return new List<EmergencyRequestDetailsDTO>();
@@ -87,7 +93,6 @@ namespace Service.CoreServices.TechniciansServices
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             var completedRequests = await requests.GetAllAsync(spec);
             if (completedRequests == null || !completedRequests.Any()) throw new CompletedRequestNotFoundException();
-
             var result = mapper.Map<List<EmergencyRequestDetailsDTO>>(completedRequests);
             return result;
 
@@ -162,7 +167,7 @@ namespace Service.CoreServices.TechniciansServices
             // 3. Find link between this technician and the request
             var targetLink = request.EmergencyRequestTechnicians
                 .FirstOrDefault(e => e.TechnicianId == dto.TechnicianId);
-            if (targetLink == null) 
+            if (targetLink == null) return false;
 
             // 4. Technician is accepting
             if (dto.RequestState == RequestState.Answered)
@@ -180,6 +185,28 @@ namespace Service.CoreServices.TechniciansServices
 
                 // Mark this technician as accepted
                 targetLink.CallStatus = RequestState.Answered;
+                request.TechnicianId = dto.TechnicianId;
+
+                // create a new chat session for this request
+                var chatRoom = new ChatSession
+                {
+                    IsClosed = false,
+                    TechnicianId = dto.TechnicianId,
+                    CarOwnerId = request.CarOwnerId
+                };
+
+                await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatRoom);
+
+                //await _hubContext.Clients
+                //    
+                //    .SendAsync("ChatStarted", new
+                //    {
+                //        ChatRoomId = chatRoom.Id,
+                //        CarOwnerId =chatRoom.CarOwnerId,
+                //        TechnicianId = chatRoom.TechnicianId
+                //    });
+
+
 
                 // Mark all other technicians as rejected
                 foreach (var link in request.EmergencyRequestTechnicians)
@@ -190,7 +217,7 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-                request.EndTimeStamp = DateTime.UtcNow;
+               
             }
             // 5. Technician is rejecting
             else if (dto.RequestState == RequestState.Rejected)

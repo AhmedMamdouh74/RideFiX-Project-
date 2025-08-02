@@ -23,14 +23,14 @@ namespace Presentation.Hubs
 
         }
 
-        public async Task AcceptRequest(int CarOwnerId)
+        public async Task acceptrequest(int CarOwnerId)
         {
             var users = await ServiceManager.userConnectionIdService.SearchByCarOwnerId(CarOwnerId);
             if (users != null && users.Any())
             {
                 foreach (var user in users)
                 {
-                    await Clients.Client(user.ConnectionId).SendAsync("RequestAccepted", "Request Accepted");
+                    await Clients.Client(user.ConnectionId).SendAsync("addreceivemessagelistener", "Request Accepted");
                 }
             }
 
