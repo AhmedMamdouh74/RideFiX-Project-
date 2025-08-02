@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using SharedData.DTOs.Account;
 using System;

@@ -3,62 +3,128 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
+using ServiceAbstraction;
+using ServiceAbstraction.CoreServicesAbstractions;
+using SharedData.DTOs.ConnectionDtos;
+using SharedData.DTOs.MessegeDTOs;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Presentation.Hubs
 {
     public class ChatHub : Hub
     {
-        private static Dictionary<string, string> UserRoom = new();
-        public ChatHub() 
-        {
+        private IHttpContextAccessor httpContextAccessor;
+        private IServiceManager ServiceManager { get; set; }
 
+        public ChatHub(IHttpContextAccessor httpContextAccessor, IServiceManager service)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+            this.ServiceManager = service;
         }
-        
 
-        // user go in room
-        public async Task JoinRoom(string roomId)
+        public async Task SendMessage(int chatsessionId , string messege)
         {
-            if (UserRoom.TryGetValue(Context.ConnectionId, out var oldRoom))
+            var user = httpContextAccessor.HttpContext?.User;
+            int userId = 0;
+            var idClaim = user?.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            int.TryParse(idClaim, out userId);
+            string otherUserId = string.Empty;
+            var UserConcId = Context.ConnectionId;
+            string ApplicationId = string.Empty;
+            var chatSession = await ServiceManager.chatSessionService.GetChatSessions(chatsessionId);
+            if (chatSession == null)
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, oldRoom);
-                UserRoom[Context.ConnectionId] = roomId;
+                throw new InvalidOperationException("Chat session not found.");
+            }
+
+            string UserRole = user?.Claims.FirstOrDefault(c => c.Type == "UserRole")?.Value;
+
+            if(UserRole == "CarOwner")
+            {             
+                var technicianId = chatSession.TechnicianId;
+                var techinicain = await ServiceManager.userConnectionIdService.SearchByTechnichanId(technicianId);
+
+                if (techinicain == null || !techinicain.Any())
+                {
+                    throw new InvalidOperationException("No technician found for this chat session.");
+                }
+                ApplicationId = techinicain.FirstOrDefault()?.ApplicationUserId;
+
+
+                otherUserId = techinicain.FirstOrDefault()?.ConnectionId;
+            }
+            else if (UserRole == "Technician")
+            {
+                var CarOwnerId = chatSession.TechnicianId;
+                var carOwners = await ServiceManager.userConnectionIdService.SearchByCarOwnerId(CarOwnerId);
+                if (carOwners == null)
+                {
+                    throw new InvalidOperationException("No car owner found for this chat");
+                }
+
+                ApplicationId = carOwners.FirstOrDefault()?.ApplicationUserId;
+                otherUserId = carOwners.FirstOrDefault()?.ConnectionId;
+
             }
             else
             {
-                UserRoom.Add(Context.ConnectionId, roomId);
+                throw new UnauthorizedAccessException("User role is not valid for sending messages.");
             }
 
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        }
-        // send massage 
-        public async Task SendMessage(string message, string senderId)
-        {
-            var roomId = UserRoom[Context.ConnectionId];
-            await Clients.Group(roomId).SendAsync("ReceiveMessage", new
+            var message = new MessegeAllDTO
             {
-                Message = message,
-                SenderId = senderId,
-                RoomId = roomId
-            });
+                ChatSessionId = chatsessionId,
+                Text = messege,
+                ApplicationId = ApplicationId
+            };
+            await ServiceManager.messegeService.AddMessegeAsync(message);
+
+            var sendMessege = new MessegeMiniDTO()
+            {
+                Text = messege,
+                SentAt = DateTime.UtcNow,
+                IsSeen = false,
+                ApplicationId = ApplicationId
+            };
+
+
+            await Clients.Client(UserConcId).SendAsync("ReceiveMessage", sendMessege);
+            await Clients.Client(otherUserId).SendAsync("ReceiveMessage", sendMessege);
+
         }
-        // disconnect
-        public override async Task OnDisconnectedAsync(Exception? exception)
+
+
+        #region Overriding
+        public async override Task OnConnectedAsync()
         {
+            var user = httpContextAccessor.HttpContext;
 
+            var userId = user.User.Claims.FirstOrDefault(s => s.Type == "userId")?.Value;
+
+            var connDto = new UserConnectionIdDto()
+            {
+                ApplicationUserId = userId,
+                ConnectionId = Context.ConnectionId,
+            };
+            await ServiceManager.userConnectionIdService.AddAsync(connDto);
+            await base.OnConnectedAsync();
         }
+        public async override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.User?.Claims
+                            .FirstOrDefault(c => c.Type == "userId")?.Value;
 
-        //public async Task sendmessage(string message)
-        //{
-        //    await Clients.All.SendAsync("recievemessage", message);
-        //}
-        //public override Task OnConnectedAsync()
-        //{
-        //    return base.OnConnectedAsync();
-        //}
-        //public override Task OnDisconnectedAsync(Exception? exception)
-        //{
-        //    return base.OnDisconnectedAsync(exception);
-        //}
+            var connDto = new UserConnectionIdDto()
+            {
+                ApplicationUserId = userId,
+                ConnectionId = Context.ConnectionId,
+            };
+            await ServiceManager.userConnectionIdService.DeleteAsync(connDto);
+            await base.OnDisconnectedAsync(exception);
+        }
+        #endregion
+
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.Wrapper;
 
@@ -22,6 +23,7 @@ namespace Presentation.Controllers
         {
             serviceManager = _serviceManager;
         }
+        [Authorize]
         [HttpGet("GetAllChats")]
         public IActionResult GetAllChhat()
         {
@@ -33,14 +35,15 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<List<ChatBreifDTO>>.SuccessResponse(chats.Result, "Chats retrieved successfully"));
         }
 
+        [Authorize]
         [HttpGet("GetChatById")]
-        public IActionResult GetChatById([FromQuery] ChatBreifDTO chatBreif)
+        public IActionResult GetChatById([FromQuery] int chatsessionid)
         {
-            if (chatBreif == null || chatBreif.chatsessionid <= 0)
+            if (chatsessionid <= 0)
             {
                 return BadRequest(ApiResponse<ChatDetailsDTO>.FailResponse("Invalid chat ID"));
             }
-            var chat = serviceManager.ChatService.GetChatByIdAsync(chatBreif);
+            var chat = serviceManager.ChatService.GetChatByIdAsync(chatsessionid);
             if (chat == null || chat.Result == null)
             {
                 return NotFound(ApiResponse<ChatDetailsDTO>.FailResponse("Chat not found"));
@@ -48,6 +51,17 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<ChatDetailsDTO>.SuccessResponse(chat.Result, "Chat retrieved successfully"));
         }
 
+        [HttpGet("LoadCurrentChat")]
+        public async Task<IActionResult> LoadCurrentChat()
+        {
+            var chat = await serviceManager.ChatService.LoadCurrentChat();
+            if (chat == null)
+            {
+                return NotFound(ApiResponse<ChatSessionAllDTO>.FailResponse("No current chat found"));
+            }
+            return Ok(ApiResponse<ChatSessionAllDTO>.SuccessResponse(chat, "Current chat loaded successfully"));
 
+
+        }
     }
 }
