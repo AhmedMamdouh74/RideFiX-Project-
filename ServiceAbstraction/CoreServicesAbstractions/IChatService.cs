@@ -10,6 +10,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
     public interface IChatService
     {
         public Task<List<ChatBreifDTO>> GetAllChatsAsync();
-        public Task<ChatDetailsDTO> GetChatByIdAsync(ChatBreifDTO ChatBreif);
+        public Task<ChatDetailsDTO> GetChatByIdAsync(int chatsessionid);
     }
 }

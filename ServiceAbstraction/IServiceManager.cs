@@ -20,6 +20,7 @@ namespace ServiceAbstraction
         ICarOwnerService carOwnerService { get; }
         IUserProfileService userProfileService { get; }
         IUserConnectionIdService userConnectionIdService { get; }
+        IChatSessionService chatSessionService { get; }
 
 
 

@@ -112,13 +112,13 @@ namespace Service.CoreServices
             return chatBreifDTOs;
         }
 
-        public async Task<ChatDetailsDTO> GetChatByIdAsync(ChatBreifDTO ChatBreif)
+        public async Task<ChatDetailsDTO> GetChatByIdAsync(int chatsessionid)
         {
-            if (ChatBreif == null || ChatBreif.chatsessionid <= 0)
+            if (chatsessionid <= 0)
             {
                 return null;
             }
-            var spec = new ChatDetailsSpecification(ChatBreif.chatsessionid);
+            var spec = new ChatDetailsSpecification(chatsessionid);
             var chatSession = await unitOfWork.GetRepository<ChatSession, int>().GetByIdAsync(spec);
         
             if (chatSession == null)
@@ -127,14 +127,42 @@ namespace Service.CoreServices
             }
             var messages = chatSession.massages.ToList();
             var mappedMessages = mapper.Map<List<MessegeDTO>>(messages);
-            var chatDetails = new ChatDetailsDTO()
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
             {
-                name = ChatBreif.name,
-                imgurl = ChatBreif.imgurl,
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var userRole = user.User.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
+            if (userRole == null)
+            {
+                throw new UnauthorizedAccessException("User role is not specified.");
+            }
+            string User = string.Empty;
+            string imgurl = string.Empty;
+            if (userRole == "CarOwner")
+            {
+                User = chatSession.Technician.ApplicationUser.Name;
+                imgurl = chatSession.Technician.ApplicationUser.FaceImageUrl;
+            }
+            else if (userRole == "Technician")
+            {
+                User = chatSession.CarOwner.ApplicationUser.Name;
+                imgurl = chatSession.CarOwner.ApplicationUser.FaceImageUrl;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("User is not authorized to access this resource.");
+
+            }
+
+                var chatDetails = new ChatDetailsDTO()
+            {
+                name = User,
+                imgurl = imgurl,
                 messages = mappedMessages
 
             };
-
 
             return chatDetails;
 

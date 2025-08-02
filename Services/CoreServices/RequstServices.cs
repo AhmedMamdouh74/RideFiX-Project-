@@ -14,7 +14,9 @@ using Service.Exception_Implementation.ArgumantNullException;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
+using SharedData.DTOs.ChatSessionDTOs;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
 using SharedData.Enums;
@@ -23,7 +25,8 @@ namespace Service.CoreServices
 {
     public class RequstServices : IRequestServices
     {
-        private readonly ITechnicianService technicianService;
+        private readonly IServiceManager serviceManager;
+
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         public RequstServices(IUnitOfWork _unitOfWork,
@@ -33,7 +36,7 @@ namespace Service.CoreServices
 
             unitOfWork = _unitOfWork;
             mapper = _mapper;
-            this.technicianService = technicianService;
+            this.serviceManager = serviceManager;
         }
 
         public async Task CancelAll(int CarOwnerID)
@@ -77,7 +80,24 @@ namespace Service.CoreServices
             emergencyRequest.IsCompleted = true;
             emergencyRequest.EndTimeStamp = DateTime.UtcNow;
             emergencyRequest.CompeletRequestDate = DateOnly.FromDateTime(DateTime.UtcNow);
+
             unitOfWork.GetRepository<EmergencyRequest, int>().Update(emergencyRequest);
+            if(emergencyRequest.TechnicianId.HasValue)
+            {
+                var ChatSession = await serviceManager.chatSessionService.GetChatSessions(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
+                if (ChatSession == null)
+                {
+                    throw new ChatSessionNotFoundException();
+                }
+                 ChatSession.IsClosed = true;
+                 ChatSession.EndAt = DateTime.UtcNow;
+                var chatSessionOrigin = mapper.Map<ChatSession>(ChatSession);
+
+                unitOfWork.GetRepository<ChatSession, int>().Update(chatSessionOrigin);
+
+            }
+            
+
             await unitOfWork.SaveChangesAsync();
             var emergencyRequestTechnicians = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().GetByIdAsync(requestId);
             if (emergencyRequestTechnicians != null)
@@ -155,7 +175,7 @@ namespace Service.CoreServices
             {
                 throw new CarOwnerNotFoundException();
             }
-            var filteredTechnicians = await technicianService.GetTechniciansByFilterAsync(request);
+            var filteredTechnicians = await serviceManager.technicianService.GetTechniciansByFilterAsync(request);
             if (filteredTechnicians == null || !filteredTechnicians.Any())
             {
                 return new PreRequestDTO { };
@@ -217,7 +237,7 @@ namespace Service.CoreServices
             {
                 throw new RequestNotFoundException();
             }
-            string city = await technicianService.GetCity(emergencyRequest.Latitude, emergencyRequest.Longitude);
+            string city = await serviceManager.technicianService.GetCity(emergencyRequest.Latitude, emergencyRequest.Longitude);
             if(emergencyRequest.Technician == null)
             {
                 throw new RequestDetailsException();
