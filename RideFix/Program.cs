@@ -40,7 +40,7 @@ namespace RideFix
                 options.AddPolicy("AllowAngularOrigin",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:5500")  // السماح فقط لواجهة Angular
+                        policy.WithOrigins("http://localhost:4200")  // السماح فقط لواجهة Angular
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .AllowCredentials();  // السماح بالـ credentials (مثل الكوكيز أو التوكنات)
@@ -148,8 +148,7 @@ namespace RideFix
 
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken)
-                        && path.StartsWithSegments("/requestWatchDogHub")
-                        && path.StartsWithSegments("/chathub"))
+                        && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub"))
                         {
                             context.Token = accessToken;
                         }

@@ -25,18 +25,23 @@ namespace Service.CoreServices
 {
     public class RequstServices : IRequestServices
     {
-        private readonly IServiceManager serviceManager;
+        //private readonly IServiceManager serviceManager;
 
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
+        private readonly ITechnicianService techService;
+        private readonly IChatSessionService chatSessionService;
         public RequstServices(IUnitOfWork _unitOfWork,
             IMapper _mapper,
-            ITechnicianService technicianService)
+            ITechnicianService technicianService,
+            IChatSessionService chatSessionService)
         {
 
             unitOfWork = _unitOfWork;
             mapper = _mapper;
-            this.serviceManager = serviceManager;
+            techService = technicianService;
+            this.chatSessionService = chatSessionService;
+            //this.serviceManager = serviceManager;
         }
 
         public async Task CancelAll(int CarOwnerID)
@@ -84,7 +89,7 @@ namespace Service.CoreServices
             unitOfWork.GetRepository<EmergencyRequest, int>().Update(emergencyRequest);
             if(emergencyRequest.TechnicianId.HasValue)
             {
-                var ChatSession = await serviceManager.chatSessionService.GetChatSessions(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
+                var ChatSession = await chatSessionService.GetChatSessions(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
                 if (ChatSession == null)
                 {
                     throw new ChatSessionNotFoundException();
@@ -175,7 +180,7 @@ namespace Service.CoreServices
             {
                 throw new CarOwnerNotFoundException();
             }
-            var filteredTechnicians = await serviceManager.technicianService.GetTechniciansByFilterAsync(request);
+            var filteredTechnicians = await techService.GetTechniciansByFilterAsync(request);
             if (filteredTechnicians == null || !filteredTechnicians.Any())
             {
                 return new PreRequestDTO { };
@@ -237,7 +242,7 @@ namespace Service.CoreServices
             {
                 throw new RequestNotFoundException();
             }
-            string city = await serviceManager.technicianService.GetCity(emergencyRequest.Latitude, emergencyRequest.Longitude);
+            string city = await techService.GetCity(emergencyRequest.Latitude, emergencyRequest.Longitude);
             if(emergencyRequest.Technician == null)
             {
                 throw new RequestDetailsException();
