@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.CarOwnerSpecifications;
+using Service.Specification_Implementation.ChatSessionsSpecifications;
+using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using SharedData.DTOs.MessegeDTOs;
 using System;
 using System.Collections.Generic;
@@ -25,14 +29,17 @@ namespace Service.CoreServices
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IChatSessionService chatSessionService;
 
 
         public ChatService(IUnitOfWork unitOfWork, IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IChatSessionService chatSessionService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.httpContextAccessor = httpContextAccessor;
+            this.chatSessionService = chatSessionService;
         }
 
 
@@ -165,5 +172,45 @@ namespace Service.CoreServices
             return chatDetails;
 
         }
+
+        public async Task<ChatSessionAllDTO> LoadCurrentChat()
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            var userRole = user.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
+            int userId = 0;
+            var idClaim = user?.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
+            int.TryParse(idClaim, out userId);
+
+            if (userRole == null)
+            {
+                throw new UnauthorizedAccessException("User role is not specified.");
+            }
+            else if(userRole == "CarOwner")
+            {
+               var currentchat = await chatSessionService.GetChatSessionsByCarOwnerId(userId);
+                if (currentchat == null)
+                {
+                    throw new ChatNotFoundException();
+                }
+                return currentchat;
+            } else if (userRole == "Technician")
+            {
+               var currentchat = await chatSessionService.GetChatSessionsByTechnicianId(userId);
+                if (currentchat == null)
+                {
+                    throw new ChatNotFoundException();
+                }
+                return currentchat;
+            }
+            throw new UnauthorizedAccessException("User is not authorized to access this resource.");
+
+        }
+
+
     }
 }

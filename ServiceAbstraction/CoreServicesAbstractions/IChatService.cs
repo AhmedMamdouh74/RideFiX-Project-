@@ -1,4 +1,5 @@
 ﻿using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
     {
         public Task<List<ChatBreifDTO>> GetAllChatsAsync();
         public Task<ChatDetailsDTO> GetChatByIdAsync(int chatsessionid);
+        public Task<ChatSessionAllDTO> LoadCurrentChat();
     }
 }

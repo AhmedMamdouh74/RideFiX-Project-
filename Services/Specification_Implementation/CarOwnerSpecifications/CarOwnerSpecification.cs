@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.CarOwnerSpecifications
 {
     public class CarOwnerSpecification : Specification<CarOwner, int>
     {

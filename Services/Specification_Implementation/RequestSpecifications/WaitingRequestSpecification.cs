@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.RequestSpecifications
 {
     
     internal class WaitingRequestSpecification : Specification<EmergencyRequest, int>

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.Wrapper;
 
@@ -50,6 +51,17 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<ChatDetailsDTO>.SuccessResponse(chat.Result, "Chat retrieved successfully"));
         }
 
+        [HttpGet("LoadCurrentChat")]
+        public async Task<IActionResult> LoadCurrentChat()
+        {
+            var chat = await serviceManager.ChatService.LoadCurrentChat();
+            if (chat == null)
+            {
+                return NotFound(ApiResponse<ChatSessionAllDTO>.FailResponse("No current chat found"));
+            }
+            return Ok(ApiResponse<ChatSessionAllDTO>.SuccessResponse(chat, "Current chat loaded successfully"));
 
+
+        }
     }
 }

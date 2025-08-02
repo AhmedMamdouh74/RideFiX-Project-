@@ -7,16 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.ChatSessionsSpecifications
 {
-    public class EmergencyRequestTotalSpecification : Specification<EmergencyRequest, int>
+    public class GetChatSessionByTechnicianId : Specification<ChatSession, int>
     {
-        public EmergencyRequestTotalSpecification(int id) : base(
-            e => e.Id == id)
+        public GetChatSessionByTechnicianId(int TechID) : base(s => s.TechnicianId == TechID && s.IsClosed == false)
         {
-
-            AddInclude(e => e.Technician);
-
         }
     }
 }

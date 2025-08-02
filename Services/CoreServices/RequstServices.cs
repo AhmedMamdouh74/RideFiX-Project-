@@ -14,6 +14,8 @@ using Service.Exception_Implementation.ArgumantNullException;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.CarOwnerSpecifications;
+using Service.Specification_Implementation.RequestSpecifications;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatSessionDTOs;

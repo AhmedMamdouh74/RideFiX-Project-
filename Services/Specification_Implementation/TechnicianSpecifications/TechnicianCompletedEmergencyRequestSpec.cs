@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.TechnicianSpecifications
 {
     public class TechnicianCompletedEmergencyRequestSpec:Specification<EmergencyRequest,int>
     {

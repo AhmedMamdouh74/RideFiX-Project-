@@ -7,7 +7,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Services.Specification_Implementation;
 using SharedData.DTOs.RequestsDTOs;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.CarOwnerSpecifications
 {
     public class CarOwnerUserPinSpecification : Specification<CarOwner, int>
     {

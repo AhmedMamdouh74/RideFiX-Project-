@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.ChatSessionsSpecifications
 {
     public class ChatSessionAllSpecification : Specification<ChatSession, int>
     {

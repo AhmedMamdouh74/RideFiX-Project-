@@ -2,7 +2,7 @@
 using Services.Specification_Implementation;
 using SharedData.Enums;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.RequestSpecifications
 {
     public class EmergencyRequestTechniciansAssignedToTechSpec : Specification<EmergencyRequestTechnicians, int>
     {

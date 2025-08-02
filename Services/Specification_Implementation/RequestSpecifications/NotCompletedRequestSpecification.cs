@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Services.Specification_Implementation;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.RequestSpecifications
 {
     internal class NotCompletedRequestSpecification : Specification<EmergencyRequest, int>
     {

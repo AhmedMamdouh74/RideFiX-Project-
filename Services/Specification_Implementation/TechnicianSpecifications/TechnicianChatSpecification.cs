@@ -7,18 +7,16 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Specification_Implementation
+namespace Service.Specification_Implementation.TechnicianSpecifications
 {
-    public class CarOwnerChatSpecification : Specification<ChatSession, int>
+    public class TechnicianChatSpecification : Specification<ChatSession, int>
     {
-        public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid )
+        public TechnicianChatSpecification(int userId) : base(s => s.TechnicianId == userId)
         {
-            AddInclude(s => s.CarOwner);
-            AddInclude(s => s.massages );
+            AddInclude(t => t.Technician);
+            AddInclude(t => t.massages);
             AddInclude(s => s.CarOwner.ApplicationUser);
 
-
-            
         }
         public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)
         {
@@ -26,5 +24,6 @@ namespace Service.Specification_Implementation
                 .OrderByDescending(s => s.StartAt)
                 .ThenByDescending(s => s.massages.Max(m => m.SentAt));
         }
+
     }
 }
