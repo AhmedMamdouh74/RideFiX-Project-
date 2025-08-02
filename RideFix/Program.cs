@@ -190,7 +190,7 @@ namespace RideFix
             //notification hub configuration
             // التسجيل الصحيح للـ Hub
             app.MapHub<NotificationHub>("/notificationhub");
-            app.MapHub<ChatHub>("/chathub");
+            //app.MapHub<ChatHub>("/chathub");
             app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
 
 

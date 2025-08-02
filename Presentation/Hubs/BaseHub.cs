@@ -15,6 +15,11 @@ namespace Presentation.Hubs
         private IHttpContextAccessor httpContextAccessor;
         private IServiceManager ServiceManager { get; set; }
 
+        public BaseHub(IHttpContextAccessor  httpContextAccessor , IServiceManager service)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+            this.ServiceManager = service;
+        }
         #region Overriding
         public async override Task OnConnectedAsync()
         {
