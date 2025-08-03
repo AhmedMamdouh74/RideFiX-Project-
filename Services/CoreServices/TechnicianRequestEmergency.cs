@@ -190,6 +190,7 @@ namespace Service.CoreServices.TechniciansServices
                 // create a new chat session for this request
                 var chatRoom = new ChatSession
                 {
+                    StartAt= DateTime.UtcNow,
                     IsClosed = false,
                     TechnicianId = dto.TechnicianId,
                     CarOwnerId = request.CarOwnerId
