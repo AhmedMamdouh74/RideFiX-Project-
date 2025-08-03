@@ -9,6 +9,7 @@ namespace SharedData.DTOs.ChatDTOs
 {
     public class ChatDetailsDTO
     {
+        public int Id { get; set; }
         public string name { get; set; }
         public string imgurl { get; set; }
         public bool IsClosed { get; set; }

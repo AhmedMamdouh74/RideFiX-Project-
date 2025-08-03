@@ -14,7 +14,7 @@ namespace Service.AutoMapperProfile
         public ChatSessionAllMapConfig()
         {
             CreateMap<ChatSession, ChatSessionAllDTO>()
-            .ForMember(dest => dest.massages, opt => opt.MapFrom(src => src.massages))
+            .ForMember(dest => dest.messages, opt => opt.MapFrom(src => src.massages))
             .ReverseMap();
 
         }

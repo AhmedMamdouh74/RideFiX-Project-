@@ -37,7 +37,8 @@ namespace Service.CoreServices
                 ApplicationId = messegeDTO.ApplicationId
             };
             await unitOfWork.GetRepository<Message, int>().AddAsync(message);
-            await unitOfWork.SaveChangesAsync();
+            var x = await unitOfWork.SaveChangesAsync();
+            
         }
 
         //public async Task<List<MessegeDTO>> GetAllMessegesAsync(int chatSessionId)

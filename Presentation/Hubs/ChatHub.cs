@@ -24,7 +24,7 @@ namespace Presentation.Hubs
             this.ServiceManager = service;
         }
 
-        public async Task SendMessage(int chatsessionId , string messege)
+        public async Task sendmessage(int chatsessionId , string messege)
         {
             var user = httpContextAccessor.HttpContext?.User;
             int userId = 0;
@@ -39,7 +39,7 @@ namespace Presentation.Hubs
                 throw new InvalidOperationException("Chat session not found.");
             }
 
-            string UserRole = user?.Claims.FirstOrDefault(c => c.Type == "UserRole")?.Value;
+            string UserRole = user?.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             if(UserRole == "CarOwner")
             {             
@@ -57,7 +57,7 @@ namespace Presentation.Hubs
             }
             else if (UserRole == "Technician")
             {
-                var CarOwnerId = chatSession.TechnicianId;
+                var CarOwnerId = chatSession.CarOwnerId;
                 var carOwners = await ServiceManager.userConnectionIdService.SearchByCarOwnerId(CarOwnerId);
                 if (carOwners == null)
                 {
@@ -77,7 +77,9 @@ namespace Presentation.Hubs
             {
                 ChatSessionId = chatsessionId,
                 Text = messege,
-                ApplicationId = ApplicationId
+                ApplicationId = ApplicationId,
+                SentAt = DateTime.UtcNow,
+
             };
             await ServiceManager.messegeService.AddMessegeAsync(message);
 
@@ -90,7 +92,7 @@ namespace Presentation.Hubs
             };
 
 
-            await Clients.Client(UserConcId).SendAsync("ReceiveMessage", sendMessege);
+            //await Clients.Client(UserConcId).SendAsync("ReceiveMessage", sendMessege);
             await Clients.Client(otherUserId).SendAsync("ReceiveMessage", sendMessege);
 
         }
