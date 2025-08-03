@@ -190,22 +190,23 @@ namespace Service.CoreServices.TechniciansServices
                 request.TechnicianId = dto.TechnicianId;
 
                 // create a new chat session for this request
-                var chatRoom = new ChatSession
+                var chatSession = new ChatSession
                 {
+                    StartAt= DateTime.UtcNow,
                     IsClosed = false,
                     TechnicianId = dto.TechnicianId,
                     CarOwnerId = request.CarOwnerId
                 };
 
-                await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatRoom);
+                await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatSession);
 
                 //await _hubContext.Clients
                 //    
                 //    .SendAsync("ChatStarted", new
                 //    {
-                //        ChatRoomId = chatRoom.Id,
-                //        CarOwnerId =chatRoom.CarOwnerId,
-                //        TechnicianId = chatRoom.TechnicianId
+                //        ChatRoomId = chatSession.Id,
+                //        CarOwnerId =chatSession.CarOwnerId,
+                //        TechnicianId = chatSession.TechnicianId
                 //    });
 
 
