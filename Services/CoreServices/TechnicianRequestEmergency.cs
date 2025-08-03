@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.RequestSpecifications;
+using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.TechnicianEmergencyRequestDTOs;
 using SharedData.Enums;

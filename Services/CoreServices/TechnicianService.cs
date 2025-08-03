@@ -5,6 +5,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Service.Exception_Implementation;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;

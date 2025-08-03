@@ -6,8 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.CarOwnerSpecifications;
+using Service.Specification_Implementation.ChatSessionsSpecifications;
+using Service.Specification_Implementation.TechnicianSpecifications;
+using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
+using SharedData.DTOs.ChatSessionDTOs;
 using SharedData.DTOs.MessegeDTOs;
 using System;
 using System.Collections.Generic;
@@ -23,18 +28,18 @@ namespace Service.CoreServices
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly IMessegeService messegeService;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IChatSessionService chatSessionService;
 
 
         public ChatService(IUnitOfWork unitOfWork, IMapper mapper,
-            IMessegeService messegeService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IChatSessionService chatSessionService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.messegeService = messegeService;
             this.httpContextAccessor = httpContextAccessor;
+            this.chatSessionService = chatSessionService;
         }
 
 
@@ -112,13 +117,13 @@ namespace Service.CoreServices
             return chatBreifDTOs;
         }
 
-        public async Task<ChatDetailsDTO> GetChatByIdAsync(ChatBreifDTO ChatBreif)
+        public async Task<ChatDetailsDTO> GetChatByIdAsync(int chatsessionid)
         {
-            if (ChatBreif == null || ChatBreif.chatsessionid <= 0)
+            if (chatsessionid <= 0)
             {
                 return null;
             }
-            var spec = new ChatDetailsSpecification(ChatBreif.chatsessionid);
+            var spec = new ChatDetailsSpecification(chatsessionid);
             var chatSession = await unitOfWork.GetRepository<ChatSession, int>().GetByIdAsync(spec);
         
             if (chatSession == null)
@@ -127,17 +132,85 @@ namespace Service.CoreServices
             }
             var messages = chatSession.massages.ToList();
             var mappedMessages = mapper.Map<List<MessegeDTO>>(messages);
-            var chatDetails = new ChatDetailsDTO()
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
             {
-                name = ChatBreif.name,
-                imgurl = ChatBreif.imgurl,
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var userRole = user.User.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
+            if (userRole == null)
+            {
+                throw new UnauthorizedAccessException("User role is not specified.");
+            }
+            string User = string.Empty;
+            string imgurl = string.Empty;
+            if (userRole == "CarOwner")
+            {
+                User = chatSession.Technician.ApplicationUser.Name;
+                imgurl = chatSession.Technician.ApplicationUser.FaceImageUrl;
+            }
+            else if (userRole == "Technician")
+            {
+                User = chatSession.CarOwner.ApplicationUser.Name;
+                imgurl = chatSession.CarOwner.ApplicationUser.FaceImageUrl;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("User is not authorized to access this resource.");
+
+            }
+
+                var chatDetails = new ChatDetailsDTO()
+            {
+                name = User,
+                imgurl = imgurl,
                 messages = mappedMessages
 
             };
 
-
             return chatDetails;
 
         }
+
+        public async Task<ChatSessionAllDTO> LoadCurrentChat()
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            var userRole = user.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
+            int userId = 0;
+            var idClaim = user?.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
+            int.TryParse(idClaim, out userId);
+
+            if (userRole == null)
+            {
+                throw new UnauthorizedAccessException("User role is not specified.");
+            }
+            else if(userRole == "CarOwner")
+            {
+               var currentchat = await chatSessionService.GetChatSessionsByCarOwnerId(userId);
+                if (currentchat == null)
+                {
+                    throw new ChatNotFoundException();
+                }
+                return currentchat;
+            } else if (userRole == "Technician")
+            {
+               var currentchat = await chatSessionService.GetChatSessionsByTechnicianId(userId);
+                if (currentchat == null)
+                {
+                    throw new ChatNotFoundException();
+                }
+                return currentchat;
+            }
+            throw new UnauthorizedAccessException("User is not authorized to access this resource.");
+
+        }
+
+
     }
 }

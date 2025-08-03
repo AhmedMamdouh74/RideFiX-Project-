@@ -8,6 +8,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.RequestSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs;
 using SharedData.DTOs.CarOwnerDTOs;

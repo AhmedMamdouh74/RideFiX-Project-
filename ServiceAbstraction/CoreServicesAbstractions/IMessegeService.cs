@@ -9,7 +9,9 @@ namespace ServiceAbstraction.CoreServicesAbstractions
 {
     public interface IMessegeService
     {
-        public Task<List<MessegeDTO>> GetAllMessegesAsync(int chatSessionId);
+        //public Task<List<MessegeDTO>> GetAllMessegesAsync(int chatSessionId);
+
+        public Task AddMessegeAsync(MessegeAllDTO messegeDTO);
 
     }
 }

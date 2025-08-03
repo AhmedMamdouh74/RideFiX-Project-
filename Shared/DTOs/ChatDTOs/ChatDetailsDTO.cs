@@ -11,6 +11,8 @@ namespace SharedData.DTOs.ChatDTOs
     {
         public string name { get; set; }
         public string imgurl { get; set; }
+        public bool IsClosed { get; set; }
+        public DateTime EndAt { get; set; }
 
         public List<MessegeDTO>? messages { get; set; } = new List<MessegeDTO>();
 
