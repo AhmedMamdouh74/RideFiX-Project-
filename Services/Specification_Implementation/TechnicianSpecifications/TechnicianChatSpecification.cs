@@ -11,11 +11,11 @@ namespace Service.Specification_Implementation.TechnicianSpecifications
 {
     public class TechnicianChatSpecification : Specification<ChatSession, int>
     {
-        public TechnicianChatSpecification(int userId) : base(s => s.TechnicianId == userId)
+        public TechnicianChatSpecification(int UserId) : base(s => s.TechnicianId == UserId && s.IsClosed == true)
         {
             AddInclude(t => t.Technician);
             AddInclude(t => t.massages);
-            AddInclude(s => s.CarOwner.ApplicationUser);
+            AddInclude(t => t.Technician.ApplicationUser);
 
         }
         public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)

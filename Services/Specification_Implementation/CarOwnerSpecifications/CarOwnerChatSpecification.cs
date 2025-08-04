@@ -11,7 +11,7 @@ namespace Service.Specification_Implementation.CarOwnerSpecifications
 {
     public class CarOwnerChatSpecification : Specification<ChatSession, int>
     {
-        public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid )
+        public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid && s.IsClosed == true)
         {
             AddInclude(s => s.CarOwner);
             AddInclude(s => s.massages );

@@ -30,9 +30,10 @@ namespace Presentation.Hubs
             int userId = 0;
             var idClaim = user?.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             int.TryParse(idClaim, out userId);
+
             string otherUserId = string.Empty;
             var UserConcId = Context.ConnectionId;
-            string ApplicationId = string.Empty;
+            string ApplicationId = ApplicationId = user?.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             var chatSession = await ServiceManager.chatSessionService.GetChatSessions(chatsessionId);
             if (chatSession == null)
             {
@@ -50,8 +51,8 @@ namespace Presentation.Hubs
                 {
                     throw new InvalidOperationException("No technician found for this chat session.");
                 }
-                ApplicationId = techinicain.FirstOrDefault()?.ApplicationUserId;
 
+               
 
                 otherUserId = techinicain.FirstOrDefault()?.ConnectionId;
             }
@@ -64,7 +65,7 @@ namespace Presentation.Hubs
                     throw new InvalidOperationException("No car owner found for this chat");
                 }
 
-                ApplicationId = carOwners.FirstOrDefault()?.ApplicationUserId;
+                
                 otherUserId = carOwners.FirstOrDefault()?.ConnectionId;
 
             }
@@ -92,8 +93,8 @@ namespace Presentation.Hubs
             };
 
 
-            //await Clients.Client(UserConcId).SendAsync("ReceiveMessage", sendMessege);
-            await Clients.Client(otherUserId).SendAsync("ReceiveMessage", sendMessege);
+            await Clients.Client(UserConcId).SendAsync("receivemessage", sendMessege);
+            await Clients.Client(otherUserId).SendAsync("receivemessage", sendMessege);
 
         }
 

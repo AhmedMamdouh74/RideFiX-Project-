@@ -13,6 +13,7 @@ namespace Service.Specification_Implementation.ChatSessionsSpecifications
     {
         public GetChatSessionByTechnicianId(int TechID) : base(s => s.TechnicianId == TechID && s.IsClosed == false)
         {
+            AddInclude(s => s.massages.OrderBy(s => s.SentAt));
         }
     }
 }
