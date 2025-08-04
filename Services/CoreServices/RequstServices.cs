@@ -256,7 +256,7 @@ namespace Service.CoreServices
                 TechnicianName = emergencyRequest.Technician.ApplicationUser.Name,
                 CategoryName = emergencyRequest.category.Name,
                 RequestDate = emergencyRequest.CompeletRequestDate ?? DateOnly.FromDateTime(DateTime.UtcNow),
-                Rate = emergencyRequest.Review.Rate,
+                Rate = emergencyRequest.Review?.Rate,
                 Comment = emergencyRequest.Review?.Comment,
             };
             return mappedRequest;

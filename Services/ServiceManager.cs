@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
+using Service.CoreServices.CarMservices;
 using Service.CoreServices.TechniciansServices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -31,6 +32,8 @@ namespace Services
         public IUserConnectionIdService userConnectionIdService { get; }
         public IChatSessionService chatSessionService { get; }
 
+        public ICarServices carServices { get; }
+
         #endregion
 
         public ServiceManager(
@@ -44,7 +47,8 @@ namespace Services
                     IChatService chatservice,
                     IMessegeService messegeService,
                     IUserConnectionIdService userConnectionIdService,
-                    IChatSessionService chatSessionService)
+                    IChatSessionService chatSessionService,
+                    ICarServices carServices)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -57,6 +61,7 @@ namespace Services
             this.messegeService = messegeService;
             this.userConnectionIdService = userConnectionIdService;
             this.chatSessionService = chatSessionService;
+            this.carServices = carServices;
         }
     }
 }
