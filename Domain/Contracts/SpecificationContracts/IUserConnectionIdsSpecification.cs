@@ -8,9 +8,10 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 
 namespace Domain.Contracts.SpecificationContracts
 {
-    public class IUserConnectionIdsSpecification
+    public interface IUserConnectionIdsSpecification
     {
         public Expression<Func<UserConnectionIds, bool>> Criteria { get; }
+
         public List<Expression<Func<UserConnectionIds, object>>> Includes { get; }
         public Expression<Func<UserConnectionIds, object>> OrderBy { get; }
         public Expression<Func<UserConnectionIds, object>> OrderByDescending { get; }
