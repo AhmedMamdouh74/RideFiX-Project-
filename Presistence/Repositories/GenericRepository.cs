@@ -9,6 +9,7 @@ using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Presistence.Data;
+using Services.Specification_Implementation;
 //using Service.Specification_Implementation;
 
 namespace Presistence.Repositories
@@ -80,7 +81,12 @@ namespace Presistence.Repositories
         public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(predicate);
-
+        }
+        public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T, TK> spec)
+        {
+            var query = _context.Set<T>().AsQueryable();
+            query = SpecificationEvaluation.ApplySpecification(query, spec);
+            return await query.ToListAsync();
         }
     }
 }

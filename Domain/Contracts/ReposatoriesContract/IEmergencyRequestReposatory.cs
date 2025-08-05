@@ -18,5 +18,6 @@ namespace Domain.Contracts.ReposatoriesContract
         Task<IEnumerable<EmergencyRequestTechnicians>> GetAllAsync(IRequestSpecification spec);
         Task UpdateAsync(EmergencyRequestTechnicians entity);
 
+
     }
 }

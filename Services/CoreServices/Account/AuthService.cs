@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using Services.Specification_Implementation.Emergency;
 using SharedData.DTOs.Account;
 using SharedData.Enums;
 
@@ -176,12 +177,31 @@ namespace Service.CoreServices.Account
             {
                 await _userManager.AddToRoleAsync(user, Roles.Technician);
 
+                var categoryRepo = _unitOfWork.GetRepository<TCategory, int>();
+
+                var categorySpec = new CategoriesByNameSpec(step1Dto.Categories);
+
+                var categories = await categoryRepo.GetAllWithSpecAsync(categorySpec);
+
+                if (categories == null || !categories.Any())
+                {
+                    return IdentityResult.Failed(new IdentityError
+                    {
+                        Code = "InvalidCategories",
+                        Description = "One or more selected categories are invalid."
+                    });
+                }
+
+
+
                 var tech = new Technician
                 {
                     ApplicationUserId = user.Id,
                     StartWorking = step1Dto.StartWorking.Value,
                     EndWorking = step1Dto.EndWorking.Value,
-                    Description = step1Dto.Description
+                    Description = step1Dto.Description,
+                    TCategories = categories.ToList()
+
                 };
                 //add in database
                 await _unitOfWork.GetRepository<Technician, int>().AddAsync(tech);
