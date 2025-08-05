@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using SharedData.DTOs.Account;
+using SharedData.Wrapper;
 
 namespace RideFix.Controllers
 {
@@ -10,10 +14,12 @@ namespace RideFix.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IServiceManager serviceManager;
 
-        public AccountController(IAuthService authService)
+        public AccountController(IAuthService authService, IServiceManager _serviceManager)
         {
             this._authService = authService;
+            serviceManager = _serviceManager;
         }
         [HttpPost("register-step1")]
 
@@ -28,7 +34,6 @@ namespace RideFix.Controllers
             return Ok(new { message = "Step 1 completed successfully. Proceed to Step 2." });
 
         }
-
         [HttpPost("register-step2")]
 
         public async Task<IActionResult> registerStep2([FromForm] RegisterStep2Dto step2Dto)
@@ -51,6 +56,21 @@ namespace RideFix.Controllers
                 return Unauthorized("Invalid email or password");
 
             return Ok(new { token });
+        }
+        [HttpGet("check-email")]
+        public async Task<IActionResult> CheckEmailExists(string email)
+        {
+            var isEmailExists = await _authService.CheckEmailExists(email);
+            return Ok(isEmailExists);
+        } 
+
+        [HttpGet("technicianDetails/{technicianId}")]
+        public async Task<IActionResult> GetTechnicianDetailsAsync(int technicianId)
+        {
+            var request = await serviceManager.userProfileService.GetTechnicianDetailsAsync(technicianId);
+            if (request == null)
+                return NotFound(ApiResponse<string>.FailResponse("Request details not found for this technician and request"));
+            return Ok(ApiResponse<ReadUserDetailsDTO>.SuccessResponse(request, "User details"));
         }
 
 

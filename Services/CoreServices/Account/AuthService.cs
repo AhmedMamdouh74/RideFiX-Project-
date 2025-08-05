@@ -8,6 +8,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,12 @@ namespace Service.CoreServices.Account
 
         }
 
+        public async Task<bool> CheckEmailExists(string email)
+        {
+            var Email = await _userManager.FindByEmailAsync(email);
+            return (Email != null);
+        }
+
         public async Task<string> LoginAsync(LoginDto dto )
         {
             int   roleEntityId = 0;
@@ -64,8 +71,13 @@ namespace Service.CoreServices.Account
                     .GetFirstOrDefaultAsync(predicate: t => t.ApplicationUserId == user.Id);
                 if (technician != null) roleEntityId = technician.Id;
             }
-
-            return _jwtService.generateToken(user , roles , roleEntityId);
+            var newUser = new JwtTokenDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Name = user.Name
+            };
+            return _jwtService.generateToken(newUser, roles , roleEntityId);
         }
 
         public async Task<IdentityResult> RegisterStep1Async(RegisterStep1Dto dto)
@@ -98,12 +110,21 @@ namespace Service.CoreServices.Account
 
                 if (string.IsNullOrWhiteSpace(dto.Description))
                     errors.Add(new IdentityError { Code = "DescriptionRequired", Description = "Description is required for technicians." });
+                if (dto.Categories == null || !dto.Categories.Any())
+                {
+                    errors.Add(new IdentityError
+                    {
+                        Code = "CategoryRequired",
+                        Description = "At least one category is required for technicians."
+                    });
+                }
+
 
                 if (errors.Any())
                     return IdentityResult.Failed(errors.ToArray());
 
             }
-            _memoryCache.Set($"register_{dto.Email}", dto, TimeSpan.FromMinutes(10));
+            _memoryCache.Set($"register_{dto.Email}", dto, TimeSpan.FromMinutes(40));
 
             return IdentityResult.Success;
 
@@ -155,6 +176,7 @@ namespace Service.CoreServices.Account
                     Description = "Face doesn't match ID image."
                 });
             }
+
             var user = _mapper.Map<ApplicationUser>(step1Dto);
             user.IdentityImageUrl = identityImageUrl;
             user.FaceImageUrl = faceImageUrl;
@@ -196,7 +218,10 @@ namespace Service.CoreServices.Account
 
                 var tech = new Technician
                 {
+
                     ApplicationUserId = user.Id,
+                    //StartWorking = start ?? default,
+                    //EndWorking = end ?? default,
                     StartWorking = step1Dto.StartWorking.Value,
                     EndWorking = step1Dto.EndWorking.Value,
                     Description = step1Dto.Description,

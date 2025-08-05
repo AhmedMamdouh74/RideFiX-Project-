@@ -34,7 +34,15 @@ namespace Services
             Services.AddScoped<ITechnicianService, TechnicianService>();
             Services.AddScoped<ITechnicianRequestEmergency, TechnicianRequestEmergency>();
             Services.AddScoped<ICategoryService, CategoryService>();
+            Services.AddScoped<IReviewService, ReviewService>();
+            Services.AddScoped<IUserProfileService, UserProfileService>();
+            Services.AddAutoMapper(typeof(UserProfileMapConfig));
             Services.AddAutoMapper(typeof(PreRequestMapConfig));
+            Services.AddScoped<ICarOwnerService, CarOwnerService>();
+            Services.AddScoped<IMessegeService, MessegeService>();
+            Services.AddScoped<IChatService, ChatService>();
+            Services.AddScoped<IUserConnectionIdService, UserConnectionIdService>();
+            Services.AddScoped<IChatSessionService , ChatSessionService>();
             return Services;
         }
     }

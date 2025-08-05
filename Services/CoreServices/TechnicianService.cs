@@ -5,6 +5,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Service.Exception_Implementation;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
@@ -91,7 +92,7 @@ namespace Service.CoreServices
             var filteredTechnicians = await unitOfWork.GetRepository<Technician, int>()
                 .GetAllAsync(spec);
 
-            var mappedTechnicians = mapper.Map<IEnumerable<Technician>, IEnumerable<FilteredTechniciansDTO>>(filteredTechnicians).ToList();
+                var mappedTechnicians = mapper.Map<IEnumerable<Technician>, IEnumerable<FilteredTechniciansDTO>>(filteredTechnicians).ToList();
             if (mappedTechnicians.Count != 0)
                 return mappedTechnicians;
             else

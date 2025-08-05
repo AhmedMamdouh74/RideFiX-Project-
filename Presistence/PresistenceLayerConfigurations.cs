@@ -30,6 +30,7 @@ namespace Presistence
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped<IDataSeeding, DataSeeding>();
             Services.AddScoped<IEmergencyRequestReposatory, EmergencyRequestReposatory>();
+            Services.AddScoped<IConnectionIdsRepository, ConnectionIdsRepository>();
             return Services;
         }
     }

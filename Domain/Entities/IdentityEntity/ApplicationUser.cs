@@ -21,6 +21,7 @@ namespace Domain.Entities.IdentityEntities
         public int PIN { get; set; }
 
 
-        public ICollection<Message> messages { get; set; } = new List<Message>();
+        public ICollection<Message> messages { get; set; } = new HashSet<Message>();
+        public ICollection<UserConnectionIds> connections { get; set; } = new HashSet<UserConnectionIds>();
     }
 }

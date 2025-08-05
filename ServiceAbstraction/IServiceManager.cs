@@ -1,4 +1,5 @@
 ﻿using ServiceAbstraction.CoreServicesAbstractions;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,18 @@ namespace ServiceAbstraction
 {
     public interface IServiceManager
     {
-
+        IChatService ChatService { get; }
         ITechnicianService technicianService { get; }
         IRequestServices requestServices { get; }
         ITechnicianRequestEmergency technicianRequestEmergency { get; }
         ICategoryService categoryService { get; }
+        IReviewService reviewService { get; }
 
-
-    }
+        ICarOwnerService carOwnerService { get; }
+        IUserProfileService userProfileService { get; }
+        IUserConnectionIdService userConnectionIdService { get; }
+        IChatSessionService chatSessionService { get; }
+        IMessegeService messegeService { get; }
+        
+        }
 }

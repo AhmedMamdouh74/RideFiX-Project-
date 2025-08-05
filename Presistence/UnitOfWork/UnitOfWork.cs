@@ -15,17 +15,23 @@ namespace Presistence.unitofwork
     {
         private readonly ApplicationDbContext _context;
         private IEmergencyRequestReposatory _emergencyRequestRepository;
+        private IConnectionIdsRepository _connectionIdsRepository;
 
         readonly Dictionary<string, object> _repositories = new Dictionary<string, object>();
 
-        public UnitOfWork(ApplicationDbContext context, IEmergencyRequestReposatory emergencyRequestRepository)
+        public UnitOfWork(ApplicationDbContext context, IEmergencyRequestReposatory emergencyRequestRepository, IConnectionIdsRepository connectionIdsRepository)
         {
             _context = context;
             _emergencyRequestRepository = emergencyRequestRepository;
+            _connectionIdsRepository = connectionIdsRepository;
         }
 
-        public IEmergencyRequestReposatory EmergencyRequestRepository => 
+        public IEmergencyRequestReposatory EmergencyRequestRepository =>
             _emergencyRequestRepository ??= new EmergencyRequestReposatory(_context);
+
+        public IConnectionIdsRepository ConnectionIdsRepository => _connectionIdsRepository ??= new ConnectionIdsRepository(_context);
+
+
 
         public IGenericRepository<T, TK> GetRepository<T, TK>() where T : BaseEntity<TK>
         {
