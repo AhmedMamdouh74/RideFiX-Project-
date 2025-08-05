@@ -8,7 +8,7 @@ namespace Service.Exception_Implementation.NotFoundExceptions
 {
     public class CompletedRequestNotFoundException:Exception
     {
-        public CompletedRequestNotFoundException() : base("there is no completed Requests for now") { 
+        public CompletedRequestNotFoundException(string message) : base(message) { 
         }
     }
 }

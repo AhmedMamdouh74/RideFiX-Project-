@@ -72,10 +72,6 @@ namespace RideFix.Controllers
         [HttpGet("assigned/{technicianId}")]
         public async Task<IActionResult> GetAllRequestsAssignedToTechnician(int technicianId)
         {
-            /*
-             to do:
-            validate if technicianId found or not 
-             */
             var request = await serviceManager.technicianRequestEmergency.GetAllRequestsAssignedToTechnicianAsync(technicianId);
             if (request == null || !request.Any())
                 return NotFound(ApiResponse<string>.FailResponse("technician doesn't have requests"));

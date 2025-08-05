@@ -70,18 +70,19 @@ namespace Service.CoreServices.TechniciansServices
 
             var requestTechRepo = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
             var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered, IsCompleted = false }));
+            if (joinEntries == null || !joinEntries.Any())
+                throw new TRequestNotFoundException("you don't have accpetence requests");
             return mapper.Map<List<EmergencyRequestDetailsDTO>>(joinEntries);
         }
 
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllActiveRequestsAsync(int tecId)
         {
-            // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
+            
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
-            // var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
             var spec = new ActiveRequestsForTechnicianSpec(tecId);
             var activeRequests = await requests.GetAllAsync(spec);
             if (activeRequests == null || !activeRequests.Any())
-                return new List<EmergencyRequestDetailsDTO>();
+                throw new TRequestNotFoundException("there is no active requests to apply");
 
             return mapper.Map<List<EmergencyRequestDetailsDTO>>(activeRequests);
 
@@ -96,7 +97,7 @@ namespace Service.CoreServices.TechniciansServices
             var spec = new TechnicianCompletedEmergencyRequestSpec(technicianId, true);
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             var completedRequests = await requests.GetAllAsync(spec);
-            if (completedRequests == null || !completedRequests.Any()) throw new CompletedRequestNotFoundException();
+            if (completedRequests == null || !completedRequests.Any()) throw new CompletedRequestNotFoundException("there is no completed Requests for now");
             var result = mapper.Map<List<EmergencyRequestDetailsDTO>>(completedRequests);
             return result;
 
