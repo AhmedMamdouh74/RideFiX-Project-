@@ -14,6 +14,7 @@ using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using Domain.Contracts.ReposatoriesContract;
 using Service.CoreServices.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 
 
 
@@ -45,6 +46,7 @@ namespace Services
             Services.AddScoped<IUserConnectionIdService, UserConnectionIdService>();
             Services.AddScoped<IChatSessionService , ChatSessionService>();
             Services.AddScoped<ICarServices, CarServices>();
+            Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
             return Services;
         }
     }

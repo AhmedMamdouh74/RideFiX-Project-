@@ -9,6 +9,7 @@ using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Http;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
+using Service.Specification_Implementation;
 using Service.Specification_Implementation.CarSpecification;
 using SharedData.DTOs.Car;
 
@@ -60,6 +61,22 @@ namespace Service.CoreServices.CarMservices
             {
                 throw new CarBadRequestException();
             }
+        }
+
+        public async Task<int> GetCarIdByOwnerId(int ownerId)
+        {
+            if (ownerId <= 0)
+            {
+                throw new CarBadRequestException();
+            }
+            var spec = new CarIdSpecification(ownerId);
+            var car = await unitOfWork.GetRepository<Car, int>().GetAllAsync(spec);
+            if (car == null || !car.Any())
+            {
+                throw new CarNotFoundException();
+            }
+            return car.FirstOrDefault().Id;
+
         }
     }
 }

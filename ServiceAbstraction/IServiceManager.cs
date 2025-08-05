@@ -1,6 +1,7 @@
 ﻿using Service.CoreServices.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace ServiceAbstraction
         IChatSessionService chatSessionService { get; }
         IMessegeService messegeService { get; }
         ICarServices carServices { get; }
+        ICarMaintananceService carMaintananceService { get; }
 
     }
 }
