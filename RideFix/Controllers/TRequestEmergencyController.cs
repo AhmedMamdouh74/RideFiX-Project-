@@ -90,10 +90,9 @@ namespace RideFix.Controllers
         public async Task<IActionResult> UpdateRequestFromCarOwnerAsync([FromBody] TechnicianUpdateEmergencyRequestDTO dto)
         {
             var result = await serviceManager.technicianRequestEmergency.UpdateRequestFromCarOwnerAsync(dto);
-            if (!result)
-                return BadRequest(ApiResponse<string>.FailResponse("Invalid technician, PIN, or request"));
+           
 
-            return Ok(ApiResponse<string>.SuccessResponse("", "Updated successfully"));
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Updated successfully"));
         }
 
         [HttpPost]

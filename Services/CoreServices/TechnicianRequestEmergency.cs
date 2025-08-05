@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
-using Microsoft.AspNetCore.SignalR;
+using Domain.Exceptions;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
-using Service.Specification_Implementation;
-using Service.Specification_Implementation.ChatSessionsSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -20,11 +18,14 @@ namespace Service.CoreServices.TechniciansServices
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         // private readonly IHubContext<ChatHub> hubContext;
-        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper/* , IHubContext<ChatHub> _hubContext*/)
+        private IChatSessionService chatSessionService;
+        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper/* , IHubContext<ChatHub> _hubContext*/ , IChatSessionService _chatSessionService)
         {
             unitOfWork = _unitOfWork;
             mapper = _mapper;
             //hubContext = _hubContext;
+            chatSessionService = _chatSessionService;
+
 
         }
         public async Task<bool> ApplyRequestFromHomePage(TechnicianApplyEmergencyRequestDTO emergencyRequestDTO)
@@ -155,105 +156,128 @@ namespace Service.CoreServices.TechniciansServices
                 return mapper.Map<List<TechReverseRequestDTO>>(techRequests);
         }
 
-        public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergencyRequestDTO dto)
+   
+
+public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergencyRequestDTO dto)
+    {
+        // 1) Verify technician & PIN
+        var technician = await LoadTechnicianWithPinAsync(dto.TechnicianId, dto.Pin);
+        if (technician is null)
+            throw new TechnicianBadRequestException("Invalid technician credentials: TechnicianId or PIN is incorrect.");
+
+        // 2) Load request + links 
+        var request = await LoadRequestWithLinksAsync(dto.RequestId);
+        if (request is null)
+            throw new TRequestNotFoundException($"Emergency request with Id={dto.RequestId} was not found.");
+
+        // 3) Must be assigned to this technician
+        var link = GetLinkForTechnician(request, dto.TechnicianId);
+        if (link is null)
+            throw new TechnicianBadRequestException("This request is not assigned to the specified technician.");
+
+       
+        switch (dto.RequestState)
         {
-            // 1. Verify technician and PIN
-            var techSpec = new TechnicianWithAppUserSpec(dto.TechnicianId, dto.Pin);
-            var technician = await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(techSpec);
-            if (technician == null) return false;
-
-            // 2. Load EmergencyRequest with technician links
-            var spec = new EmergencyRequestWithTechnicianLinkSpec(dto.RequestId);
-            var request = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
-            if (request == null) return false;
-
-            // 3. Find link between this technician and the request
-            var targetLink = request.EmergencyRequestTechnicians
-                .FirstOrDefault(e => e.TechnicianId == dto.TechnicianId);
-            if (targetLink == null) return false;
-
-            // 4. Technician is accepting
-            if (dto.RequestState == RequestState.Answered)
-            {
-                // Check if technician already has 2 active accepted requests
-                var Answeredspec = new TechnicianActiveAnsweredRequestsSpec(dto.TechnicianId);
-                var activeRequests = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(Answeredspec);
-                if (activeRequests.Count() >= 2)
-                    return false;
-
-                // Make sure no one else has accepted this request
-                bool alreadyAccepted = request.EmergencyRequestTechnicians
-                    .Any(e => e.CallStatus == RequestState.Answered);
-                if (alreadyAccepted) return false;
-
-                // Mark this technician as accepted
-                targetLink.CallStatus = RequestState.Answered;
-                request.TechnicianId = dto.TechnicianId;
-
-                //  Find-or-create chat session between these two participants
-                var chatRepo = unitOfWork.GetRepository<ChatSession, int>();
-                var existingSessions = await chatRepo.GetAllAsync(
-                    new ChatSessionBetweenParticipantsSpec(request.CarOwnerId, dto.TechnicianId));
-
-                // Prefer an already open session; otherwise reopen a closed one; otherwise create new
-                var chatSession = existingSessions.FirstOrDefault(cs => !cs.IsClosed)
-                               ?? existingSessions.OrderByDescending(cs => cs.Id).FirstOrDefault();
-
-                if (chatSession is null)
+            case RequestState.Answered:
                 {
-                    // Create new
-                    chatSession = new ChatSession
-                    {
-                        StartAt = DateTime.UtcNow,
-                        IsClosed = false,
-                        TechnicianId = dto.TechnicianId,
-                        CarOwnerId = request.CarOwnerId
-                    };
-                    await chatRepo.AddAsync(chatSession);
-                }
-                else
-                {
-                    // Re-open existing (if closed)
-                    if (chatSession.IsClosed)
-                    {
-                        chatSession.IsClosed = false;
-                        // when a chat session is reopened
-                        // chatSession.ReopenedAt = DateTime.UtcNow;
-                        chatRepo.Update(chatSession);
-                    }
+                    //  Technician limit (max 2 active accepted)
+                    if (await TechnicianHasReachedActiveAcceptedLimitAsync(dto.TechnicianId))
+                        throw new TechnicianBadRequestException("Technician already has 2 active accepted requests.");
+
+                    //  Someone else already accepted?
+                    if (AnotherTechnicianAlreadyAccepted(request))
+                        throw new TechnicianBadRequestException("Another technician has already accepted this request.");
+
+                    //  Accept + assign
+                    AcceptOnLink(request, link, dto.TechnicianId);
+
+                    //  Find or create chat session (reopen if closed)
+                    var chat = await chatSessionService.GetOrCreateSessionAsync(request.CarOwnerId, dto.TechnicianId);
+
+                    // boardcast using SignalR notification 
+                   
+
+                    // 4.6) Reject others
+                    RejectOtherTechnicians(request, dto.TechnicianId);
+                    break;
                 }
 
-                //await _hubContext.Clients
-                //    
-                //    .SendAsync("ChatStarted", new
-                //    {
-                //        ChatRoomId = chatSession.Id,
-                //        CarOwnerId =chatSession.CarOwnerId,
-                //        TechnicianId = chatSession.TechnicianId
-                //    });
-
-
-
-                // Mark all other technicians as rejected
-                foreach (var link in request.EmergencyRequestTechnicians)
+            case RequestState.Rejected:
                 {
-                    if (link.TechnicianId != dto.TechnicianId)
-                    {
-                        link.CallStatus = RequestState.Rejected;
-                    }
+                    RejectOnLink(link);
+                    break;
                 }
 
-
-            }
-            // 5. Technician is rejecting
-            else if (dto.RequestState == RequestState.Rejected)
-            {
-                targetLink.CallStatus = RequestState.Rejected;
-            }
-
-            await unitOfWork.SaveChangesAsync();
-            return true;
+            default:
+                throw new TechnicianBadRequestException($"Unsupported RequestState '{dto.RequestState}'.");
         }
+
+        await unitOfWork.SaveChangesAsync();
+        return true;
+    }
+
+
+
+    // helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
+
+    private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
+        {
+            var techSpec = new TechnicianWithAppUserSpec(technicianId, pin);
+            return await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(techSpec);
+        }
+
+        private async Task<EmergencyRequest?> LoadRequestWithLinksAsync(int requestId)
+        {
+            var spec = new EmergencyRequestWithTechnicianLinkSpec(requestId);
+            return await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
+        }
+
+        private EmergencyRequestTechnicians? GetLinkForTechnician(EmergencyRequest request, int technicianId)
+        {
+            return request.EmergencyRequestTechnicians
+                          .FirstOrDefault(e => e.TechnicianId == technicianId);
+        }
+
+        private async Task<bool> TechnicianHasReachedActiveAcceptedLimitAsync(int technicianId)
+        {
+           
+            var spec = new TechnicianActiveAnsweredRequestsSpec(technicianId);
+            var active = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(spec);
+         
+            return active.Count(r => !r.IsCompleted) >= 2;
+        }
+
+        private bool AnotherTechnicianAlreadyAccepted(EmergencyRequest request)
+        {
+            return request.EmergencyRequestTechnicians
+                          .Any(l => l.CallStatus == RequestState.Answered);
+        }
+
+        private void AcceptOnLink(EmergencyRequest request, EmergencyRequestTechnicians link, int technicianId)
+        {
+            link.CallStatus = RequestState.Answered;
+
+
+            request.TechnicianId = technicianId;
+
+
+        }
+
+        private void RejectOnLink(EmergencyRequestTechnicians link)
+        {
+            link.CallStatus = RequestState.Rejected;
+        }
+
+        private void RejectOtherTechnicians(EmergencyRequest request, int acceptedTechnicianId)
+        {
+            foreach (var l in request.EmergencyRequestTechnicians)
+            {
+                if (l.TechnicianId != acceptedTechnicianId)
+                    l.CallStatus = RequestState.Rejected;
+            }
+        }
+
+
 
 
 
