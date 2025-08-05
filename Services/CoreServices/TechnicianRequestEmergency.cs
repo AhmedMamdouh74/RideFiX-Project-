@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
+using Service.Specification_Implementation.ChatSessionsSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -18,7 +19,7 @@ namespace Service.CoreServices.TechniciansServices
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-       // private readonly IHubContext<ChatHub> hubContext;
+        // private readonly IHubContext<ChatHub> hubContext;
         public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper/* , IHubContext<ChatHub> _hubContext*/)
         {
             unitOfWork = _unitOfWork;
@@ -67,13 +68,13 @@ namespace Service.CoreServices.TechniciansServices
         {
 
             var requestTechRepo = unitOfWork.GetRepository<EmergencyRequestTechnicians, int>();
-            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered, IsCompleted=false}));
+            var joinEntries = await requestTechRepo.GetAllAsync(new EmergencyRequestTechnicanSpecefication(new RequestQueryData() { TechnicainId = tecId, CallState = RequestState.Answered, IsCompleted = false }));
             return mapper.Map<List<EmergencyRequestDetailsDTO>>(joinEntries);
         }
 
         public async Task<List<EmergencyRequestDetailsDTO>> GetAllActiveRequestsAsync(int tecId)
         {
-           // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
+            // var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             var requests = unitOfWork.GetRepository<EmergencyRequest, int>();
             // var spec = new EmergencyRequestWithTechnicianLinkSpec(tecId, false);
             var spec = new ActiveRequestsForTechnicianSpec(tecId);
@@ -119,7 +120,7 @@ namespace Service.CoreServices.TechniciansServices
 
         public async Task<EmergencyRequestDetailsDTO> GetRequestDetailsByIdAsync(int requestId, int technicianId)
         {
-            var tech =await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(technicianId);
+            var tech = await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(technicianId);
             if (tech == null) throw new TechnicianBadRequestException("there is no tech with this id");
 
             var req = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
@@ -189,16 +190,38 @@ namespace Service.CoreServices.TechniciansServices
                 targetLink.CallStatus = RequestState.Answered;
                 request.TechnicianId = dto.TechnicianId;
 
-                // create a new chat session for this request
-                var chatSession = new ChatSession
-                {
-                    StartAt= DateTime.UtcNow,
-                    IsClosed = false,
-                    TechnicianId = dto.TechnicianId,
-                    CarOwnerId = request.CarOwnerId
-                };
+                //  Find-or-create chat session between these two participants
+                var chatRepo = unitOfWork.GetRepository<ChatSession, int>();
+                var existingSessions = await chatRepo.GetAllAsync(
+                    new ChatSessionBetweenParticipantsSpec(request.CarOwnerId, dto.TechnicianId));
 
-                await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatSession);
+                // Prefer an already open session; otherwise reopen a closed one; otherwise create new
+                var chatSession = existingSessions.FirstOrDefault(cs => !cs.IsClosed)
+                               ?? existingSessions.OrderByDescending(cs => cs.Id).FirstOrDefault();
+
+                if (chatSession is null)
+                {
+                    // Create new
+                    chatSession = new ChatSession
+                    {
+                        StartAt = DateTime.UtcNow,
+                        IsClosed = false,
+                        TechnicianId = dto.TechnicianId,
+                        CarOwnerId = request.CarOwnerId
+                    };
+                    await chatRepo.AddAsync(chatSession);
+                }
+                else
+                {
+                    // Re-open existing (if closed)
+                    if (chatSession.IsClosed)
+                    {
+                        chatSession.IsClosed = false;
+                        // when a chat session is reopened
+                        // chatSession.ReopenedAt = DateTime.UtcNow;
+                        chatRepo.Update(chatSession);
+                    }
+                }
 
                 //await _hubContext.Clients
                 //    
@@ -220,7 +243,7 @@ namespace Service.CoreServices.TechniciansServices
                     }
                 }
 
-               
+
             }
             // 5. Technician is rejecting
             else if (dto.RequestState == RequestState.Rejected)
