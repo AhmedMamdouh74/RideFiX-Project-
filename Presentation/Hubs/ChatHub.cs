@@ -30,9 +30,10 @@ namespace Presentation.Hubs
             int userId = 0;
             var idClaim = user?.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             int.TryParse(idClaim, out userId);
-            string otherUserId = string.Empty;
+
+            List<string> strings = new List<string>();
             var UserConcId = Context.ConnectionId;
-            string ApplicationId = string.Empty;
+            string ApplicationId = ApplicationId = user?.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             var chatSession = await ServiceManager.chatSessionService.GetChatSessions(chatsessionId);
             if (chatSession == null)
             {
@@ -50,10 +51,10 @@ namespace Presentation.Hubs
                 {
                     throw new InvalidOperationException("No technician found for this chat session.");
                 }
-                ApplicationId = techinicain.FirstOrDefault()?.ApplicationUserId;
 
 
-                otherUserId = techinicain.FirstOrDefault()?.ConnectionId;
+
+                strings.AddRange(techinicain?.Select(x => x.ConnectionId));
             }
             else if (UserRole == "Technician")
             {
@@ -64,8 +65,8 @@ namespace Presentation.Hubs
                     throw new InvalidOperationException("No car owner found for this chat");
                 }
 
-                ApplicationId = carOwners.FirstOrDefault()?.ApplicationUserId;
-                otherUserId = carOwners.FirstOrDefault()?.ConnectionId;
+
+                strings.AddRange(carOwners?.Select(x => x.ConnectionId));
 
             }
             else
@@ -92,9 +93,13 @@ namespace Presentation.Hubs
             };
 
 
-            //await Clients.Client(UserConcId).SendAsync("ReceiveMessage", sendMessege);
-            await Clients.Client(otherUserId).SendAsync("ReceiveMessage", sendMessege);
+            await Clients.Client(UserConcId).SendAsync("receivemessage", sendMessege);
 
+            foreach (var item in strings)
+            {
+                await Clients.Client(item).SendAsync("receivemessage", sendMessege);
+
+            }
         }
 
 
