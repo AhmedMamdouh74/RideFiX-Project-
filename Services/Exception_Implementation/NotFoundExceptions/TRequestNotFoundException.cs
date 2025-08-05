@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Service.Exception_Implementation.NotFoundExceptions
 {
-    public class CompletedRequestNotFoundException:Exception
+    public class TRequestNotFoundException:Exception
     {
-        public CompletedRequestNotFoundException(string message) : base(message) { 
+        public TRequestNotFoundException(string message) : base(message)
+        {
         }
     }
 }

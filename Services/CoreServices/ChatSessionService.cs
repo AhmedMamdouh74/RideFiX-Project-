@@ -71,5 +71,33 @@ namespace Service.CoreServices
             return mappedChatSession;
 
         }
+
+        public async Task<ChatSession> GetOrCreateSessionAsync(int carOwnerId, int technicianId)
+        {
+
+            var chatRepo = unitOfWork.GetRepository<ChatSession, int>();
+            var existing = await chatRepo.GetAllAsync(new ChatSessionBetweenParticipantsSpec(carOwnerId, technicianId));
+
+            var open = existing.FirstOrDefault(cs => !cs.IsClosed);
+            if (open != null) return open;
+
+            var recent = existing.OrderByDescending(cs => cs.Id).FirstOrDefault();
+            if (recent != null)
+            {
+                recent.IsClosed = false;
+                chatRepo.Update(recent); 
+                return recent;
+            }
+
+            var created = new ChatSession
+            {
+                StartAt = DateTime.UtcNow,
+                IsClosed = false,
+                CarOwnerId = carOwnerId,
+                TechnicianId = technicianId
+            };
+            await chatRepo.AddAsync(created);
+            return created;
+        }
     }
 }
