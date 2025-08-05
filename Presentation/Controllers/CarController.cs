@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
+using SharedData.DTOs.Car;
 using SharedData.DTOs.RequestsDTOs;
 using SharedData.Wrapper;
 
@@ -21,10 +23,11 @@ namespace Presentation.Controllers
         }
 
         [HttpGet]
+        
         public async Task<IActionResult> GetCarDetails()
         {
-            return null;
-            //return Ok(ApiResponse<RequestBreifDTO>.SuccessResponse(Request, "Has a Request"));
+            var Car = await serviceManager.carServices.GetCarDetailsAsync();
+            return Ok(ApiResponse<CarDetailsDto>.SuccessResponse(Car, "Has a Car"));
         }
     }
 }

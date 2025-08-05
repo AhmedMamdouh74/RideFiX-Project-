@@ -16,5 +16,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions
         public Task<ChatSessionAllDTO> GetChatSessionsByTechnicianId(int technicianId);
 
         public Task<ChatSessionAllDTO> GetChatSessions(int ChatSessionId);
+
+        public Task CompleteChatSession(int technicianId, int CarOwnerId);
     }
 }

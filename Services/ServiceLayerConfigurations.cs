@@ -13,6 +13,7 @@ using Service.CoreServices.TechniciansServices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using Domain.Contracts.ReposatoriesContract;
+using Service.CoreServices.CarMservices;
 
 
 
@@ -43,6 +44,7 @@ namespace Services
             Services.AddScoped<IChatService, ChatService>();
             Services.AddScoped<IUserConnectionIdService, UserConnectionIdService>();
             Services.AddScoped<IChatSessionService , ChatSessionService>();
+            Services.AddScoped<ICarServices, CarServices>();
             return Services;
         }
     }

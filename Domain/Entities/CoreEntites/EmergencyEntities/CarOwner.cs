@@ -15,7 +15,6 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<EmergencyRequest> EmergencyRequests { get; set; } = new List<EmergencyRequest>();
-
         public Car? Car { get; set; }
 
     }
