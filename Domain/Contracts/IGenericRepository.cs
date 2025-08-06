@@ -22,6 +22,9 @@ namespace Domain.Contracts
         Task<T> GetByIdAsync(ISpecification<T, TK> specification);
         Task<int> CountAsync(ISpecification<T, TK> specification);
         Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T, TK> spec);
+
+
 
     }
 }

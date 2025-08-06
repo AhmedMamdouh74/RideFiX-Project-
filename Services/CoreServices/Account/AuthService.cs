@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using Services.Specification_Implementation.Emergency;
 using SharedData.DTOs.Account;
 using SharedData.Enums;
 
@@ -198,19 +199,21 @@ namespace Service.CoreServices.Account
             {
                 await _userManager.AddToRoleAsync(user, Roles.Technician);
 
-                //var categoryRepo = _unitOfWork.GetRepository<TCategory, int>();
+                var categoryRepo = _unitOfWork.GetRepository<TCategory, int>();
 
-                //var categories = await categoryRepo
-                //    .GetAllAsync(c => step1Dto.Categories.Contains(c.Name));
+                var categorySpec = new CategoriesByNameSpec(step1Dto.Categories);
 
-                //if (categories == null || !categories.Any())
-                //{
-                //    return IdentityResult.Failed(new IdentityError
-                //    {
-                //        Code = "InvalidCategories",
-                //        Description = "One or more selected categories are invalid."
-                //    });
-                //}
+                var categories = await categoryRepo.GetAllWithSpecAsync(categorySpec);
+
+                if (categories == null || !categories.Any())
+                {
+                    return IdentityResult.Failed(new IdentityError
+                    {
+                        Code = "InvalidCategories",
+                        Description = "One or more selected categories are invalid."
+                    });
+                }
+
 
 
                 var tech = new Technician
@@ -222,7 +225,7 @@ namespace Service.CoreServices.Account
                     StartWorking = step1Dto.StartWorking.Value,
                     EndWorking = step1Dto.EndWorking.Value,
                     Description = step1Dto.Description,
-                    //TCategories = categories.ToList()
+                    TCategories = categories.ToList()
 
                 };
                 //add in database

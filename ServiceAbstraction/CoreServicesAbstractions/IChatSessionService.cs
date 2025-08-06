@@ -1,4 +1,5 @@
-﻿using SharedData.DTOs.ChatDTOs;
+﻿using Domain.Entities.CoreEntites.EmergencyEntities;
+using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.ChatSessionDTOs;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ namespace ServiceAbstraction.CoreServicesAbstractions
         public Task<ChatSessionAllDTO> GetChatSessionsByTechnicianId(int technicianId);
 
         public Task<ChatSessionAllDTO> GetChatSessions(int ChatSessionId);
+
+        Task<ChatSession> GetOrCreateSessionAsync(int carOwnerId, int technicianId);
 
         public Task CompleteChatSession(int technicianId, int CarOwnerId);
     }

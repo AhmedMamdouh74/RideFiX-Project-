@@ -72,10 +72,6 @@ namespace RideFix.Controllers
         [HttpGet("assigned/{technicianId}")]
         public async Task<IActionResult> GetAllRequestsAssignedToTechnician(int technicianId)
         {
-            /*
-             to do:
-            validate if technicianId found or not 
-             */
             var request = await serviceManager.technicianRequestEmergency.GetAllRequestsAssignedToTechnicianAsync(technicianId);
             if (request == null || !request.Any())
                 return NotFound(ApiResponse<string>.FailResponse("technician doesn't have requests"));
@@ -90,10 +86,9 @@ namespace RideFix.Controllers
         public async Task<IActionResult> UpdateRequestFromCarOwnerAsync([FromBody] TechnicianUpdateEmergencyRequestDTO dto)
         {
             var result = await serviceManager.technicianRequestEmergency.UpdateRequestFromCarOwnerAsync(dto);
-            if (!result)
-                return BadRequest(ApiResponse<string>.FailResponse("Invalid technician, PIN, or request"));
+           
 
-            return Ok(ApiResponse<string>.SuccessResponse("", "Updated successfully"));
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Updated successfully"));
         }
 
         [HttpPost]
