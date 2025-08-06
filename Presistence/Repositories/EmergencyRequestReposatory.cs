@@ -64,5 +64,7 @@ namespace Presistence.Repositories
             _context.EmergencyRequestTechnicians.Update(entity);
             return Task.CompletedTask;
         }
+     
+
     }
 }
