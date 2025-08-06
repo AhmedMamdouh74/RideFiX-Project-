@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804102945_Car Maintenance Entities")]
+    partial class CarMaintenanceEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,26 +36,12 @@ namespace Presistence.Migrations
                     b.Property<int>("AvgKmPerMonth")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaintenanceCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("ModelName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TotalMaintenanceCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("TypeOfCar")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TypeOfFuel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vendor")
                         .IsRequired()
@@ -82,13 +71,6 @@ namespace Presistence.Migrations
 
                     b.Property<int>("CarKMsAtTime")
                         .HasColumnType("int");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MaintenanceCenter")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaintenanceTypeId")
                         .HasColumnType("int");

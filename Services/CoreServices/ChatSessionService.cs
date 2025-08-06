@@ -1,16 +1,17 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
 using Service.Specification_Implementation.ChatSessionsSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.ChatSessionDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.CoreServices
 {
@@ -28,14 +29,35 @@ namespace Service.CoreServices
 
         public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId)
         {
-            var spec = new ChatSessionAllSpecification(CarOwnerId, technicianId);
-            var chatSessions = await unitOfWork.GetRepository<ChatSession, int>().GetAllAsync(spec);
+            var spec = new ChatSessionAllSpecification(technicianId ,CarOwnerId);
+            var Repo = unitOfWork.GetRepository<ChatSession, int>();
+            var chatSessions = await Repo.GetAllAsync(spec);
             if (chatSessions == null || !chatSessions.Any())
             {
                 return null;
             }
             var chatsession = chatSessions.FirstOrDefault();
             return mapper.Map<ChatSessionAllDTO>(chatsession);
+        }
+
+
+        public async Task CompleteChatSession(int technicianId, int CarOwnerId)
+        {
+            var spec = new ChatSessionAllSpecification(technicianId, CarOwnerId);
+            var Repo = unitOfWork.GetRepository<ChatSession, int>();
+            var chatSessions = await Repo.GetAllAsync(spec);
+            if (chatSessions == null || !chatSessions.Any())
+            {
+                throw new ChatSessionNotFoundException();
+            }
+            var chatsession = chatSessions.FirstOrDefault();
+            if (chatsession == null)
+            {
+                throw new ChatSessionNotFoundException();
+            }
+            chatsession.IsClosed = true;
+            chatsession.EndAt = DateTime.UtcNow;
+            Repo.Update(chatsession);
         }
 
         public async Task<ChatSessionAllDTO> GetChatSessions(int ChatSessionId)

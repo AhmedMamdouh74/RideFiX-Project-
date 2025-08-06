@@ -89,35 +89,22 @@ namespace Service.CoreServices
             emergencyRequest.CompeletRequestDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
             unitOfWork.GetRepository<EmergencyRequest, int>().Update(emergencyRequest);
-            if(emergencyRequest.TechnicianId.HasValue)
+            if (emergencyRequest.TechnicianId.HasValue)
             {
-                var ChatSession = await chatSessionService.GetChatSessions(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
-                if (ChatSession == null)
-                {
-                    throw new ChatSessionNotFoundException();
-                }
-                 ChatSession.IsClosed = true;
-                 ChatSession.EndAt = DateTime.UtcNow;
-                var chatSessionOrigin = mapper.Map<ChatSession>(ChatSession);
-
-                unitOfWork.GetRepository<ChatSession, int>().Update(chatSessionOrigin);
-
-            }
-            
-
-            await unitOfWork.SaveChangesAsync();
-            var emergencyRequestTechnicians = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().GetByIdAsync(requestId);
-            if (emergencyRequestTechnicians != null)
-            {
-                emergencyRequestTechnicians.CallStatus = RequestState.Completed;
-                unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequestTechnicians);
+                await chatSessionService.CompleteChatSession(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
                 await unitOfWork.SaveChangesAsync();
             }
-
+            //var emergencyRequestTechnicians = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().GetByIdAsync(requestId);
+            //if (emergencyRequestTechnicians != null)
+            //{
+            //    emergencyRequestTechnicians.CallStatus = RequestState.Completed;
+            //    unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequestTechnicians);
+            //    await unitOfWork.SaveChangesAsync();
+            //}
         }
 
         public async Task CreateRealRequest(RealRequestDTO request)
-        {       
+        {
             bool isPresent = await IsPresent(request);
             if (!isPresent)
             {
@@ -170,7 +157,7 @@ namespace Service.CoreServices
             {
                 throw new RequestAlreadyFoundException();
             }
-            }
+        }
 
         public async Task<PreRequestDTO> CreateRequestAsync(CreatePreRequestDTO request)
         {
@@ -203,7 +190,7 @@ namespace Service.CoreServices
             {
                 throw new RequestNotFoundException();
             }
-            if(emergencyTechnician.Technician == null )
+            if (emergencyTechnician.Technician == null)
             {
                 throw new TechnicianNotFoundException();
             }
@@ -245,7 +232,7 @@ namespace Service.CoreServices
                 throw new RequestNotFoundException();
             }
             string city = await techService.GetCity(emergencyRequest.Latitude, emergencyRequest.Longitude);
-            if(emergencyRequest.Technician == null)
+            if (emergencyRequest.Technician == null)
             {
                 throw new RequestDetailsException();
             }
@@ -256,7 +243,7 @@ namespace Service.CoreServices
                 TechnicianName = emergencyRequest.Technician.ApplicationUser.Name,
                 CategoryName = emergencyRequest.category.Name,
                 RequestDate = emergencyRequest.CompeletRequestDate ?? DateOnly.FromDateTime(DateTime.UtcNow),
-                Rate = emergencyRequest.Review.Rate,
+                Rate = emergencyRequest.Review?.Rate,
                 Comment = emergencyRequest.Review?.Comment,
             };
             return mappedRequest;

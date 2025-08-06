@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Domain.Entities.CoreEntites.EmergencyEntities
 {
    public class ChatSession : BaseEntity<int>
-    {
+   {
         public DateTime StartAt { get; set; }
         public DateTime? EndAt { get; set; }
         public bool IsClosed { get; set; }

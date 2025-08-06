@@ -182,8 +182,10 @@ namespace RideFix
             #endregion
 
 
-
-
+            #region Send EMAIL
+            //builder.Services.AddHangfire(x => x.UseInMemoryStorage());
+            //builder.Services.AddHangfireServer();
+            #endregion
             var app = builder.Build();
             app.UseCors("AllowAngularOrigin");
 
@@ -221,6 +223,8 @@ namespace RideFix
             app.UseAuthentication();
             app.UseAuthorization();
 
+            //EMAIL
+            //app.UseHangfireDashboard();
 
             app.MapControllers();
 
