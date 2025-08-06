@@ -13,12 +13,12 @@ namespace Service.Specification_Implementation.CarOwnerSpecifications
     {
         public CarOwnerChatSpecification(int Userid) : base(s => s.CarOwnerId == Userid && s.IsClosed == true)
         {
-            AddInclude(s => s.CarOwner);
             AddInclude(s => s.massages );
-            AddInclude(s => s.CarOwner.ApplicationUser);
+            AddInclude(s => s.Technician);
+            AddInclude(s => s.Technician.ApplicationUser);
 
 
-            
+
         }
         public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)
         {
