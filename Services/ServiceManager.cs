@@ -36,6 +36,7 @@ namespace Services
         public ICarServices carServices { get; }
 
         public ICarMaintananceService carMaintananceService { get; }
+        public IEmailService emailService { get; } 
 
         #endregion
 
@@ -52,7 +53,8 @@ namespace Services
                     IUserConnectionIdService userConnectionIdService,
                     IChatSessionService chatSessionService,
                     ICarServices carServices,
-                    ICarMaintananceService carMaintananceService)
+                    ICarMaintananceService carMaintananceService,
+                    IEmailService emailService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -67,6 +69,7 @@ namespace Services
             this.chatSessionService = chatSessionService;
             this.carServices = carServices;
             this.carMaintananceService = carMaintananceService;
+            this.emailService = emailService;
         }
     }
 }

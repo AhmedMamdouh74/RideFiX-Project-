@@ -24,6 +24,8 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using SharedData.Enums;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Hubs;
+using Hangfire;
+using Hangfire.MemoryStorage;
 
 namespace RideFix
 {
@@ -183,8 +185,8 @@ namespace RideFix
 
 
             #region Send EMAIL
-            //builder.Services.AddHangfire(x => x.UseInMemoryStorage());
-            //builder.Services.AddHangfireServer();
+            builder.Services.AddHangfire(x => x.UseMemoryStorage());
+            builder.Services.AddHangfireServer();
             #endregion
             var app = builder.Build();
             app.UseCors("AllowAngularOrigin");
@@ -224,7 +226,7 @@ namespace RideFix
             app.UseAuthorization();
 
             //EMAIL
-            //app.UseHangfireDashboard();
+            app.UseHangfireDashboard();
 
             app.MapControllers();
 

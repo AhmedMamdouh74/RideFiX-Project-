@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Http;
 using Service.Exception_Implementation.ArgumantNullException;
+using Service.Exception_Implementation.NotFoundExceptions;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using SharedData.DTOs.CarMaintananceDTOs;
 using System;
@@ -68,5 +69,30 @@ namespace Service.CoreServices.CarMservices
                 throw new CarMainTainanceNullException();
             }
         }
+
+        //public DateOnly DetermindNextDate(string maintananceType, DateOnly lastMaintananceDate)
+        //{
+        //    if (string.IsNullOrEmpty(maintananceType) || lastMaintananceDate == default)
+        //    {
+        //        throw new MaintananceNullException();
+        //    }
+
+        //    switch (maintananceType)
+        //        {
+        //        case "تغيير زيت المحرك":
+        //            return lastMaintananceDate.AddMonths(6);
+        //        case "تغيير فلتر الزيت":
+        //            return lastMaintananceDate.AddMonths(6);
+        //        case "تغيير فلتر الهواء":
+        //            return lastMaintananceDate.AddMonths(12);
+        //        default:
+        //            throw new MaintananceNotFoundException();
+
+
+        //            break;
+        //        }
+        //    return lastMaintananceDate;
+
+        //}
     }
 }
