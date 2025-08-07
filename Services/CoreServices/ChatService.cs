@@ -160,7 +160,6 @@ namespace Service.CoreServices
                 throw new UnauthorizedAccessException("User is not authorized to access this resource.");
 
             }
-
                 var chatDetails = new ChatDetailsDTO()
             {
                 name = User,
