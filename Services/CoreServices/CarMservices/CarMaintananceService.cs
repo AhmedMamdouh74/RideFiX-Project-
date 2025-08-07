@@ -1,4 +1,11 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Http;
@@ -6,12 +13,6 @@ using Service.Exception_Implementation.ArgumantNullException;
 using Service.Exception_Implementation.NotFoundExceptions;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using SharedData.DTOs.CarMaintananceDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.CoreServices.CarMservices
 {
@@ -21,18 +22,21 @@ namespace Service.CoreServices.CarMservices
         private readonly IMapper mapper;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ICarServices carServices;
+        private readonly IMaintenanceTypesService maintenanceTypesService;
 
-        public CarMaintananceService(IUnitOfWork unitOfWork, 
-            IMapper mapper , 
+        public CarMaintananceService(IUnitOfWork unitOfWork,
+            IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            ICarServices carServices)
+            ICarServices carServices,
+            IMaintenanceTypesService maintenanceTypesService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.httpContextAccessor = httpContextAccessor;
             this.carServices = carServices;
-
+            this.maintenanceTypesService = maintenanceTypesService;
         }
+
         public async Task AddMaintananceRecord(CarMaintananceAllDTO carMaintananceAllDTO)
         {
 
@@ -57,11 +61,22 @@ namespace Service.CoreServices.CarMservices
             var carId = await carServices.GetCarIdByOwnerId(carOwnerId);
             carMaintananceAllDTO.CarId = carId;
 
-            var repo =  unitOfWork.GetRepository<CarMaintenanceRecord, int>();
+            var repo = unitOfWork.GetRepository<CarMaintenanceRecord, int>();
             var originCarMaintenanceRecord = mapper.Map<CarMaintenanceRecord>(carMaintananceAllDTO);
             if (originCarMaintenanceRecord != null)
             {
                 await repo.AddAsync(originCarMaintenanceRecord);
+                var mRepo = unitOfWork.GetRepository<CarMaintenanceRecord, int>();
+                //var maintenanceType = await mRepo.GetByIdAsync();
+                //if (maintenanceType != null)
+                //{
+                //    var car = unitOfWork.GetRepository<Car, int>().GetByIdAsync(carId);
+                //    if (car != null)
+                //    {
+                //        var Date = DueDateCalculate(maintenanceType, car);
+
+                //    }
+                //}
                 await unitOfWork.SaveChangesAsync();
             }
             else
@@ -70,29 +85,24 @@ namespace Service.CoreServices.CarMservices
             }
         }
 
-        //public DateOnly DetermindNextDate(string maintananceType, DateOnly lastMaintananceDate)
-        //{
-        //    if (string.IsNullOrEmpty(maintananceType) || lastMaintananceDate == default)
-        //    {
-        //        throw new MaintananceNullException();
-        //    }
 
-        //    switch (maintananceType)
-        //        {
-        //        case "تغيير زيت المحرك":
-        //            return lastMaintananceDate.AddMonths(6);
-        //        case "تغيير فلتر الزيت":
-        //            return lastMaintananceDate.AddMonths(6);
-        //        case "تغيير فلتر الهواء":
-        //            return lastMaintananceDate.AddMonths(12);
-        //        default:
-        //            throw new MaintananceNotFoundException();
-
-
-        //            break;
-        //        }
-        //    return lastMaintananceDate;
-
-        //}
+        private DateTime DueDateCalculate(MaintenanceTypes maintenanceType, Car car)
+        {
+            if (maintenanceType.RepeatEveryKM != null)
+            {
+                double TimeInDays = (double)(maintenanceType.RepeatEveryKM / car.AvgKmPerMonth) * 30;  // الشهور المطلوبة
+                DateTime nextMaintenanceDate = DateTime.Now.AddDays(TimeInDays);
+                return nextMaintenanceDate;
+            }
+            else if (maintenanceType.RepeatEveryDays != null)
+            {
+                DateTime nextMaintenanceDate = DateTime.Now.AddDays((double)maintenanceType.RepeatEveryDays);
+                return nextMaintenanceDate;
+            }
+            else
+            {
+                throw new ArgumentException("Error in calculating");
+            }
+        }
     }
 }

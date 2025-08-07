@@ -47,6 +47,7 @@ namespace Services
             Services.AddScoped<IChatSessionService , ChatSessionService>();
             Services.AddScoped<ICarServices, CarServices>();
             Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
+            Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
             Services.AddScoped<IEmailService, EmailService>();
 
 
