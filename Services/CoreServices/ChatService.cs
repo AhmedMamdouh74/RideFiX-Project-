@@ -47,6 +47,8 @@ namespace Service.CoreServices
         {
             string lastmessege = string.Empty;
             var userChats = new List<ChatSession>();
+            var chatBreifDTO = new ChatBreifDTO();
+            List<ChatBreifDTO> chatBreifDTOs = new List<ChatBreifDTO>();
             var user = httpContextAccessor.HttpContext;
             if (user == null)
             {
@@ -54,7 +56,7 @@ namespace Service.CoreServices
             }
             // Determine if the user is a Car Owner or Technician
             var userRole = user.User.Claims.FirstOrDefault(s => s.Type == "Role")?.Value;
-            var ApplicationUser = user.User.Claims.FirstOrDefault(s => s.Type == "userId")?.Value;
+            //var ApplicationUser = user.User.Claims.FirstOrDefault(s => s.Type == "userId")?.Value;
             int entityId;
             bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
             if (!isValid)
@@ -77,6 +79,26 @@ namespace Service.CoreServices
                     return null;
                 }
                 userChats = carOwnerChat.ToList();
+                if (userChats == null || !userChats.Any())
+                {
+                    return null;
+                }
+                
+               
+                foreach (var chat in userChats)
+                {
+                    if (chat.massages == null || !chat.massages.Any())
+                    {
+                        continue;
+                    }
+                    lastmessege = chat.massages?.FirstOrDefault().Text;
+                    chatBreifDTO.name = chat.Technician.ApplicationUser.Name;
+                    chatBreifDTO.imgurl = chat.Technician.ApplicationUser.FaceImageUrl;
+                    chatBreifDTO.chatsessionid = chat.Id;
+                    chatBreifDTO.lastmessage = lastmessege;
+
+                    chatBreifDTOs.Add(chatBreifDTO);
+                }
             }
             else if (userRole == "Technician")
             {
@@ -87,33 +109,34 @@ namespace Service.CoreServices
                     return null;
                 }
                 userChats = technicianChat.ToList();
+                if (userChats == null || !userChats.Any())
+                {
+                    return null;
+                }
+                
+                foreach (var chat in userChats)
+                {
+                    if (chat.massages == null || !chat.massages.Any())
+                    {
+                        continue;
+                    }
+                    lastmessege = chat.massages?.FirstOrDefault().Text;
+                    chatBreifDTO.name = chat.CarOwner.ApplicationUser.Name;
+                    chatBreifDTO.imgurl = chat.CarOwner.ApplicationUser.FaceImageUrl;
+                    chatBreifDTO.chatsessionid = chat.Id;
+                    chatBreifDTO.lastmessage = lastmessege;
+
+                   
+                    chatBreifDTOs.Add(chatBreifDTO);
+                }
+
             }
             else
             {
                 throw new UnauthorizedAccessException("User is not authorized to access this resource.");
             }
 
-            if (userChats == null || !userChats.Any())
-            {
-                return null;
-            }
-            List<ChatBreifDTO> chatBreifDTOs = new List<ChatBreifDTO>();
-            foreach (var chat in userChats)
-            {
-                if(chat.massages == null || !chat.massages.Any())
-                {
-                    continue; 
-                }
-                lastmessege = chat.massages?.FirstOrDefault().Text;
-                var chatBreifDTO = new ChatBreifDTO()
-                {
-                    name = chat.CarOwner.ApplicationUser.Name,
-                    imgurl = chat.CarOwner.ApplicationUser.FaceImageUrl,
-                    chatsessionid = chat.Id,
-                    lastmessage = lastmessege
-                };
-                chatBreifDTOs.Add(chatBreifDTO);
-            }
+           
             return chatBreifDTOs;
         }
 
@@ -171,6 +194,7 @@ namespace Service.CoreServices
             return chatDetails;
 
         }
+
 
         public async Task<ChatSessionAllDTO> LoadCurrentChat()
         {
