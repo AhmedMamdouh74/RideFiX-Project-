@@ -9,6 +9,7 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Http;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using SharedData.DTOs.CarMaintananceDTOs;
 using SharedData.DTOs.MTypesDtos;
 
 namespace Service.CoreServices.CarMservices
@@ -31,6 +32,13 @@ namespace Service.CoreServices.CarMservices
         {
             var Repo = unitOfWork.GetRepository<MaintenanceTypes , int>();
             var MType = mapper.Map<MaintenanceTypeDetailsDto>(await Repo.GetByIdAsync(Id));
+            return MType;
+        }
+
+        public async Task<List<MaintenanceTypeDTO>> GetAll()
+        {
+            var Repo = unitOfWork.GetRepository<MaintenanceTypes, int>();
+            var MType = mapper.Map<List<MaintenanceTypeDTO>>(await Repo.GetAllAsync());
             return MType;
         }
     }
