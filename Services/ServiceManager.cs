@@ -36,6 +36,7 @@ namespace Services
         public ICarServices carServices { get; }
 
         public ICarMaintananceService carMaintananceService { get; }
+        public IEmailService emailService { get; } 
 
         public IMaintenanceTypesService maintenanceTypesService { get; }
 
@@ -56,6 +57,10 @@ namespace Services
                     ICarServices carServices,
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService)
+                    ICarMaintananceService carMaintananceService,
+                    IEmailService emailService,
+                                ICarMaintananceService carMaintananceService,
+)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -71,6 +76,9 @@ namespace Services
             this.carServices = carServices;
             this.carMaintananceService = carMaintananceService;
             this.maintenanceTypesService = maintenanceTypesService;
+            this.emailService = emailService;
+                        this.maintenanceTypesService = maintenanceTypesService;
+
         }
-    }
+}
 }

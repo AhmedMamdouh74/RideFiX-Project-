@@ -9,6 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hangfire;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+
 
 namespace Presentation.Controllers
 {
@@ -30,6 +34,37 @@ namespace Presentation.Controllers
             }
             await serviceManager.carMaintananceService.AddMaintananceRecord(carMaintananceAllDTO);
             return Ok(ApiResponse<CarMaintananceAllDTO>.SuccessResponse(null, "Maintanance record Added succefulluy"));
+        }
+
+
+
+
+        // Schedule
+        [HttpPost("Schedule")]
+
+        public async Task<IActionResult> ScheduleMaintanance(ScheduleDTO maintenanceRequest)
+        {
+            if (maintenanceRequest == null ||
+                string.IsNullOrEmpty(maintenanceRequest.ToEmail) ||
+                string.IsNullOrEmpty(maintenanceRequest.MaintananceType) ||
+                string.IsNullOrEmpty(maintenanceRequest.Ownername) ||
+                maintenanceRequest.MaintananceDate == default)
+            {
+                return BadRequest("Email, maintenance type, owner name, and maintenance date cannot be null");
+            }
+            BackgroundJob.Schedule(()=>
+                    SendEmailAsync(maintenanceRequest),
+                    TimeSpan.FromMinutes(2)); 
+
+            return Ok("تم جدولة الصيانة بنجاح");
+
+        }
+
+        [HttpGet("send-email")]
+        public async Task SendEmailAsync(ScheduleDTO maintenanceRequest)
+        {
+            var emailService = serviceManager.emailService;
+            await emailService.SendEmail(maintenanceRequest.ToEmail , maintenanceRequest.MaintananceType , maintenanceRequest.Ownername , maintenanceRequest.MaintananceDate);
         }
     }
 }

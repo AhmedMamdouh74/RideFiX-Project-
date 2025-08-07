@@ -25,6 +25,8 @@ namespace ServiceAbstraction
         IMessegeService messegeService { get; }
         ICarServices carServices { get; }
         ICarMaintananceService carMaintananceService { get; }
+        IEmailService emailService { get; }
         IMaintenanceTypesService maintenanceTypesService { get; }
+
     }
 }
