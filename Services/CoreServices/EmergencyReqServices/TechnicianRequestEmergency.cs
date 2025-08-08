@@ -11,7 +11,7 @@ using SharedData.DTOs.TechnicianEmergencyRequestDTOs;
 using SharedData.Enums;
 using SharedData.QueryModel;
 
-namespace Service.CoreServices.TechniciansServices
+namespace Service.CoreServices.EmergencyReqServices
 {
     public class TechnicianRequestEmergency : ITechnicianRequestEmergency
     {

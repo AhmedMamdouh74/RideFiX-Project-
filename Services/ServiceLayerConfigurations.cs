@@ -5,16 +5,17 @@ using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using Services.AutoMapperProfile;
 
-﻿using Domain.Contracts;
+using Domain.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
-using Service.CoreServices.TechniciansServices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using Domain.Contracts.ReposatoriesContract;
 using Service.CoreServices.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using Service.CoreServices.EmergencyReqServices;
+using Service.CoreServices.ChatServices;
 
 
 

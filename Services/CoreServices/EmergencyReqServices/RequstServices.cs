@@ -23,7 +23,7 @@ using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
 using SharedData.Enums;
 
-namespace Service.CoreServices
+namespace Service.CoreServices.EmergencyReqServices
 {
     public class RequstServices : IRequestServices
     {

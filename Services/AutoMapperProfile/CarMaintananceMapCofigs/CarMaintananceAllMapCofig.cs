@@ -15,7 +15,6 @@ namespace Service.AutoMapperProfile.CarMaintananceMapCofigs
         public CarMaintananceAllMapCofig()
         {
             CreateMap<CarMaintenanceRecord, CarMaintananceAllDTO>()
-                .ForMember(dest => dest.MaintenanceType, opt => opt.MapFrom(src => src.MaintenanceType))
                 .ReverseMap();
             CreateMap<MaintenanceTypes, MaintenanceTypeDTO>()
                 .ReverseMap();

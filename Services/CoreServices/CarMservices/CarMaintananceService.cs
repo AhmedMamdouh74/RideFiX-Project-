@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Service.Exception_Implementation.ArgumantNullException;
-using Service.Exception_Implementation.NotFoundExceptions;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using SharedData.DTOs.Car;
 using SharedData.DTOs.CarMaintananceDTOs;
+using SharedData.DTOs.MTypesDtos;
 
 namespace Service.CoreServices.CarMservices
 {
@@ -23,80 +19,91 @@ namespace Service.CoreServices.CarMservices
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ICarServices carServices;
         private readonly IMaintenanceTypesService maintenanceTypesService;
+        private readonly IEmailService emailService;
 
         public CarMaintananceService(IUnitOfWork unitOfWork,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             ICarServices carServices,
-            IMaintenanceTypesService maintenanceTypesService)
+            IMaintenanceTypesService maintenanceTypesService,
+            IEmailService emailService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.httpContextAccessor = httpContextAccessor;
             this.carServices = carServices;
             this.maintenanceTypesService = maintenanceTypesService;
+            this.emailService = emailService;
         }
 
         public async Task AddMaintananceRecord(CarMaintananceAllDTO carMaintananceAllDTO)
         {
+            try
+            {
+                var idClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
+                var emailClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Email")?.Value;
+                var nameClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Name")?.Value;
 
-            if (carMaintananceAllDTO == null)
-            {
-                throw new CarMainTainanceNullException();
-            }
-            var idClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
-            if (idClaim == null)
-            {
-                throw new CarMainTainanceNullException();
-            }
-            int carOwnerId = 0;
-            if (!int.TryParse(idClaim, out carOwnerId))
-            {
-                throw new Exception("Invalid CarOwner Id in Claims.");
-            }
-            if (carOwnerId <= 0)
-            {
-                throw new CarMainTainanceNullException();
-            }
-            var carId = await carServices.GetCarIdByOwnerId(carOwnerId);
-            carMaintananceAllDTO.CarId = carId;
+                #region Validate of Input
+                if (idClaim == null)
+                {
+                    throw new CarMainTainanceNullException();
+                }
+                if (!int.TryParse(idClaim, out var carOwnerId))
+                {
+                    throw new Exception("Invalid CarOwner Id in Claims.");
+                }
+                if (carOwnerId <= 0)
+                {
+                    throw new CarMainTainanceNullException();
+                }
+                #endregion
 
-            var repo = unitOfWork.GetRepository<CarMaintenanceRecord, int>();
-            var originCarMaintenanceRecord = mapper.Map<CarMaintenanceRecord>(carMaintananceAllDTO);
-            if (originCarMaintenanceRecord != null)
-            {
-                await repo.AddAsync(originCarMaintenanceRecord);
-                var mRepo = unitOfWork.GetRepository<CarMaintenanceRecord, int>();
-                //var maintenanceType = await mRepo.GetByIdAsync();
-                //if (maintenanceType != null)
-                //{
-                //    var car = unitOfWork.GetRepository<Car, int>().GetByIdAsync(carId);
-                //    if (car != null)
-                //    {
-                //        var Date = DueDateCalculate(maintenanceType, car);
+                #region Helper Objects
 
-                //    }
-                //}
+                var car = await carServices.GetCarDetailsAsync();
+                var maintenanceType = await maintenanceTypesService.GetMTypebyIdAsync(carMaintananceAllDTO.MaintenanceTypeId);
+                if (maintenanceType == null)
+                {
+                    throw new CarMainTainanceNullException();
+                }
+
+                #endregion
+
+                var NextMDate = DueDateCalculateAsync(maintenanceType, carMaintananceAllDTO.PerformedAt, car);
+
+                #region Initialize CarMaintainance Data
+
+                var originCarMaintenanceRecord = mapper.Map<CarMaintenanceRecord>(carMaintananceAllDTO);
+                originCarMaintenanceRecord.NextMaintenanceDue = NextMDate;
+                originCarMaintenanceRecord.CarId = car.Id;
+
+                #endregion
+
+                ScheduleMaintainanceReminder(emailClaim!,
+                    maintenanceType.Name,
+                    nameClaim!,
+                    NextMDate);
                 await unitOfWork.SaveChangesAsync();
             }
-            else
+            catch (Exception ex)
             {
-                throw new CarMainTainanceNullException();
+                throw new BadHttpRequestException("Server Error or Invalid input Data");
             }
         }
 
 
-        private DateTime DueDateCalculate(MaintenanceTypes maintenanceType, Car car)
+        private DateTime DueDateCalculateAsync(MaintenanceTypeDetailsDto maintenanceType, DateTime Mdate, CarDetailsDto car)
         {
-            if (maintenanceType.RepeatEveryKM != null)
+            if (maintenanceType?.RepeatEveryKM != null)
             {
-                double TimeInDays = (double)(maintenanceType.RepeatEveryKM / car.AvgKmPerMonth) * 30;  // الشهور المطلوبة
-                DateTime nextMaintenanceDate = DateTime.Now.AddDays(TimeInDays);
+                var TimeInMonths = (int)(maintenanceType?.RepeatEveryKM / car?.AvgKmPerMonth)!;  // الشهور المطلوبة
+                DateTime nextMaintenanceDate = Mdate.AddMonths(TimeInMonths);
                 return nextMaintenanceDate;
             }
-            else if (maintenanceType.RepeatEveryDays != null)
+            else if (maintenanceType?.RepeatEveryDays != null)
             {
-                DateTime nextMaintenanceDate = DateTime.Now.AddDays((double)maintenanceType.RepeatEveryDays);
+                DateTime nextMaintenanceDate = Mdate.AddDays((int)maintenanceType?.RepeatEveryDays!);
                 return nextMaintenanceDate;
             }
             else
@@ -104,5 +111,30 @@ namespace Service.CoreServices.CarMservices
                 throw new ArgumentException("Error in calculating");
             }
         }
+
+        private void ScheduleMaintainanceReminder(string toEmail, string maintananceType, string ownername, DateTime maintananceDate)
+        {
+            if (string.IsNullOrEmpty(toEmail) ||
+                string.IsNullOrEmpty(maintananceType) ||
+                string.IsNullOrEmpty(ownername) ||
+                maintananceDate == default)
+            {
+                throw new ArgumentException("Email, maintenance type, owner name, and maintenance date cannot be null");
+            }
+
+            DateTime currentDate = DateTime.Today;
+            if (currentDate >= maintananceDate)
+            {
+                return;
+            }
+            int daysDifference = (maintananceDate - currentDate).Days;
+
+            BackgroundJob.Schedule(() =>
+                        emailService.SendEmail(toEmail, maintananceType, ownername, DateOnly.FromDateTime(maintananceDate)),
+                        TimeSpan.FromDays(daysDifference));
+        }
     }
 }
+
+
+

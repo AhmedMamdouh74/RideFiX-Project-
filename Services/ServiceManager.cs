@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Service.CoreServices.CarMservices;
-using Service.CoreServices.TechniciansServices;
+
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
@@ -36,7 +36,7 @@ namespace Services
         public ICarServices carServices { get; }
 
         public ICarMaintananceService carMaintananceService { get; }
-        public IEmailService emailService { get; } 
+        public IEmailService emailService { get; }
 
         public IMaintenanceTypesService maintenanceTypesService { get; }
 
@@ -56,11 +56,8 @@ namespace Services
                     IChatSessionService chatSessionService,
                     ICarServices carServices,
                     ICarMaintananceService carMaintananceService,
-                    IMaintenanceTypesService maintenanceTypesService)
-                    ICarMaintananceService carMaintananceService,
-                    IEmailService emailService,
-                                ICarMaintananceService carMaintananceService,
-)
+                    IMaintenanceTypesService maintenanceTypesService,
+                    IEmailService emailService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -77,8 +74,8 @@ namespace Services
             this.carMaintananceService = carMaintananceService;
             this.maintenanceTypesService = maintenanceTypesService;
             this.emailService = emailService;
-                        this.maintenanceTypesService = maintenanceTypesService;
+            this.maintenanceTypesService = maintenanceTypesService;
 
         }
-}
+    }
 }

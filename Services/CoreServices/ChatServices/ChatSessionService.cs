@@ -13,7 +13,7 @@ using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.ChatSessionDTOs;
 
-namespace Service.CoreServices
+namespace Service.CoreServices.ChatServices
 {
     public class ChatSessionService : IChatSessionService
     {
