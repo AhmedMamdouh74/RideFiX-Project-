@@ -39,6 +39,13 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<CarMaintananceAllDTO>.SuccessResponse(null, "Maintanance record Added succefulluy"));
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetMaintenanceSummary()
+        {
+            var list = await serviceManager.carMaintananceService.GetMaintenanceSummary();
+            return Ok(ApiResponse<List<MaintenanceSummaryDTO>>.SuccessResponse(list, "Maintanance Summary"));
+        }
 
 
 

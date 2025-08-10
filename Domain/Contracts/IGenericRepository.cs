@@ -24,7 +24,7 @@ namespace Domain.Contracts
         Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
         Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T, TK> spec);
 
-
+        public IQueryable<T> GetAllQueryable(ISpecification<T, TK> spec);
 
     }
 }
