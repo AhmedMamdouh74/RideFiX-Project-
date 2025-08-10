@@ -11,8 +11,8 @@ namespace SharedData.DTOs.CarMaintananceDTOs
     {
         public string MaintenanceTypeName { get; set; } // نوع الصيانة (مثال: الفرامل)
         public MaintenanceEnum Status { get; set; }              // الحالة (Needed, Not Needed Yet, No Information)
-        public string? LastMaintenanceDate { get; set; } // آخر صيانة (nullable لو مفيش)
-        public string? NextExpectedMaintenance { get; set; } // الصيانة الجاية (nullable لو مفيش)
+        public DateTime? LastMaintenanceDate { get; set; } // آخر صيانة (nullable لو مفيش)
+        public DateTime? NextExpectedMaintenance { get; set; } // الصيانة الجاية (nullable لو مفيش)
     }
 
 }

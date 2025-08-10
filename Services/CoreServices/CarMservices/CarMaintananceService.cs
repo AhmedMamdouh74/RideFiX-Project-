@@ -186,8 +186,8 @@ namespace Service.CoreServices.CarMservices
                     SummaryDtoList.Add(new MaintenanceSummaryDTO()
                     {
                         MaintenanceTypeName = item.Name,
-                        LastMaintenanceDate = item.LastRecord.PerformedAt.ToString(),
-                        NextExpectedMaintenance = item.LastRecord.NextMaintenanceDue.ToString(),
+                        LastMaintenanceDate = item.LastRecord.PerformedAt,
+                        NextExpectedMaintenance = item.LastRecord.NextMaintenanceDue,
                         Status = item.LastRecord.NextMaintenanceDue <= DateTime.UtcNow ? MaintenanceEnum.Needed
                                                                         : MaintenanceEnum.NoNeeded
                     });
