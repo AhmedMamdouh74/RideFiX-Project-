@@ -121,6 +121,7 @@ namespace Service.CoreServices.CarMservices
             }
             var maintananceHistory = mapper.Map<List<MaintananceHistory>>(carMaintenanceRecords);
             return maintananceHistory;
+        }
 
 
         private DateTime DueDateCalculateAsync(MaintenanceTypeDetailsDto maintenanceType, DateTime Mdate, CarDetailsDto car)

@@ -13,5 +13,6 @@ namespace SharedData.DTOs.CarMaintananceDTOs
         public int CarKMsAtTime { get; set; }
         public string MaintenanceCenter { get; set; }
         public string? Comment { get; set; }
+        public decimal Cost { get; set; }
     }
 }
