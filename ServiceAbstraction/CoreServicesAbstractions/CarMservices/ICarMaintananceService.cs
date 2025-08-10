@@ -12,6 +12,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions.CarMservices
         public Task AddMaintananceRecord(CarMaintananceAllDTO carMaintananceAllDTO);
         //public Task<DateOnly> DetermindNextDate(string maintananceType, DateOnly lastMaintananceDate);
         public Task<List<MaintenanceSummaryDTO>> GetMaintenanceSummary();
+        public Task<List<MaintananceHistory>> GetAllMaintananceHistoryByID( int maintananceId);
 
     }
 }

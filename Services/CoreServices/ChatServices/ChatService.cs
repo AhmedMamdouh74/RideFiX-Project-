@@ -47,7 +47,7 @@ namespace Service.CoreServices.ChatServices
         {
             string lastmessege = string.Empty;
             var userChats = new List<ChatSession>();
-            var chatBreifDTO = new ChatBreifDTO();
+            //var chatBreifDTO = new ChatBreifDTO();
             List<ChatBreifDTO> chatBreifDTOs = new List<ChatBreifDTO>();
             var user = httpContextAccessor.HttpContext;
             if (user == null)
@@ -87,17 +87,18 @@ namespace Service.CoreServices.ChatServices
                
                 foreach (var chat in userChats)
                 {
+                    var chatBreifCDTO = new ChatBreifDTO();
                     if (chat.massages == null || !chat.massages.Any())
                     {
                         continue;
                     }
                     lastmessege = chat.massages?.FirstOrDefault().Text;
-                    chatBreifDTO.name = chat.Technician.ApplicationUser.Name;
-                    chatBreifDTO.imgurl = chat.Technician.ApplicationUser.FaceImageUrl;
-                    chatBreifDTO.chatsessionid = chat.Id;
-                    chatBreifDTO.lastmessage = lastmessege;
+                    chatBreifCDTO.name = chat.Technician.ApplicationUser.Name;
+                    chatBreifCDTO.imgurl = chat.Technician.ApplicationUser.FaceImageUrl;
+                    chatBreifCDTO.chatsessionid = chat.Id;
+                    chatBreifCDTO.lastmessage = lastmessege;
 
-                    chatBreifDTOs.Add(chatBreifDTO);
+                    chatBreifDTOs.Add(chatBreifCDTO);
                 }
             }
             else if (userRole == "Technician")
@@ -113,21 +114,23 @@ namespace Service.CoreServices.ChatServices
                 {
                     return null;
                 }
-                
+
                 foreach (var chat in userChats)
                 {
                     if (chat.massages == null || !chat.massages.Any())
                     {
                         continue;
                     }
-                    lastmessege = chat.massages?.FirstOrDefault().Text;
-                    chatBreifDTO.name = chat.CarOwner.ApplicationUser.Name;
-                    chatBreifDTO.imgurl = chat.CarOwner.ApplicationUser.FaceImageUrl;
-                    chatBreifDTO.chatsessionid = chat.Id;
-                    chatBreifDTO.lastmessage = lastmessege;
+                    var chatBreifTDTO = new ChatBreifDTO();
 
-                   
-                    chatBreifDTOs.Add(chatBreifDTO);
+                    lastmessege = chat.massages?.FirstOrDefault().Text;
+                    chatBreifTDTO.name = chat.CarOwner.ApplicationUser.Name;
+                    chatBreifTDTO.imgurl = chat.CarOwner.ApplicationUser.FaceImageUrl;
+                    chatBreifTDTO.chatsessionid = chat.Id;
+                    chatBreifTDTO.lastmessage = lastmessege;
+
+
+                    chatBreifDTOs.Add(chatBreifTDTO);
                 }
 
             }

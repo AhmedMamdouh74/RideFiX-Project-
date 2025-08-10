@@ -19,6 +19,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CarMaintananceController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
@@ -28,7 +29,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+      
         public async Task<IActionResult> AddMaintananceRecord([FromBody] CarMaintananceAllDTO carMaintananceAllDTO)
         {
             if (carMaintananceAllDTO == null)
@@ -47,34 +48,19 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<List<MaintenanceSummaryDTO>>.SuccessResponse(list, "Maintanance Summary"));
         }
 
-
-
-        //// Schedule
-        //[HttpPost("Schedule")]
-
-        //public async Task<IActionResult> ScheduleMaintanance(ScheduleDTO maintenanceRequest)
-        //{
-        //    if (maintenanceRequest == null ||
-        //        string.IsNullOrEmpty(maintenanceRequest.ToEmail) ||
-        //        string.IsNullOrEmpty(maintenanceRequest.MaintananceType) ||
-        //        string.IsNullOrEmpty(maintenanceRequest.Ownername) ||
-        //        maintenanceRequest.MaintananceDate == default)
-        //    {
-        //        return BadRequest("Email, maintenance type, owner name, and maintenance date cannot be null");
-        //    }
-        //    BackgroundJob.Schedule(()=>
-        //            SendEmailAsync(maintenanceRequest),
-        //            TimeSpan.FromMinutes(2)); 
-
-        //    return Ok("تم جدولة الصيانة بنجاح");
-
-        //}
-
-        //[HttpGet("send-email")]
-        //public async Task SendEmailAsync(ScheduleDTO maintenanceRequest)
-        //{
-        //    var emailService = serviceManager.emailService;
-        //    await emailService.SendEmail(maintenanceRequest.ToEmail , maintenanceRequest.MaintananceType , maintenanceRequest.Ownername , maintenanceRequest.MaintananceDate);
-        //}
+        [HttpGet("history/{maintananceId:int}")]
+        public async Task<IActionResult> GetAllMaintananceHistoryByID(int maintananceId)
+        {
+            if (maintananceId <= 0)
+            {
+                return BadRequest("Invalid maintenance ID");
+            }
+            var maintananceHistory = await serviceManager.carMaintananceService.GetAllMaintananceHistoryByID(maintananceId);
+            if (maintananceHistory == null || !maintananceHistory.Any())
+            {
+                return NotFound("No maintenance history found for the given ID");
+            }
+            return Ok(ApiResponse<List<MaintananceHistory>>.SuccessResponse(maintananceHistory, "Maintenance history retrieved successfully"));
+        }
     }
 }
