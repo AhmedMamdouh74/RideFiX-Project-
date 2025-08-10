@@ -55,7 +55,7 @@ namespace Service.CoreServices.EmergencyReqServices
                 NotificationDto notification = new NotificationDto();
                 notification.Name = reverseRequest.Technician.ApplicationUser.Name;
                 notification.GovernmentName = reverseRequest.Technician.government.ToString();
-                notification.RequestId = reverseRequest.EmergencyRequestId;
+                notification.RequestId = reverseRequest.Id;
 
                 notificationDtos.Add(notification);
             }
