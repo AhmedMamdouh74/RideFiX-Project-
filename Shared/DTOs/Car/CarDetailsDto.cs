@@ -17,5 +17,6 @@ namespace SharedData.DTOs.Car
         public int AvgKmPerMonth { get; set; }
         public decimal TotalMaintenanceCost { get; set; }
         public int MaintenanceCount { get; set; }
+        public int DaysSinceLastMaintenance { get; set; }
     }
 }

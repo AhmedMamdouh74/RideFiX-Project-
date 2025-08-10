@@ -23,6 +23,7 @@ namespace Domain.Entities.CoreEntites.CarMaintenance_Entities
         public int AvgKmPerMonth { get; set; }
         public decimal TotalMaintenanceCost { get; set; }
         public int MaintenanceCount { get; set; }
+        public DateTime? LastMaintenanceDate { get; set; }
         #endregion
 
         public ICollection<CarMaintenanceRecord> CarMaintenanceRecords { get; set; } = new HashSet<CarMaintenanceRecord>();

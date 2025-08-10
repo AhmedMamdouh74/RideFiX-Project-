@@ -4,12 +4,15 @@ using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Hangfire;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Service.Exception_Implementation.ArgumantNullException;
+using Service.Specification_Implementation.MaintenanceSpecification;
 using Service.Specification_Implementation.MaintananceDTOs;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using SharedData.DTOs.Car;
 using SharedData.DTOs.CarMaintananceDTOs;
 using SharedData.DTOs.MTypesDtos;
+using SharedData.Enums;
 
 namespace Service.CoreServices.CarMservices
 {
@@ -36,6 +39,8 @@ namespace Service.CoreServices.CarMservices
             this.maintenanceTypesService = maintenanceTypesService;
             this.emailService = emailService;
         }
+
+        #region Add New Maintainence Record
 
         public async Task AddMaintananceRecord(CarMaintananceAllDTO carMaintananceAllDTO)
         {
@@ -85,6 +90,8 @@ namespace Service.CoreServices.CarMservices
                     maintenanceType.Name,
                     nameClaim!,
                     NextMDate);
+                await carServices.SetCarStats(carMaintananceAllDTO.PerformedAt, carMaintananceAllDTO.Cost, car.Id);
+                await unitOfWork.GetRepository<CarMaintenanceRecord, int>().AddAsync(originCarMaintenanceRecord);
                 await unitOfWork.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -115,7 +122,6 @@ namespace Service.CoreServices.CarMservices
             var maintananceHistory = mapper.Map<List<MaintananceHistory>>(carMaintenanceRecords);
             return maintananceHistory;
 
-        }
 
         private DateTime DueDateCalculateAsync(MaintenanceTypeDetailsDto maintenanceType, DateTime Mdate, CarDetailsDto car)
         {
@@ -157,6 +163,74 @@ namespace Service.CoreServices.CarMservices
                         emailService.SendEmail(toEmail, maintananceType, ownername, DateOnly.FromDateTime(maintananceDate)),
                         TimeSpan.FromDays(daysDifference));
         }
+
+        #endregion
+
+        #region Get Maintainance Summary
+
+        public async Task<List<MaintenanceSummaryDTO>> GetMaintenanceSummary()
+        {
+            var idClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
+            if (idClaim == null)
+            {
+                throw new CarMainTainanceNullException();
+            }
+            var Flag = int.TryParse(idClaim, out var roleId);
+            if (Flag)
+            {
+                var CarId = await carServices.GetCarIdByOwnerId(roleId);
+                var summaryList = await GetMListAsync(CarId);
+                if (!summaryList.Any())
+                {
+                    throw new ArgumentException(message: "There is no M types");
+                }
+                return summaryList;
+            }
+            throw new ArgumentException(message: "Bad Request, error in Role Id");
+        }
+
+        private async Task<List<MaintenanceSummaryDTO>> GetMListAsync(int CarId)
+        {
+            var MRepo = unitOfWork.GetRepository<MaintenanceTypes, int>();
+            var spec = new MaintenanceSummarySpecification(CarId);
+            var maintenanceDataQ = MRepo.GetAllQueryable(spec);
+
+            var maintenanceList = await maintenanceDataQ.Select(mt => new
+            {
+                mt.Name,
+                LastRecord = mt.CarMaintenanceRecords.FirstOrDefault()
+            }).ToListAsync();
+
+            var SummaryDtoList = new List<MaintenanceSummaryDTO>();
+
+            foreach (var item in maintenanceList)
+            {
+                if (item.LastRecord != null)
+                {
+                    SummaryDtoList.Add(new MaintenanceSummaryDTO()
+                    {
+                        MaintenanceTypeName = item.Name,
+                        LastMaintenanceDate = item.LastRecord.PerformedAt.ToString(),
+                        NextExpectedMaintenance = item.LastRecord.NextMaintenanceDue.ToString(),
+                        Status = item.LastRecord.NextMaintenanceDue <= DateTime.UtcNow ? MaintenanceEnum.Needed
+                                                                        : MaintenanceEnum.NoNeeded
+                    });
+                }
+                else
+                {
+                    SummaryDtoList.Add(new MaintenanceSummaryDTO()
+                    {
+                        MaintenanceTypeName = item.Name,
+                        LastMaintenanceDate = null,
+                        NextExpectedMaintenance = null,
+                        Status = MaintenanceEnum.NoInfo
+                    });
+                }
+            }
+            return SummaryDtoList;
+        }
+
+        #endregion
     }
 }
 
