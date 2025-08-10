@@ -10,7 +10,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions.CarMservices
     public interface ICarMaintananceService
     {
         public Task AddMaintananceRecord(CarMaintananceAllDTO carMaintananceAllDTO);
-        //public Task<DateOnly> DetermindNextDate(string maintananceType, DateOnly lastMaintananceDate);
+        public Task<List<MaintananceHistory>> GetAllMaintananceHistoryByID( int maintananceId);
 
     }
 }
