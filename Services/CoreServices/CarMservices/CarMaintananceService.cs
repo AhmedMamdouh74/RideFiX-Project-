@@ -100,30 +100,6 @@ namespace Service.CoreServices.CarMservices
             }
         }
 
-        public async Task<List<MaintananceHistory>> GetAllMaintananceHistoryByID(int maintananceId)
-        {
-            var idClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
-            if (idClaim == null || !int.TryParse(idClaim, out var carOwnerId) || carOwnerId <= 0)
-            {
-                throw new CarMainTainanceNullException();
-            }
-            int CarId = await carServices.GetCarIdByOwnerId(carOwnerId);
-
-            if (maintananceId <= 0)
-            {
-                throw new MaintananceArgumentException();
-            }
-            var spec = new GetMaintananceByID(CarId, maintananceId);
-            var carMaintenanceRecords = await unitOfWork.GetRepository<CarMaintenanceRecord, int>().GetAllWithSpecAsync(spec);
-            if (carMaintenanceRecords == null || !carMaintenanceRecords.Any())
-            {
-                throw new MaintananceArgumentException("There is no maintanance matches");
-            }
-            var maintananceHistory = mapper.Map<List<MaintananceHistory>>(carMaintenanceRecords);
-            return maintananceHistory;
-        }
-
-
         private DateTime DueDateCalculateAsync(MaintenanceTypeDetailsDto maintenanceType, DateTime Mdate, CarDetailsDto car)
         {
             if (maintenanceType?.RepeatEveryKM != null)
@@ -230,6 +206,34 @@ namespace Service.CoreServices.CarMservices
             }
             return SummaryDtoList;
         }
+
+        #endregion
+
+        #region M History by Id
+
+        public async Task<List<MaintananceHistory>> GetAllMaintananceHistoryByID(int maintananceId)
+        {
+            var idClaim = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value;
+            if (idClaim == null || !int.TryParse(idClaim, out var carOwnerId) || carOwnerId <= 0)
+            {
+                throw new CarMainTainanceNullException();
+            }
+            int CarId = await carServices.GetCarIdByOwnerId(carOwnerId);
+
+            if (maintananceId <= 0)
+            {
+                throw new MaintananceArgumentException();
+            }
+            var spec = new GetMaintananceByID(CarId, maintananceId);
+            var carMaintenanceRecords = await unitOfWork.GetRepository<CarMaintenanceRecord, int>().GetAllWithSpecAsync(spec);
+            if (carMaintenanceRecords == null || !carMaintenanceRecords.Any())
+            {
+                throw new MaintananceArgumentException("There is no maintanance matches");
+            }
+            var maintananceHistory = mapper.Map<List<MaintananceHistory>>(carMaintenanceRecords);
+            return maintananceHistory;
+        }
+
 
         #endregion
     }

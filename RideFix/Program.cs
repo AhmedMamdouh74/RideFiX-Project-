@@ -153,7 +153,8 @@ namespace RideFix
 
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken)
-                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub"))
+                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub") 
+                    || path.StartsWithSegments("/NotificationHub"))
                     {
                         context.Token = accessToken;
                     }
@@ -186,7 +187,6 @@ namespace RideFix
             });
             #endregion
 
-
             #region Send EMAIL
             builder.Services.AddHangfire(x => x.UseMemoryStorage());
             builder.Services.AddHangfireServer();
@@ -199,7 +199,8 @@ namespace RideFix
             // التسجيل الصحيح للـ Hub
             app.MapHub<NotificationHub>("/notificationhub");
             app.MapHub<ChatHub>("/chathub");//http://localhost:5038/chathub
-            app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
+            app.MapHub<RequestWatchDogHub>(pattern: "/requestWatchDogHub");
+            app.MapHub<NotificationHub>(pattern: "/NotificationHub");
 
 
 
