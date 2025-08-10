@@ -89,7 +89,7 @@ namespace Service.CoreServices.CarMservices
                     maintenanceType.Name,
                     nameClaim!,
                     NextMDate);
-
+                await carServices.SetCarStats(carMaintananceAllDTO.PerformedAt, carMaintananceAllDTO.Cost, car.Id);
                 await unitOfWork.GetRepository<CarMaintenanceRecord, int>().AddAsync(originCarMaintenanceRecord);
                 await unitOfWork.SaveChangesAsync();
             }

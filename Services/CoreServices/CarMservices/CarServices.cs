@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation;
@@ -47,9 +48,14 @@ namespace Service.CoreServices.CarMservices
                 var Repo = unitOfWork.GetRepository<Car, int>();
                 var spec = new CarByOwnerIdSpecification(roleId);
                 var Car = await Repo.GetAllAsync(spec);
+                var car = Car.FirstOrDefault();
                 if (Car != null)
                 {
-                    var carDto = mapper.Map<CarDetailsDto>(Car?.FirstOrDefault());
+                    var carDto = mapper.Map<CarDetailsDto>(car);
+                    carDto.DaysSinceLastMaintenance =
+                        car.LastMaintenanceDate.HasValue
+                            ? (DateTime.Now - car.LastMaintenanceDate.Value).Days
+                            : 0;
                     return carDto;
                 }
                 else
@@ -77,6 +83,19 @@ namespace Service.CoreServices.CarMservices
             }
             return car.FirstOrDefault().Id;
 
+        }
+
+        public async Task SetCarStats(DateTime date, decimal cost, int CarId)
+        {
+            var carRepo = unitOfWork.GetRepository<Car, int>();
+            var car = await carRepo.GetByIdAsync(CarId);
+            if (car == null)
+            {
+                throw new CarNotFoundException();
+            }
+            car.TotalMaintenanceCost += cost;
+            car.MaintenanceCount++;
+            car.LastMaintenanceDate = date;
         }
     }
 }
