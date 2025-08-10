@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.Http;
 using Service.Exception_Implementation.ArgumantNullException;
 using Service.Specification_Implementation;
 using Service.Specification_Implementation.RequestSpecifications;
@@ -19,6 +20,7 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly IUnitOfWork unitOfWork;
         private readonly IRequestServices requestServices;
         private readonly IMapper mapper;
+        
         public ReviewService(IUnitOfWork _unitOfWork, 
             IMapper _mapper,
             IRequestServices requestServices
@@ -27,6 +29,7 @@ namespace Service.CoreServices.EmergencyReqServices
             unitOfWork = _unitOfWork;
             mapper = _mapper;
             this.requestServices = requestServices;
+            
         }
         public async Task AddReviewAsync(AddReviewDTO addReview) 
         {
