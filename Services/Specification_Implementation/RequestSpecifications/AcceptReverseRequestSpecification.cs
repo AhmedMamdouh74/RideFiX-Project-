@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace Service.Specification_Implementation.RequestSpecifications
 {
-    public class GetCurrentRequestSpecification : Specification<EmergencyRequest, int>
+    public class AcceptReverseRequestSpecification : Specification<TechReverseRequest, int>
     {
-        public GetCurrentRequestSpecification(int carOwnerId) : base(s => s.CarOwnerId == carOwnerId && s.IsCompleted == false)
+        public AcceptReverseRequestSpecification(int requestID) : base(s => s.Id == requestID)
         {
+            AddInclude(s => s.EmergencyRequest);
+            
         }
     }
 }

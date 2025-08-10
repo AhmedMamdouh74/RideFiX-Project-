@@ -16,7 +16,7 @@ namespace Presentation.Controllers
     [Route("api/[controller]")]
     [Authorize]
 
-    public class ReverseRequestController: ControllerBase
+    public class ReverseRequestController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
 
@@ -38,6 +38,29 @@ namespace Presentation.Controllers
 
 
 
+        }
+
+        [HttpPost("accept/{requestId}")]
+        public async Task<IActionResult> AcceptRequest(int requestId)
+        {
+            if (requestId <= 0)
+            {
+                return BadRequest(ApiResponse<string>.FailResponse("Invalid request ID."));
+            }
+
+            await serviceManager.reverserRequestService.AcceptRequest(requestId);
+            return Ok(ApiResponse<string>.SuccessResponse("Reverse request accepted successfully."));
+
+        }
+        [HttpPost("reject/{requestId}")]
+        public async Task<IActionResult> RejectRequest(int requestId)
+        {
+            if (requestId <= 0)
+            {
+                return BadRequest(ApiResponse<string>.FailResponse("Invalid request ID."));
+            }
+            await serviceManager.reverserRequestService.RejectRequest(requestId);
+            return Ok(ApiResponse<string>.SuccessResponse("Reverse request rejected successfully."));
         }
     }
 }

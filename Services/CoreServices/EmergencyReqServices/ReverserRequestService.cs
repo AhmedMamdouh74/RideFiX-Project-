@@ -2,9 +2,11 @@
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Microsoft.AspNetCore.Http;
+using Service.Exception_Implementation.ArgumantNullException;
 using Service.Specification_Implementation.RequestSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.Notifications;
+using SharedData.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +32,28 @@ namespace Service.CoreServices.EmergencyReqServices
         
 
         }
-        public Task AcceptRequest(int requestId)
+        public async Task AcceptRequest(int requestId)
         {
-            throw new NotImplementedException();
+            if (requestId <= 0)
+            {
+                throw new ReverseArgumentException();
+            }
+            var spec = new AcceptReverseRequestSpecification(requestId);
+            var reverseRequest = await unitOfWork.GetRepository<TechReverseRequest, int>().GetByIdAsync(spec);
+
+            if (reverseRequest == null)
+            {
+                throw new ReverseArgumentException("Reverse request not found");
+            }
+            if (reverseRequest.EmergencyRequest.TechnicianId != null)
+            {
+                throw new ReverseArgumentException("This request has already been accepted by another technician.");
+            }
+            reverseRequest.EmergencyRequest.TechnicianId = reverseRequest.TechnicianId;
+            reverseRequest.CallState = RequestState.Answered;
+
+            await unitOfWork.SaveChangesAsync();
+
         }
 
         public async Task<List<NotificationDto>> GetReverserequest()
@@ -65,9 +86,21 @@ namespace Service.CoreServices.EmergencyReqServices
 
         }
 
-        public Task RejectRequest(int requestId)
+        public async Task RejectRequest(int requestId)
         {
-            throw new NotImplementedException();
+            if (requestId <= 0)
+            {
+                throw new ReverseArgumentException();
+            }
+            var spec = new AcceptReverseRequestSpecification(requestId);
+            var reverseRequest = await unitOfWork.GetRepository<TechReverseRequest, int>().GetByIdAsync(spec);
+            if (reverseRequest == null)
+            {
+                throw new ReverseArgumentException("Reverse request not found.");
+            }
+            reverseRequest.CallState = RequestState.Rejected;
+
+            await unitOfWork.SaveChangesAsync();
         }
     }
 }
