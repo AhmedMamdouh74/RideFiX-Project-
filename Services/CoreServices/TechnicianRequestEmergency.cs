@@ -152,7 +152,7 @@ namespace Service.CoreServices.TechniciansServices
             var spec = new TechReverseRequestSpec(techId);
             var techRequests = await repo.GetAllAsync(spec);
             if (techRequests == null || !techRequests.Any())
-                return null;
+                throw new TRequestNotFoundException("you didn't apply yet");
             else
                 return mapper.Map<List<TechReverseRequestDTO>>(techRequests);
         }
@@ -221,7 +221,7 @@ public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergency
 
     // helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
 
-    private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
+        private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
         {
             var techSpec = new TechnicianWithAppUserSpec(technicianId, pin);
             return await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(techSpec);
