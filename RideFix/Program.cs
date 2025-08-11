@@ -154,7 +154,7 @@ namespace RideFix
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken)
                     && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub") 
-                    || path.StartsWithSegments("/NotificationHub"))
+                    || path.StartsWithSegments("/notificationhub"))
                     {
                         context.Token = accessToken;
                     }
@@ -197,10 +197,9 @@ namespace RideFix
 
             //notification hub configuration
             // التسجيل الصحيح للـ Hub
-            app.MapHub<NotificationHub>("/notificationhub");
             app.MapHub<ChatHub>("/chathub");//http://localhost:5038/chathub
             app.MapHub<RequestWatchDogHub>(pattern: "/requestWatchDogHub");
-            app.MapHub<NotificationHub>(pattern: "/NotificationHub");
+            app.MapHub<NotificationHub>(pattern: "/notificationhub");
 
 
 

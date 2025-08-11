@@ -1,21 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Service.AutoMapperProfile;
-using Service.CoreServices.Account;
-using ServiceAbstraction;
-using ServiceAbstraction.CoreServicesAbstractions.Account;
-using Services.AutoMapperProfile;
-
-using Domain.Contracts;
+﻿using Domain.Contracts;
+using Domain.Contracts.ReposatoriesContract;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Presentation.Hubs;
+using Service.AutoMapperProfile;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
+using Service.CoreServices.Account;
+using Service.CoreServices.CarMservices;
+using Service.CoreServices.ChatServices;
+using Service.CoreServices.EmergencyReqServices;
+using ServiceAbstraction;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
-using Domain.Contracts.ReposatoriesContract;
-using Service.CoreServices.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
-using Service.CoreServices.EmergencyReqServices;
-using Service.CoreServices.ChatServices;
+using Services.AutoMapperProfile;
 
 
 
@@ -50,8 +51,6 @@ namespace Services
             Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
             Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
             Services.AddScoped<IEmailService, EmailService>();
-
-
             return Services;
         }
     }
