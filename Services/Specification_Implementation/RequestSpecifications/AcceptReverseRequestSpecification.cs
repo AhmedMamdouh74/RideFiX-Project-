@@ -11,7 +11,7 @@ namespace Service.Specification_Implementation.RequestSpecifications
 {
     public class AcceptReverseRequestSpecification : Specification<TechReverseRequest, int>
     {
-        public AcceptReverseRequestSpecification(int requestID) : base(s => s.EmergencyRequestId == requestID)
+        public AcceptReverseRequestSpecification(int requestID) : base(s => s.Id == requestID)
         {
             AddInclude(s => s.EmergencyRequest);
             
