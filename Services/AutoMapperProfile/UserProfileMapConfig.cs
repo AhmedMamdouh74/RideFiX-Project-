@@ -23,7 +23,10 @@ namespace Service.AutoMapperProfile
               .ForMember(dest => dest.StartWorking, opt => opt.MapFrom(src => src.StartWorking))
               .ForMember(dest => dest.EndWorking, opt => opt.MapFrom(src => src.EndWorking))
               .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.ApplicationUser.Address))
-            
+              .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.reviews != null && src.reviews.Any()
+                           ? src.reviews.Average(r => r.Rate)
+                           : 0.0))
+
               //.ForMember(dest => dest.Category, opt => opt.MapFrom((src, dest, destMember, context) =>
               // {
               //     // Resolve category from context.Items

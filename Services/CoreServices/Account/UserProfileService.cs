@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
+using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Specification_Implementation;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
@@ -27,7 +28,7 @@ namespace Service.CoreServices.Account
         {
             var techSpec = new TechnicianWithAppUserSpec(TechnicianId);
             var technician = await unitOfWork.GetRepository<Technician, int>().GetByIdAsync(techSpec);
-            if (technician == null) return null;
+            if (technician == null) throw new TechnicianBadRequestException("there is no tech with this id");
             return mapper.Map<ReadUserDetailsDTO>(technician);
         }
     }
