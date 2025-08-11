@@ -35,11 +35,13 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly ITechnicianService techService;
         private readonly IChatSessionService chatSessionService;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICarOwnerService carOwnerService;
         public RequstServices(IUnitOfWork _unitOfWork,
             IMapper _mapper,
             ITechnicianService technicianService,
             IChatSessionService chatSessionService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ICarOwnerService carOwnerService)
         {
 
             unitOfWork = _unitOfWork;
@@ -47,17 +49,53 @@ namespace Service.CoreServices.EmergencyReqServices
             techService = technicianService;
             this.chatSessionService = chatSessionService;
             this.httpContextAccessor = httpContextAccessor;
+            this.carOwnerService = carOwnerService;
             //this.serviceManager = serviceManager;
         }
 
         public async Task CancelAll(int CarOwnerID)
         {
-            var spec = new CancelledRquestSpecification(CarOwnerID);
+            if (CarOwnerID <= 0)
+            {
+                throw new ArgumentNullException(nameof(CarOwnerID), "Car Owner ID cannot be null or negative.");
+            }
+            var requestBrief = await carOwnerService.IsRequested(CarOwnerID);
+            int requestId = requestBrief.Id;
+            var Request = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
+            if (Request == null)
+            {
+                throw new RequestNotFoundException();
+            }
+            if (Request.IsCompleted)
+            {
+                throw new RequestAlreadyCompletedException();
+            }
+
+            Request.IsCompleted = true;
+
+            var spec = new CancelledRquestSpecification(CarOwnerID , requestId);
             var emergencyRequests = await unitOfWork.EmergencyRequestRepository.GetAllAsync(spec);
             if (emergencyRequests == null || !emergencyRequests.Any())
             {
                 throw new RequestNotFoundException();
             }
+            var spec2 = new CancelledReverseRquestSpecification(requestId);
+            var emergencyRequestsTechnicians = await unitOfWork.GetRepository<TechReverseRequest, int>().GetAllAsync(spec2);
+            if (emergencyRequestsTechnicians != null && emergencyRequestsTechnicians.Any())
+            {
+                foreach (var emergencyRequestTechnician in emergencyRequestsTechnicians)
+                {
+                    if (emergencyRequestTechnician.CallState == RequestState.Waiting || emergencyRequestTechnician.CallState == RequestState.Answered)
+                    {
+                        emergencyRequestTechnician.CallState = RequestState.Cancelled;
+                    }
+                    else
+                    {
+                        throw new RequestAlreadyAccepted();
+                    }
+                }
+            }
+
             foreach (var emergencyRequest in emergencyRequests)
             {
                 if (emergencyRequest.CallStatus == RequestState.Waiting)
@@ -71,6 +109,7 @@ namespace Service.CoreServices.EmergencyReqServices
                     emergencyRequest.EmergencyRequests.EndTimeStamp = DateTime.UtcNow;
                     await unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequest);
                 }
+               
             }
             await unitOfWork.SaveChangesAsync();
 

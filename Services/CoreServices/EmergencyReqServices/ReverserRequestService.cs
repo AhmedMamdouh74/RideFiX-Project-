@@ -21,17 +21,23 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly IMapper mapper;
         private readonly IRequestServices requestServices;
         private readonly IChatSessionService chatSessionService;
-       
+        private readonly ICarOwnerService carOwnerService;
+        private readonly IHttpContextAccessor httpContextAccessor;
+
 
         public ReverserRequestService(IUnitOfWork unitOfWork,
             IMapper mapper, 
             IRequestServices requestServices,
-            IChatSessionService chatSessionService)
+            IChatSessionService chatSessionService,
+            ICarOwnerService carOwnerService,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.requestServices = requestServices;
             this.chatSessionService = chatSessionService;
+            this.carOwnerService = carOwnerService;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public async Task AcceptRequest(int requestId)
         {
@@ -72,7 +78,19 @@ namespace Service.CoreServices.EmergencyReqServices
 
         public async Task<List<NotificationDto>> GetReverserequest()
         {
-            var CurrentRequestId = requestServices.GetCurrentRequestId().Result;
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            int entityId;
+            bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
+            if (!isValid)
+            {
+                return null;
+            }
+            var requestBreif = await carOwnerService.IsRequested(entityId);
+            var CurrentRequestId = requestBreif.Id;
             if (CurrentRequestId == 0)
             {
                 throw new Exception("No current request found.");
