@@ -32,8 +32,8 @@ namespace Service.CoreServices.ChatServices
         public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId)
         {
             var spec = new ChatSessionAllSpecification(technicianId ,CarOwnerId);
-            var Repo = unitOfWork.GetRepository<ChatSession, int>();
-            var chatSessions = await Repo.GetAllAsync(spec);
+
+            var chatSessions = await unitOfWork.GetRepository<ChatSession, int>().GetAllWithSpecAsync(spec);
             if (chatSessions == null || !chatSessions.Any())
             {
                 return null;
