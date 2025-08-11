@@ -20,17 +20,18 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IRequestServices requestServices;
+        private readonly IChatSessionService chatSessionService;
        
 
         public ReverserRequestService(IUnitOfWork unitOfWork,
             IMapper mapper, 
-            IRequestServices requestServices)
+            IRequestServices requestServices,
+            IChatSessionService chatSessionService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.requestServices = requestServices;
-        
-
+            this.chatSessionService = chatSessionService;
         }
         public async Task AcceptRequest(int requestId)
         {
@@ -52,6 +53,19 @@ namespace Service.CoreServices.EmergencyReqServices
             reverseRequest.EmergencyRequest.TechnicianId = reverseRequest.TechnicianId;
             reverseRequest.CallState = RequestState.Answered;
 
+            var chatSession = await chatSessionService.GetChatSessions(reverseRequest.TechnicianId, reverseRequest.EmergencyRequest.CarOwnerId);
+            if (chatSession == null)
+            {
+                await chatSessionService.createChatsession(reverseRequest.TechnicianId, reverseRequest.EmergencyRequest.CarOwnerId);
+            }
+            else
+            {
+                chatSession.IsClosed = false;
+                chatSession.EndAt = null;
+                chatSessionService.update(chatSession);
+                
+            }
+           
             await unitOfWork.SaveChangesAsync();
 
         }

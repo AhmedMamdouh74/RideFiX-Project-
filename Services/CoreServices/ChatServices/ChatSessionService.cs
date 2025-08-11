@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace Service.CoreServices.ChatServices
             this.mapper = mapper;
         }
 
+        
 
 
         public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId)
@@ -120,6 +122,26 @@ namespace Service.CoreServices.ChatServices
             };
             await chatRepo.AddAsync(created);
             return created;
+        }
+
+        public async Task createChatsession(int technicianId, int CarOwnerId)
+        {
+            ChatSession chatSession = new ChatSession()
+            {
+                CarOwnerId = CarOwnerId,
+                StartAt = DateTime.UtcNow,
+                TechnicianId = technicianId,
+                IsClosed = false,
+            };
+            await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatSession);
+                     
+    }
+
+        public async Task update(ChatSessionAllDTO chatSession)
+        {
+            var mappedchat = mapper.Map<ChatSession>(chatSession);
+            unitOfWork.GetRepository<ChatSession, int>().Update(mappedchat);
+            unitOfWork.SaveChangesAsync();
         }
     }
 }
