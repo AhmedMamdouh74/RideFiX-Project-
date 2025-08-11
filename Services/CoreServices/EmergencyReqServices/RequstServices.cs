@@ -111,8 +111,8 @@ namespace Service.CoreServices.EmergencyReqServices
                 }
                
             }
-            var technicianId = Request?.TechnicianId ?? 0;
-            var chatsession = chatSessionService.GetChatSessions(technicianId, CarOwnerID);
+          
+            var chatsession = await chatSessionService.GetChatSessionsByCarOwnerId(CarOwnerID);
             if (chatsession == null)
             {
                 throw new ChatSessionNotFoundException();
