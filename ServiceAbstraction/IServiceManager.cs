@@ -28,5 +28,8 @@ namespace ServiceAbstraction
         IEmailService emailService { get; }
         IMaintenanceTypesService maintenanceTypesService { get; }
 
+        IReverserRequestService reverserRequestService { get; }
+
+
     }
 }

@@ -26,9 +26,11 @@ namespace Services
     {
         public static IServiceCollection AddServiceConfig(this IServiceCollection Services)
         {
+            Services.AddHttpContextAccessor();
             Services.AddScoped<IServiceManager, ServiceManager>();
             Services.AddAutoMapper(typeof(RegisterMapping));
             Services.AddScoped<IFileService, FileService>();
+           
             Services.AddHttpClient(); // تحضير الـ HttpClient في الـ DI
             Services.AddScoped<IFaceRecognitionService, FaceRecognitionService>(); Services.AddScoped<IAuthService, AuthService>();
             Services.AddMemoryCache();
@@ -51,6 +53,9 @@ namespace Services
             Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
             Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
             Services.AddScoped<IEmailService, EmailService>();
+            Services.AddScoped<IReverserRequestService, ReverserRequestService>();
+
+
             return Services;
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation;
@@ -33,16 +34,19 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly IMapper mapper;
         private readonly ITechnicianService techService;
         private readonly IChatSessionService chatSessionService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         public RequstServices(IUnitOfWork _unitOfWork,
             IMapper _mapper,
             ITechnicianService technicianService,
-            IChatSessionService chatSessionService)
+            IChatSessionService chatSessionService,
+            IHttpContextAccessor httpContextAccessor)
         {
 
             unitOfWork = _unitOfWork;
             mapper = _mapper;
             techService = technicianService;
             this.chatSessionService = chatSessionService;
+            this.httpContextAccessor = httpContextAccessor;
             //this.serviceManager = serviceManager;
         }
 
@@ -196,6 +200,26 @@ namespace Service.CoreServices.EmergencyReqServices
             }
             var mappedTechnician = mapper.Map<EmergencyTechnicianID>(emergencyTechnician);
             return mappedTechnician;
+        }
+
+        public async Task<int> GetCurrentRequestId()
+        {
+
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            int entityId;
+            bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
+            var spec = new GetCurrentRequestSpecification(entityId);
+            var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
+            if (emergencyRequest == null)
+            {
+                throw new RequestNotFoundException();
+            }
+            return emergencyRequest.Id;
+
         }
 
         public async Task<bool> IsPresent(RealRequestDTO request)
