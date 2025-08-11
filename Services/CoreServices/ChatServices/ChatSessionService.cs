@@ -109,6 +109,7 @@ namespace Service.CoreServices.ChatServices
             if (recent != null)
             {
                 recent.IsClosed = false;
+                recent.EndAt = null;
                 chatRepo.Update(recent); 
                 return recent;
             }

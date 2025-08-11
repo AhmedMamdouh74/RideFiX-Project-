@@ -41,7 +41,7 @@ namespace RideFix.Controllers
                 return BadRequest(ApiResponse<string>.FailResponse($"An error occurred: {ex.Message}"));
             }
         }
-        [HttpGet("accepted/id")]
+
         [HttpGet("accepted/{technicalId}")]
         public async Task<ActionResult<EmergencyRequestDetailsDTO>> GetAllAcceptedRequests(int technicalId)
         {
