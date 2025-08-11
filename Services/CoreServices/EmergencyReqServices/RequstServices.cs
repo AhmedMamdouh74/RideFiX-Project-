@@ -111,6 +111,14 @@ namespace Service.CoreServices.EmergencyReqServices
                 }
                
             }
+            var technicianId = Request?.TechnicianId ?? 0;
+            var chatsession = chatSessionService.GetChatSessions(technicianId, CarOwnerID);
+            if (chatsession == null)
+            {
+                throw new ChatSessionNotFoundException();
+            }
+            var mappedChat = mapper.Map<ChatSession>(chatsession);
+            mappedChat.IsClosed = true;
             await unitOfWork.SaveChangesAsync();
 
         }
