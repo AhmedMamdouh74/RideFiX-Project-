@@ -2,6 +2,8 @@
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.SignalR;
+using Presentation.Hubs;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation.RequestSpecifications;
@@ -11,7 +13,7 @@ using SharedData.DTOs.TechnicianEmergencyRequestDTOs;
 using SharedData.Enums;
 using SharedData.QueryModel;
 
-namespace Service.CoreServices.TechniciansServices
+namespace Service.CoreServices.EmergencyReqServices
 {
     public class TechnicianRequestEmergency : ITechnicianRequestEmergency
     {
@@ -19,14 +21,14 @@ namespace Service.CoreServices.TechniciansServices
         private readonly IMapper mapper;
         // private readonly IHubContext<ChatHub> hubContext;
         private IChatSessionService chatSessionService;
-        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper/* , IHubContext<ChatHub> _hubContext*/ , IChatSessionService _chatSessionService)
+        private readonly IHubContext<NotificationHub> hubContext;
+
+        public TechnicianRequestEmergency(IUnitOfWork _unitOfWork, IMapper _mapper , IHubContext<NotificationHub> _hubContext , IChatSessionService _chatSessionService)
         {
             unitOfWork = _unitOfWork;
             mapper = _mapper;
-            //hubContext = _hubContext;
+            hubContext = _hubContext;
             chatSessionService = _chatSessionService;
-
-
         }
         public async Task<bool> ApplyRequestFromHomePage(TechnicianApplyEmergencyRequestDTO emergencyRequestDTO)
         {

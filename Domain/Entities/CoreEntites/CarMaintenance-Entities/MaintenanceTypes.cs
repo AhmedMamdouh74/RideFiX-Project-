@@ -11,5 +11,6 @@ namespace Domain.Entities.CoreEntites.CarMaintenance_Entities
         public string Name { get; set; }
         public int? RepeatEveryKM { get; set; }
         public int? RepeatEveryDays { get; set; }
+        public ICollection<CarMaintenanceRecord> CarMaintenanceRecords { get; set; } = new HashSet<CarMaintenanceRecord>();
     }
 }

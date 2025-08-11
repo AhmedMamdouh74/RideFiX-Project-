@@ -16,6 +16,6 @@ namespace SharedData.DTOs.ChatSessionDTOs
         public bool IsClosed { get; set; }
         public int CarOwnerId { get; set; }
         public int TechnicianId { get; set; }
-        public ICollection<MessegeAllDTO> messages { get; set; } = new List<MessegeAllDTO>();
+        public ICollection<MessegeAllDTO>? messages { get; set; } = new List<MessegeAllDTO>();
     }
 }

@@ -18,7 +18,6 @@ namespace ServiceAbstraction
         ITechnicianRequestEmergency technicianRequestEmergency { get; }
         ICategoryService categoryService { get; }
         IReviewService reviewService { get; }
-
         ICarOwnerService carOwnerService { get; }
         IUserProfileService userProfileService { get; }
         IUserConnectionIdService userConnectionIdService { get; }
@@ -26,6 +25,11 @@ namespace ServiceAbstraction
         IMessegeService messegeService { get; }
         ICarServices carServices { get; }
         ICarMaintananceService carMaintananceService { get; }
+        IEmailService emailService { get; }
+        IMaintenanceTypesService maintenanceTypesService { get; }
+
+        IReverserRequestService reverserRequestService { get; }
+
 
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Service.CoreServices.CarMservices;
-using Service.CoreServices.TechniciansServices;
+
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
@@ -36,6 +36,10 @@ namespace Services
         public ICarServices carServices { get; }
 
         public ICarMaintananceService carMaintananceService { get; }
+        public IEmailService emailService { get; }
+
+        public IMaintenanceTypesService maintenanceTypesService { get; }
+        public IReverserRequestService reverserRequestService { get; }
 
         #endregion
 
@@ -52,7 +56,10 @@ namespace Services
                     IUserConnectionIdService userConnectionIdService,
                     IChatSessionService chatSessionService,
                     ICarServices carServices,
-                    ICarMaintananceService carMaintananceService)
+                    ICarMaintananceService carMaintananceService,
+                    IMaintenanceTypesService maintenanceTypesService,
+                    IEmailService emailService,
+                    IReverserRequestService reverserRequestService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -67,6 +74,10 @@ namespace Services
             this.chatSessionService = chatSessionService;
             this.carServices = carServices;
             this.carMaintananceService = carMaintananceService;
+            this.maintenanceTypesService = maintenanceTypesService;
+            this.emailService = emailService;
+            this.maintenanceTypesService = maintenanceTypesService;
+            this.reverserRequestService = reverserRequestService;
         }
     }
 }

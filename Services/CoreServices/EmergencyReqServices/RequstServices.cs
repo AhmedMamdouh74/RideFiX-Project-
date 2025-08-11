@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Service.Exception_Implementation;
@@ -23,7 +24,7 @@ using SharedData.DTOs.RequestsDTOs;
 using SharedData.DTOs.TechnicianDTOs;
 using SharedData.Enums;
 
-namespace Service.CoreServices
+namespace Service.CoreServices.EmergencyReqServices
 {
     public class RequstServices : IRequestServices
     {
@@ -33,27 +34,68 @@ namespace Service.CoreServices
         private readonly IMapper mapper;
         private readonly ITechnicianService techService;
         private readonly IChatSessionService chatSessionService;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICarOwnerService carOwnerService;
         public RequstServices(IUnitOfWork _unitOfWork,
             IMapper _mapper,
             ITechnicianService technicianService,
-            IChatSessionService chatSessionService)
+            IChatSessionService chatSessionService,
+            IHttpContextAccessor httpContextAccessor,
+            ICarOwnerService carOwnerService)
         {
 
             unitOfWork = _unitOfWork;
             mapper = _mapper;
             techService = technicianService;
             this.chatSessionService = chatSessionService;
+            this.httpContextAccessor = httpContextAccessor;
+            this.carOwnerService = carOwnerService;
             //this.serviceManager = serviceManager;
         }
 
         public async Task CancelAll(int CarOwnerID)
         {
-            var spec = new CancelledRquestSpecification(CarOwnerID);
+            if (CarOwnerID <= 0)
+            {
+                throw new ArgumentNullException(nameof(CarOwnerID), "Car Owner ID cannot be null or negative.");
+            }
+            var requestBrief = await carOwnerService.IsRequested(CarOwnerID);
+            int requestId = requestBrief.Id;
+            var Request = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
+            if (Request == null)
+            {
+                throw new RequestNotFoundException();
+            }
+            if (Request.IsCompleted)
+            {
+                throw new RequestAlreadyCompletedException();
+            }
+
+            Request.IsCompleted = true;
+
+            var spec = new CancelledRquestSpecification(CarOwnerID , requestId);
             var emergencyRequests = await unitOfWork.EmergencyRequestRepository.GetAllAsync(spec);
             if (emergencyRequests == null || !emergencyRequests.Any())
             {
                 throw new RequestNotFoundException();
             }
+            var spec2 = new CancelledReverseRquestSpecification(requestId);
+            var emergencyRequestsTechnicians = await unitOfWork.GetRepository<TechReverseRequest, int>().GetAllAsync(spec2);
+            if (emergencyRequestsTechnicians != null && emergencyRequestsTechnicians.Any())
+            {
+                foreach (var emergencyRequestTechnician in emergencyRequestsTechnicians)
+                {
+                    if (emergencyRequestTechnician.CallState == RequestState.Waiting || emergencyRequestTechnician.CallState == RequestState.Answered)
+                    {
+                        emergencyRequestTechnician.CallState = RequestState.Cancelled;
+                    }
+                    else
+                    {
+                        throw new RequestAlreadyAccepted();
+                    }
+                }
+            }
+
             foreach (var emergencyRequest in emergencyRequests)
             {
                 if (emergencyRequest.CallStatus == RequestState.Waiting)
@@ -67,7 +109,16 @@ namespace Service.CoreServices
                     emergencyRequest.EmergencyRequests.EndTimeStamp = DateTime.UtcNow;
                     await unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequest);
                 }
+               
             }
+          
+            var chatsession = await chatSessionService.GetChatSessionsByCarOwnerId(CarOwnerID);
+            if (chatsession == null)
+            {
+                throw new ChatSessionNotFoundException();
+            }
+            var mappedChat = mapper.Map<ChatSession>(chatsession);
+            mappedChat.IsClosed = true;
             await unitOfWork.SaveChangesAsync();
 
         }
@@ -196,6 +247,26 @@ namespace Service.CoreServices
             }
             var mappedTechnician = mapper.Map<EmergencyTechnicianID>(emergencyTechnician);
             return mappedTechnician;
+        }
+
+        public async Task<int> GetCurrentRequestId()
+        {
+
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            int entityId;
+            bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
+            var spec = new GetCurrentRequestSpecification(entityId);
+            var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(spec);
+            if (emergencyRequest == null)
+            {
+                throw new RequestNotFoundException();
+            }
+            return emergencyRequest.Id;
+
         }
 
         public async Task<bool> IsPresent(RealRequestDTO request)
