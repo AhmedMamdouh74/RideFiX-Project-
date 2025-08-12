@@ -94,13 +94,7 @@ namespace Service.CoreServices
                 await chatSessionService.CompleteChatSession(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
                 await unitOfWork.SaveChangesAsync();
             }
-            //var emergencyRequestTechnicians = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().GetByIdAsync(requestId);
-            //if (emergencyRequestTechnicians != null)
-            //{
-            //    emergencyRequestTechnicians.CallStatus = RequestState.Completed;
-            //    unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequestTechnicians);
-            //    await unitOfWork.SaveChangesAsync();
-            //}
+            
         }
 
         public async Task CreateRealRequest(RealRequestDTO request)
