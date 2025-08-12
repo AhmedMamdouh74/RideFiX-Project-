@@ -17,5 +17,6 @@ namespace Domain.Contracts.SpecificationContracts
         public int? Take { get; }
         public int Skip { get;}
         public bool IsPagingEnabled { get; set; }
+        public bool? IsTracking { get; set; }
     }
 }
