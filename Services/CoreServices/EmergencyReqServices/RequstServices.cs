@@ -9,6 +9,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
+using Service.CoreServices.ChatServices;
 using Service.Exception_Implementation;
 using Service.Exception_Implementation.AlreadyFound;
 using Service.Exception_Implementation.ArgumantNullException;
@@ -117,8 +118,8 @@ namespace Service.CoreServices.EmergencyReqServices
             {
                 throw new ChatSessionNotFoundException();
             }
-            var mappedChat = mapper.Map<ChatSession>(chatsession);
-            mappedChat.IsClosed = true;
+            chatsession.IsClosed = true;
+            await chatSessionService.update(chatsession);
             await unitOfWork.SaveChangesAsync();
 
         }

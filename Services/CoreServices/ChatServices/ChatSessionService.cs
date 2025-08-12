@@ -84,7 +84,6 @@ namespace Service.CoreServices.ChatServices
             var chatSession = await unitOfWork.GetRepository<ChatSession , int> ().GetByIdAsync(spec);
             var mappedChatSession = mapper.Map<ChatSessionAllDTO>(chatSession);
             return mappedChatSession;
-
         }
 
         public async Task<ChatSessionAllDTO> GetChatSessionsByTechnicianId(int technicianId)
@@ -138,11 +137,10 @@ namespace Service.CoreServices.ChatServices
                      
     }
 
-        public async Task update(ChatSessionAllDTO chatSession)
+        public async  Task update(ChatSessionAllDTO chatSession)
         {
             var mappedchat = mapper.Map<ChatSession>(chatSession);
-            unitOfWork.GetRepository<ChatSession, int>().Update(mappedchat);
-            unitOfWork.SaveChangesAsync();
+             unitOfWork.GetRepository<ChatSession, int>().Update(mappedchat);
         }
     }
 }
