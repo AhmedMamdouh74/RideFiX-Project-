@@ -52,6 +52,10 @@ namespace Service.CoreServices.CarMservices
                 if (Car != null)
                 {
                     var carDto = mapper.Map<CarDetailsDto>(car);
+                    if(car == null)
+                    {
+                        throw new CarNotFoundException();
+                    }
                     carDto.DaysSinceLastMaintenance =
                         car.LastMaintenanceDate.HasValue
                             ? (DateTime.Now - car.LastMaintenanceDate.Value).Days
