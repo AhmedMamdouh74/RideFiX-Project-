@@ -18,6 +18,9 @@ namespace Presistence.Data.Configurations
             builder.HasOne(C => C.Owner).
                 WithOne(O => O.Car).
                 HasForeignKey<Car>(C => C.OwnerId).OnDelete(DeleteBehavior.NoAction);
+            builder.Property(c => c.TotalMaintenanceCost)
+                .HasColumnType("decimal(18,2)");
+
         }
     }
 }

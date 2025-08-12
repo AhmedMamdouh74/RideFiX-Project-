@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ChatDTOs;
 using SharedData.DTOs.ChatSessionDTOs;
 
-namespace Service.CoreServices
+namespace Service.CoreServices.ChatServices
 {
     public class ChatSessionService : IChatSessionService
     {
@@ -25,13 +26,14 @@ namespace Service.CoreServices
             this.mapper = mapper;
         }
 
+        
 
 
         public async Task<ChatSessionAllDTO> GetChatSessions(int technicianId, int CarOwnerId)
         {
             var spec = new ChatSessionAllSpecification(technicianId ,CarOwnerId);
-            var Repo = unitOfWork.GetRepository<ChatSession, int>();
-            var chatSessions = await Repo.GetAllAsync(spec);
+
+            var chatSessions = await unitOfWork.GetRepository<ChatSession, int>().GetAllWithSpecAsync(spec);
             if (chatSessions == null || !chatSessions.Any())
             {
                 return null;
@@ -107,6 +109,7 @@ namespace Service.CoreServices
             if (recent != null)
             {
                 recent.IsClosed = false;
+                recent.EndAt = null;
                 chatRepo.Update(recent); 
                 return recent;
             }
@@ -120,6 +123,26 @@ namespace Service.CoreServices
             };
             await chatRepo.AddAsync(created);
             return created;
+        }
+
+        public async Task createChatsession(int technicianId, int CarOwnerId)
+        {
+            ChatSession chatSession = new ChatSession()
+            {
+                CarOwnerId = CarOwnerId,
+                StartAt = DateTime.UtcNow,
+                TechnicianId = technicianId,
+                IsClosed = false,
+            };
+            await unitOfWork.GetRepository<ChatSession, int>().AddAsync(chatSession);
+                     
+    }
+
+        public async Task update(ChatSessionAllDTO chatSession)
+        {
+            var mappedchat = mapper.Map<ChatSession>(chatSession);
+            unitOfWork.GetRepository<ChatSession, int>().Update(mappedchat);
+            unitOfWork.SaveChangesAsync();
         }
     }
 }

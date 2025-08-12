@@ -13,7 +13,7 @@ using Service.Specification_Implementation.ConnectionIdsSpecification;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs.ConnectionDtos;
 
-namespace Service.CoreServices
+namespace Service.CoreServices.ChatServices
 {
     public class UserConnectionIdService : IUserConnectionIdService
     {

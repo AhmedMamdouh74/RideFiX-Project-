@@ -1,20 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Service.AutoMapperProfile;
-using Service.CoreServices.Account;
-using ServiceAbstraction;
-using ServiceAbstraction.CoreServicesAbstractions.Account;
-using Services.AutoMapperProfile;
-
 ﻿using Domain.Contracts;
+using Domain.Contracts.ReposatoriesContract;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Presentation.Hubs;
+using Service.AutoMapperProfile;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
-using Service.CoreServices.TechniciansServices;
+using Service.CoreServices.Account;
+using Service.CoreServices.CarMservices;
+using Service.CoreServices.ChatServices;
+using Service.CoreServices.EmergencyReqServices;
+using ServiceAbstraction;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
-using Domain.Contracts.ReposatoriesContract;
-using Service.CoreServices.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using Services.AutoMapperProfile;
 
 
 
@@ -24,9 +26,11 @@ namespace Services
     {
         public static IServiceCollection AddServiceConfig(this IServiceCollection Services)
         {
+            Services.AddHttpContextAccessor();
             Services.AddScoped<IServiceManager, ServiceManager>();
             Services.AddAutoMapper(typeof(RegisterMapping));
             Services.AddScoped<IFileService, FileService>();
+           
             Services.AddHttpClient(); // تحضير الـ HttpClient في الـ DI
             Services.AddScoped<IFaceRecognitionService, FaceRecognitionService>(); Services.AddScoped<IAuthService, AuthService>();
             Services.AddMemoryCache();
@@ -47,6 +51,11 @@ namespace Services
             Services.AddScoped<IChatSessionService , ChatSessionService>();
             Services.AddScoped<ICarServices, CarServices>();
             Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
+            Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
+            Services.AddScoped<IEmailService, EmailService>();
+            Services.AddScoped<IReverserRequestService, ReverserRequestService>();
+
+
             return Services;
         }
     }

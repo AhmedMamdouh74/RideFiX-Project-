@@ -20,6 +20,8 @@ namespace Service.AutoMapperProfile
               .ForMember(dest => dest.CarOwnerId, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwnerId))
               .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.EmergencyRequests.Latitude))
               .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.EmergencyRequests.Longitude))
+              .ForMember(dest => dest.TimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.TimeStamp))
+              .ForMember(dest => dest.EndTimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.EndTimeStamp))
              
               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.EmergencyRequests.Description))
               .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.Name))

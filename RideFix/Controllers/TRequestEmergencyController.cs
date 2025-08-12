@@ -1,8 +1,6 @@
-﻿using Azure.Core;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presistence.unitofwork;
 using ServiceAbstraction;
-using Services;
 using SharedData.DTOs.TechnicianEmergencyRequestDTOs;
 using SharedData.Wrapper;
 
@@ -10,6 +8,7 @@ namespace RideFix.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TRequestEmergencyController : ControllerBase
     {
         private readonly IServiceManager serviceManager;
@@ -42,7 +41,7 @@ namespace RideFix.Controllers
                 return BadRequest(ApiResponse<string>.FailResponse($"An error occurred: {ex.Message}"));
             }
         }
-        [HttpGet("accepted/id")]
+
         [HttpGet("accepted/{technicalId}")]
         public async Task<ActionResult<EmergencyRequestDetailsDTO>> GetAllAcceptedRequests(int technicalId)
         {
@@ -86,7 +85,7 @@ namespace RideFix.Controllers
         public async Task<IActionResult> UpdateRequestFromCarOwnerAsync([FromBody] TechnicianUpdateEmergencyRequestDTO dto)
         {
             var result = await serviceManager.technicianRequestEmergency.UpdateRequestFromCarOwnerAsync(dto);
-           
+
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Updated successfully"));
         }

@@ -33,6 +33,9 @@ namespace Presistence.Migrations
                     b.Property<int>("AvgKmPerMonth")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("LastMaintenanceDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("MaintenanceCount")
                         .HasColumnType("int");
 
@@ -66,7 +69,7 @@ namespace Presistence.Migrations
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
-                    b.ToTable("Car");
+                    b.ToTable("cars");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.CarMaintenanceRecord", b =>
@@ -86,12 +89,18 @@ namespace Presistence.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("MaintenanceCenter")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaintenanceTypeId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("NextMaintenanceDue")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("PerformedAt")
                         .HasColumnType("datetime2");
@@ -102,7 +111,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("MaintenanceTypeId");
 
-                    b.ToTable("CarMaintenanceRecord");
+                    b.ToTable("carMaintenanceRecords");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
@@ -714,7 +723,7 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", "MaintenanceType")
-                        .WithMany()
+                        .WithMany("CarMaintenanceRecords")
                         .HasForeignKey("MaintenanceTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -974,6 +983,11 @@ namespace Presistence.Migrations
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.Car", b =>
+                {
+                    b.Navigation("CarMaintenanceRecords");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
                 {
                     b.Navigation("CarMaintenanceRecords");
                 });

@@ -1,29 +1,34 @@
 ﻿
 using System.Text;
+using Domain.Contracts;
+using Domain.Contracts;
+using Domain.Entities.CoreEntites.CarMaintenance_Entities;
+using Domain.Entities.CoreEntites.EmergencyEntities;
+using Domain.Entities.IdentityEntities;
+using Domain.Entities.IdentityEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Hubs;
+using Presistence;
+using Presistence;
 using Presistence;
 using Presistence.Data;
-using Domain.Contracts;
-using Domain.Entities.IdentityEntities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Presistence;
 using Presistence.Data;
-using Domain.Contracts;
-using Domain.Entities.IdentityEntities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Presistence;
 using Presistence.Data;
 using RideFix.CustomMiddlewares;
 using Services;
-using Domain.Entities.CoreEntites.EmergencyEntities;
 using SharedData.Enums;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Hubs;
+using Hangfire;
+using Hangfire.MemoryStorage;
 
 namespace RideFix
 {
@@ -83,81 +88,82 @@ namespace RideFix
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             });
-                //.AddJwtBearer(options =>
-                //            {
-                //                var config = builder.Configuration;
-                //                options.TokenValidationParameters = new TokenValidationParameters
-                //                {
-                //                    ValidateIssuer = true,
-                //                    ValidateAudience = true,
-                //                    ValidateLifetime = true,
-                //                    ValidateIssuerSigningKey = true,
-                //                    ValidIssuer = config["JWT:Issuer"],
-                //                    ValidAudience = config["JWT:Audience"],
-                //                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
-                //                };
-                //            });
+            //.AddJwtBearer(options =>
+            //            {
+            //                var config = builder.Configuration;
+            //                options.TokenValidationParameters = new TokenValidationParameters
+            //                {
+            //                    ValidateIssuer = true,
+            //                    ValidateAudience = true,
+            //                    ValidateLifetime = true,
+            //                    ValidateIssuerSigningKey = true,
+            //                    ValidIssuer = config["JWT:Issuer"],
+            //                    ValidAudience = config["JWT:Audience"],
+            //                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+            //                };
+            //            });
 
-                builder.Services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-            .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(options =>
             {
-                var config = builder.Configuration;
-                options.TokenValidationParameters = new TokenValidationParameters
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+        .AddJwtBearer(options =>
+        {
+            var config = builder.Configuration;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = config["JWT:Issuer"],
+                ValidAudience = config["JWT:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = config["JWT:Issuer"],
-                    ValidAudience = config["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]))
-                };
-
-                options.Events = new JwtBearerEvents
+                    context.HandleResponse();
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        statusCode = 401,
+                        message = "Unauthorized: Token is missing or invalid"
+                    });
+                    return context.Response.WriteAsync(result);
+                },
+                OnForbidden = context =>
                 {
-                    OnChallenge = context =>
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(new
                     {
-                        context.HandleResponse();
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        context.Response.ContentType = "application/json";
-                        var result = System.Text.Json.JsonSerializer.Serialize(new
-                        {
-                            statusCode = 401,
-                            message = "Unauthorized: Token is missing or invalid"
-                        });
-                        return context.Response.WriteAsync(result);
-                    },
-                    OnForbidden = context =>
-                    {
-                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        context.Response.ContentType = "application/json";
-                        var result = System.Text.Json.JsonSerializer.Serialize(new
-                        {
-                            statusCode = 403,
-                            message = "Forbidden: You are not allowed to access this resource"
-                        });
-                        return context.Response.WriteAsync(result);
-                    },
-                    OnMessageReceived = context =>
-                    {
-                        var accessToken = context.Request.Query["access_token"];
+                        statusCode = 403,
+                        message = "Forbidden: You are not allowed to access this resource"
+                    });
+                    return context.Response.WriteAsync(result);
+                },
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
 
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken)
-                        && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub"))
-                        {
-                            context.Token = accessToken;
-                        }
-
-                        return Task.CompletedTask;
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken)
+                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub") 
+                    || path.StartsWithSegments("/notificationhub"))
+                    {
+                        context.Token = accessToken;
                     }
-                };
 
-            });
+                    return Task.CompletedTask;
+                }
+            };
+
+        });
             #endregion
 
             #region Invalid Model State Response Factory Configuration
@@ -181,10 +187,9 @@ namespace RideFix
             });
             #endregion
 
-
             #region Send EMAIL
-            //builder.Services.AddHangfire(x => x.UseInMemoryStorage());
-            //builder.Services.AddHangfireServer();
+            builder.Services.AddHangfire(x => x.UseMemoryStorage());
+            builder.Services.AddHangfireServer();
             #endregion
             var app = builder.Build();
             app.UseCors("AllowAngularOrigin");
@@ -192,9 +197,9 @@ namespace RideFix
 
             //notification hub configuration
             // التسجيل الصحيح للـ Hub
-            app.MapHub<NotificationHub>("/notificationhub");
             app.MapHub<ChatHub>("/chathub");//http://localhost:5038/chathub
-            app.MapHub<RequestWatchDogHub>("/requestWatchDogHub");
+            app.MapHub<RequestWatchDogHub>(pattern: "/requestWatchDogHub");
+            app.MapHub<NotificationHub>(pattern: "/notificationhub");
 
 
 
@@ -224,11 +229,12 @@ namespace RideFix
             app.UseAuthorization();
 
             //EMAIL
-            //app.UseHangfireDashboard();
+            app.UseHangfireDashboard();
 
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

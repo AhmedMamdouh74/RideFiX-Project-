@@ -57,6 +57,8 @@ namespace Presistence.Repositories
         }
         #endregion
 
+        #region Specification ToList
+
         public async Task<IEnumerable<T>> GetAllAsync(ISpecification<T, TK> specification)
         {
             var query = _context.Set<T>().AsQueryable();
@@ -87,6 +89,17 @@ namespace Presistence.Repositories
             var query = _context.Set<T>().AsQueryable();
             query = SpecificationEvaluation.ApplySpecification(query, spec);
             return await query.ToListAsync();
+        }
+
+        #endregion
+
+        public IQueryable<T> GetAllQueryable(ISpecification<T, TK> spec)
+        {
+            {
+                var query = _context.Set<T>().AsQueryable();
+                query = SpecificationEvaluation.ApplySpecification(query, spec);
+                return query;
+            }
         }
     }
 }

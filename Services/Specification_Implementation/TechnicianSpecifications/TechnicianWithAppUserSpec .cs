@@ -18,6 +18,8 @@ namespace Service.Specification_Implementation.TechnicianSpecifications
         public TechnicianWithAppUserSpec(int technicianId) : base(t => t.Id == technicianId) {
             AddInclude(t => t.ApplicationUser);
             AddInclude(t => t.TCategories);
+            AddInclude(t => t.reviews);
+            
 
         }
     }
