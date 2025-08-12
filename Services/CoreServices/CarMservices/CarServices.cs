@@ -29,9 +29,27 @@ namespace Service.CoreServices.CarMservices
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task AddNewCar(CreateCarDto car)
+        public async Task AddNewCar(CreateCarDto car)
         {
-            throw new NotImplementedException();
+            if (car == null)
+            {
+                throw new CarBadRequestException();
+            }
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new CarBadRequestException("no authorize");
+            }
+            var flag = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value
+                        , out var ownerId);
+            if (!flag)
+            {
+                throw new CarBadRequestException("there ids no ownerId");
+            }
+            var carRepo = unitOfWork.GetRepository<Car, int>();
+            var carEntity = mapper.Map<Car>(car);
+            carEntity.OwnerId = ownerId;
+
         }
 
         public async Task<CarDetailsDto> GetCarDetailsAsync()
