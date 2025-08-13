@@ -8,6 +8,7 @@ using Service.AutoMapperProfile;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
 using Service.CoreServices.Account;
+using Service.CoreServices.Admin;
 using Service.CoreServices.CarMservices;
 using Service.CoreServices.ChatServices;
 using Service.CoreServices.EmergencyReqServices;
@@ -15,6 +16,7 @@ using ServiceAbstraction;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using Services.AutoMapperProfile;
 
@@ -54,6 +56,7 @@ namespace Services
             Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
             Services.AddScoped<IEmailService, EmailService>();
             Services.AddScoped<IReverserRequestService, ReverserRequestService>();
+            Services.AddScoped<IAdminService, AdminService>();
 
 
             return Services;

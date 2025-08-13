@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SharedData.DTOs.Admin.TechnicianCategory
 {
-    public class TechnicianCategoryDTO
+    public class ReadTCategoryDTO
     {
         public int Id { get; set; }
         public string? Name { get; set; }

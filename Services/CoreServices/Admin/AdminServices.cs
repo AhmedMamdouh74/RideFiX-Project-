@@ -1,0 +1,133 @@
+﻿using Domain.Contracts;
+using Domain.Entities.CoreEntites.EmergencyEntities;
+using Domain.Entities.IdentityEntities;
+using Microsoft.AspNetCore.Identity;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
+using SharedData.DTOs.Admin.TechnicianCategory;
+using SharedData.DTOs.Admin.Users;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Service.CoreServices.Admin
+{
+    public class AdminService : IAdminService
+    {
+        private readonly IUnitOfWork unitOfWork;
+        private readonly UserManager<ApplicationUser> userManager;
+
+        public AdminService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        {
+            this.unitOfWork = unitOfWork;
+            this.userManager = userManager;
+        }
+
+        // Users
+        public async Task<List<ReadUsersDTO>> GetAllUsersAsync()
+        {
+            var users = userManager.Users.ToList();
+            var result = new List<ReadUsersDTO>();
+
+            foreach (var user in users)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                result.Add(new ReadUsersDTO
+                {
+                    Id = user.Id,
+                    FullName = user.Name,
+                    Role = roles.FirstOrDefault(),
+                    IsActivated = user.IsActivated
+                });
+            }
+
+            return result;
+        }
+
+        public async Task<bool> SoftDeleteUserAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsActivated = false;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
+        public async Task<bool> RestoreUserAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return false;
+
+            user.IsActivated = true;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
+        // Categories
+        public async Task<List<ReadTCategoryDTO>> GetAllCategoriesAsync()
+        {
+            var repo = unitOfWork.GetRepository<TCategory, int>();
+            var categories = await repo.GetAllAsync();
+            return categories.Select(c => new ReadTCategoryDTO
+            {
+                Id = c.Id,
+                Name = c.Name,
+                IsDeleted = c.IsDeleted
+            }).ToList();
+        }
+
+        public async Task<ReadTCategoryDTO> CreateCategoryAsync(CreateTCategoryDTO dto)
+        {
+            var repo = unitOfWork.GetRepository<TCategory, int>();
+            var entity = new TCategory { Name = dto.Name, IsDeleted = false };
+            await repo.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
+
+            return new ReadTCategoryDTO
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                IsDeleted = entity.IsDeleted
+            };
+        }
+
+        public async Task<bool> UpdateCategoryAsync(int id, UpdateTCategoryDTO dto)
+        {
+            var repo = unitOfWork.GetRepository<TCategory, int>();
+            var category = await repo.GetByIdAsync(id);
+            if (category == null) return false;
+
+            category.Name = dto.Name;
+            repo.Update(category);
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> SoftDeleteCategoryAsync(int id)
+        {
+            var repo = unitOfWork.GetRepository<TCategory, int>();
+            var category = await repo.GetByIdAsync(id);
+            if (category == null) return false;
+
+            category.IsDeleted = true;
+            repo.Update(category);
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RestoreCategoryAsync(int id)
+        {
+            var repo = unitOfWork.GetRepository<TCategory, int>();
+            var category = await repo.GetByIdAsync(id);
+            if (category == null) return false;
+
+            category.IsDeleted = false;
+            repo.Update(category);
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+    }
+
+}

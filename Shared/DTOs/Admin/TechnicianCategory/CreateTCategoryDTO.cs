@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SharedData.DTOs.Admin.TechnicianCategory
 {
 
-    public class CreateCategoryDTO
+    public class CreateTCategoryDTO
     {
         public string? Name { get; set; }
     }

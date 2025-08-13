@@ -10,6 +10,7 @@ using Service.CoreServices.CarMservices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 
 namespace Services
@@ -40,6 +41,7 @@ namespace Services
 
         public IMaintenanceTypesService maintenanceTypesService { get; }
         public IReverserRequestService reverserRequestService { get; }
+        public IAdminService adminService { get; }
 
         #endregion
 
@@ -59,7 +61,8 @@ namespace Services
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
-                    IReverserRequestService reverserRequestService)
+                    IReverserRequestService reverserRequestService,
+                    IAdminService adminService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -78,6 +81,7 @@ namespace Services
             this.emailService = emailService;
             this.maintenanceTypesService = maintenanceTypesService;
             this.reverserRequestService = reverserRequestService;
+            this.adminService = adminService;
         }
     }
 }

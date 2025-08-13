@@ -200,7 +200,7 @@ public async Task<bool> UpdateRequestFromCarOwnerAsync(TechnicianUpdateEmergency
                     // boardcast using SignalR notification 
                    
 
-                    // 4.6) Reject others
+                    // Reject others
                     RejectOtherTechnicians(request, dto.TechnicianId);
                     break;
                 }

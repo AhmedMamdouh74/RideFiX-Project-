@@ -3,17 +3,17 @@ using SharedData.DTOs.Admin.Users;
 
 namespace ServiceAbstraction.CoreServicesAbstractions.Admin
 {
-    public interface IAdminServices
+    public interface IAdminService
     {
         // Users
         Task<List<ReadUsersDTO>> GetAllUsersAsync();
-        Task<bool> SoftDeleteUserAsync(int userId);
-        Task<bool> RestoreUserAsync(int userId);
+        Task<bool> SoftDeleteUserAsync(string userId);
+        Task<bool> RestoreUserAsync(string userId);
 
         // Categories
-        Task<List<TechnicianCategoryDTO>> GetAllCategoriesAsync();
-        Task<TechnicianCategoryDTO> CreateCategoryAsync(CreateCategoryDTO dto);
-        Task<bool> UpdateCategoryAsync(int id, UpdateCategoryDTO dto);
+        Task<List<ReadTCategoryDTO>> GetAllCategoriesAsync();
+        Task<ReadTCategoryDTO> CreateCategoryAsync(CreateTCategoryDTO dto);
+        Task<bool> UpdateCategoryAsync(int id, UpdateTCategoryDTO dto);
         Task<bool> SoftDeleteCategoryAsync(int id);
         Task<bool> RestoreCategoryAsync(int id);
     }
