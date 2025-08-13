@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace SharedData.DTOs.Admin.TechnicianCategory
 {
-    internal class TechnicianCategoryDTO
+    public class TechnicianCategoryDTO
     {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

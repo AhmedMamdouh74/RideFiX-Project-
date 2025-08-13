@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SharedData.DTOs.Admin.TechnicianCategory
 {
-    internal class UpdateCategoryDTO
+    public class UpdateCategoryDTO
     {
+        public string Name { get; set; }
     }
 }
