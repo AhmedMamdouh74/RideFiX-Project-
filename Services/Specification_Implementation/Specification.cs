@@ -55,8 +55,6 @@ namespace Services.Specification_Implementation
         }
         #endregion
 
-        #region
-        
-        #endregion
+        public bool? IsTracking { get; set; }
     }
 }

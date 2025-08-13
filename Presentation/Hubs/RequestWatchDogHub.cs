@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Contracts;
+using Domain.Entities.CoreEntites.EmergencyEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using ServiceAbstraction;
@@ -14,18 +16,23 @@ namespace Presentation.Hubs
     {
         IServiceManager ServiceManager { get; set; }
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IUnitOfWork unitOfWork;
 
         public RequestWatchDogHub(IServiceManager servicemanager,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
         {
             ServiceManager = servicemanager;
             this.httpContextAccessor = httpContextAccessor;
+            this.unitOfWork = unitOfWork;
 
         }
 
-        public async Task acceptrequest(int CarOwnerId)
+        public async Task acceptrequest(int requestId)
         {
-            var users = await ServiceManager.userConnectionIdService.SearchByCarOwnerId(CarOwnerId);
+
+            var carOwner = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
+            var carOwnerId = carOwner.CarOwnerId;
+            var users = await ServiceManager.userConnectionIdService.SearchByCarOwnerId(carOwnerId);
             if (users != null && users.Any())
             {
                 foreach (var user in users)

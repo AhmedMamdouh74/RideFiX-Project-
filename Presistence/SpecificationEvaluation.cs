@@ -28,6 +28,10 @@ namespace Presistence
             {
                 query = query.Include(include);
             }
+            if (specification.IsTracking.HasValue)
+            {
+                query = specification.IsTracking.Value ? query.AsTracking() : query.AsNoTracking();
+            }
             return query;
         }
     }
