@@ -12,6 +12,7 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public string Name { get; set; } // name of category 
 
         public string Description { get; set; }
+        public bool IsDeleted { get; set; }=false;
 
         public ICollection<Technician> Technicians { get; set; } = new HashSet<Technician>(); // List OF Technicains
         public ICollection<EmergencyRequest> EmergencyRequests { get; set; } = new HashSet<EmergencyRequest>();
