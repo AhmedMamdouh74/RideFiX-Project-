@@ -24,7 +24,7 @@ namespace Service.CoreServices.Admin
         public async Task<List<ReadUsersDTO>> GetAllUsersAsync()
         {
             var users = userManager.Users.ToList();
-            if (users.Any()) throw new UsersNotFoundException("no users found");
+            if (!users.Any()) throw new UsersNotFoundException("no users found");
             var result = new List<ReadUsersDTO>();
 
             foreach (var user in users)
@@ -46,7 +46,7 @@ namespace Service.CoreServices.Admin
         {
             var user = await userManager.FindByIdAsync(userId);
             if (user == null) throw new UsersNotFoundException("no user found with this id");
-            user.IsActivated = false;
+            user.isDeleted = true;
             await userManager.UpdateAsync(user);
             return true;
         }
@@ -65,7 +65,7 @@ namespace Service.CoreServices.Admin
         {
             var repo = unitOfWork.GetRepository<TCategory, int>();
             var categories = await repo.GetAllAsync();
-            if (categories == null || categories.Any()) throw new CategoriesNotFoundException("there is no categories");
+            if (categories == null ||! categories.Any()) throw new CategoriesNotFoundException("there is no categories");
             return categories.Select(c => new ReadTCategoryDTO
             {
                 Id = c.Id,
@@ -122,6 +122,39 @@ namespace Service.CoreServices.Admin
             category.IsDeleted = false;
             repo.Update(category);
             await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<ReadUsersDTO>> GetAllTechniciansAsync()
+        {
+            var technicians = await userManager.GetUsersInRoleAsync("Technician");
+            return technicians.Select(u => new ReadUsersDTO
+            {
+                Id = u.Id,
+                FullName = u.Name,
+                IsActivated = u.IsActivated,
+            }).ToList();
+        }
+
+        public async Task<List<ReadUsersDTO>> GetAllCarOwnersAsync()
+        {
+            var carOwners = await userManager.GetUsersInRoleAsync("CarOwner");
+            return carOwners.Select(u => new ReadUsersDTO
+            {
+                Id = u.Id,
+                FullName = u.Name,
+                IsActivated = u.IsActivated,
+               // rate=u
+
+            }).ToList();
+        }
+
+        public async Task<bool> BanUserAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            if (user == null) throw new UsersNotFoundException("no user found with this id");
+            user.IsActivated = true;
+            await userManager.UpdateAsync(user);
             return true;
         }
     }

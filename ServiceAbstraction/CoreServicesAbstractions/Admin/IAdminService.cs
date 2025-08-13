@@ -7,7 +7,10 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Admin
     {
         // Users
         Task<List<ReadUsersDTO>> GetAllUsersAsync();
+        Task<List<ReadUsersDTO>> GetAllTechniciansAsync();
+        Task<List<ReadUsersDTO>> GetAllCarOwnersAsync();
         Task<bool> SoftDeleteUserAsync(string userId);
+        Task<bool> BanUserAsync(string userId);
         Task<bool> RestoreUserAsync(string userId);
 
         // Categories
