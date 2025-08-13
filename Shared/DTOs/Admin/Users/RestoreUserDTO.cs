@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SharedData.DTOs.Admin.Users
 {
-    internal class RestoreUserDTO
+    public class RestoreUserDTO
     {
+        public int UserId { get; set; }
     }
 }

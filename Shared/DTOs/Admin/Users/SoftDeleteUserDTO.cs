@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SharedData.DTOs.Admin.Users
 {
-    internal class SoftDeleteUserDTO
+    public class SoftDeleteUserDTO
     {
+        public int UserId { get; set; }
     }
 }
