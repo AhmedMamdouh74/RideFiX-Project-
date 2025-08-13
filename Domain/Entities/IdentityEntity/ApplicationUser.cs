@@ -19,6 +19,9 @@ namespace Domain.Entities.IdentityEntities
         public string IdentityImageUrl { get; set; }
         public string FaceImageUrl { get; set; }
         public int PIN { get; set; }
+        public bool IsActivated { get; set; }=true;
+        public bool isDeleted {  get; set; }=false;
+
 
 
         public ICollection<Message> messages { get; set; } = new HashSet<Message>();
