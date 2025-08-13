@@ -2,14 +2,10 @@
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Identity;
+using Service.Exception_Implementation.NotFoundExceptions;
 using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.CoreServices.Admin
 {
@@ -28,6 +24,7 @@ namespace Service.CoreServices.Admin
         public async Task<List<ReadUsersDTO>> GetAllUsersAsync()
         {
             var users = userManager.Users.ToList();
+            if (users.Any()) throw new UsersNotFoundException("no users found");
             var result = new List<ReadUsersDTO>();
 
             foreach (var user in users)
@@ -48,8 +45,7 @@ namespace Service.CoreServices.Admin
         public async Task<bool> SoftDeleteUserAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
-            if (user == null) return false;
-
+            if (user == null) throw new UsersNotFoundException("no user found with this id");
             user.IsActivated = false;
             await userManager.UpdateAsync(user);
             return true;
@@ -58,8 +54,7 @@ namespace Service.CoreServices.Admin
         public async Task<bool> RestoreUserAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId.ToString());
-            if (user == null) return false;
-
+            if (user == null) throw new UsersNotFoundException("no user found with this id");
             user.IsActivated = true;
             await userManager.UpdateAsync(user);
             return true;
@@ -70,6 +65,7 @@ namespace Service.CoreServices.Admin
         {
             var repo = unitOfWork.GetRepository<TCategory, int>();
             var categories = await repo.GetAllAsync();
+            if (categories == null || categories.Any()) throw new CategoriesNotFoundException("there is no categories");
             return categories.Select(c => new ReadTCategoryDTO
             {
                 Id = c.Id,
@@ -97,7 +93,7 @@ namespace Service.CoreServices.Admin
         {
             var repo = unitOfWork.GetRepository<TCategory, int>();
             var category = await repo.GetByIdAsync(id);
-            if (category == null) return false;
+            if (category == null) if (category == null) throw new CategoriesNotFoundException("there is no category with this id");
 
             category.Name = dto.Name;
             repo.Update(category);
@@ -109,7 +105,7 @@ namespace Service.CoreServices.Admin
         {
             var repo = unitOfWork.GetRepository<TCategory, int>();
             var category = await repo.GetByIdAsync(id);
-            if (category == null) return false;
+            if (category == null) if (category == null) throw new CategoriesNotFoundException("there is no category with this id");
 
             category.IsDeleted = true;
             repo.Update(category);
@@ -121,7 +117,7 @@ namespace Service.CoreServices.Admin
         {
             var repo = unitOfWork.GetRepository<TCategory, int>();
             var category = await repo.GetByIdAsync(id);
-            if (category == null) return false;
+            if (category == null) throw new CategoriesNotFoundException("there is no category with this id");
 
             category.IsDeleted = false;
             repo.Update(category);
