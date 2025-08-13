@@ -11,6 +11,7 @@ namespace Service.CoreServices.CarMservices
     {
         public Task<CarDetailsDto> GetCarDetailsAsync();
         public Task AddNewCar(CreateCarDto car);
+        public Task DeleteCar();
         public Task<int> GetCarIdByOwnerId(int ownerId);
         public Task SetCarStats(DateTime date, decimal cost, int CarId);
     }

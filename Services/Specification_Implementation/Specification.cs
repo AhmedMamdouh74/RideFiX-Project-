@@ -52,7 +52,9 @@ namespace Services.Specification_Implementation
             Skip = skip;
             Take = take;
             IsPagingEnabled = true;
-        }   
+        }
         #endregion
+
+        public bool? IsTracking { get; set; }
     }
 }

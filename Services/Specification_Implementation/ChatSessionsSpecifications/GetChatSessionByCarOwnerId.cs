@@ -14,8 +14,7 @@ namespace Service.Specification_Implementation.ChatSessionsSpecifications
             : base(s => s.CarOwnerId == carOwnerId && s.IsClosed == false)
         {
             AddInclude(s => s.massages.OrderBy(s => s.SentAt));
-            AddInclude(s => s.Technician);
-            AddInclude(s => s.CarOwner);
+            IsTracking = false;
         }
     }
     
