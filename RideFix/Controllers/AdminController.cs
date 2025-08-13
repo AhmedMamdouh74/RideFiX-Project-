@@ -19,7 +19,7 @@ namespace RideFix.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users=await serviceManager.adminService.GetAllUsersAsync();
-            return Ok(ApiResponse<List<ReadUsersDTO>>.SuccessResponse(users,""));
+            return Ok(ApiResponse<List<ReadUsersDTO>>.SuccessResponse(users,"successfull Request"));
         }
      
     }

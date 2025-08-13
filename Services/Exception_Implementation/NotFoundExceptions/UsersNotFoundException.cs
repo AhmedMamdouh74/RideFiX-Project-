@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Service.Exception_Implementation.NotFoundExceptions
 {
-    internal class UsersNotFoundException
+    public class UsersNotFoundException:Exception
     {
+        public UsersNotFoundException(string message):base(message) { }
     }
 }

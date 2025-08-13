@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Service.Exception_Implementation.NotFoundExceptions
 {
-    internal class CategoriesNotFoundException
+    public class CategoriesNotFoundException:Exception
     {
+        public CategoriesNotFoundException(string message):base(message) { }
     }
 }
