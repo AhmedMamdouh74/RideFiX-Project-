@@ -11,6 +11,7 @@ namespace Domain.Entities.e_Commerce
         public string Name { get; set; }
 
         // Navigation property for products in this category
+        public string ImageUrl { get; set; }
         public ICollection<Product> Products { get; set; } = new HashSet<Product>();
     }
 }

@@ -29,6 +29,7 @@ using Microsoft.EntityFrameworkCore;
 using Presentation.Hubs;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using StackExchange.Redis;
 
 namespace RideFix
 {
@@ -58,6 +59,13 @@ namespace RideFix
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //Redis
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var configuration = ConfigurationOptions.Parse("localhost:6379,abortConnect=false");
+                return ConnectionMultiplexer.Connect(configuration);
+            });
 
 
             builder.Services.AddSignalR(); // Add SignalR services

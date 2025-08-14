@@ -29,5 +29,6 @@ namespace Presentation.Controllers
             var Car = await serviceManager.carServices.GetCarDetailsAsync();
             return Ok(ApiResponse<CarDetailsDto>.SuccessResponse(Car, "Has a Car"));
         }
+       
     }
 }

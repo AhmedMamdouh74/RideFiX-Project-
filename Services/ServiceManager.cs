@@ -11,6 +11,7 @@ using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
 
 namespace Services
 {
@@ -40,6 +41,10 @@ namespace Services
 
         public IMaintenanceTypesService maintenanceTypesService { get; }
         public IReverserRequestService reverserRequestService { get; }
+        public IProductCategoryService productCategoryService { get; }
+        public IProductsService productsService { get; }
+        public IShoppingCartService shoppingCartService { get; } 
+
 
         #endregion
 
@@ -59,7 +64,10 @@ namespace Services
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
-                    IReverserRequestService reverserRequestService)
+                    IReverserRequestService reverserRequestService,
+                    IProductCategoryService productCategoryService,
+                    IProductsService productsService,
+                    IShoppingCartService shoppingCartService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -78,6 +86,9 @@ namespace Services
             this.emailService = emailService;
             this.maintenanceTypesService = maintenanceTypesService;
             this.reverserRequestService = reverserRequestService;
+            this.productCategoryService = productCategoryService;
+            this.productsService = productsService;
+            this.shoppingCartService = shoppingCartService;
         }
     }
 }
