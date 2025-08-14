@@ -20,9 +20,15 @@ namespace Presentation.Controllers
             serviceManager = _serviceManager;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts(decimal? maxPrice = null, int? categoryId = null)
+       
+        public async Task<IActionResult> GetAllProducts(
+            int? pageNumber, 
+            int? itemPerPage,
+            decimal? maxPrice = null, 
+            int? categoryId = null)
         {
-            var products = await serviceManager.productsService.FilterProductsAsync(maxPrice , categoryId);
+            var products = await serviceManager.productsService
+                .FilterProductsAsync(pageNumber, itemPerPage, maxPrice, categoryId);
             if (products == null || !products.Any())
             {
                 return NotFound("No products found.");

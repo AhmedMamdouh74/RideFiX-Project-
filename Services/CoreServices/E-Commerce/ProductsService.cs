@@ -22,9 +22,14 @@ namespace Service.CoreServices.E_Commerce
             unitOfWork = _unitOfWork;
             mapper = _mapper;
         }
-        public async Task<List<ProductBreifDTO>> FilterProductsAsync(decimal? maxPrice = null, int? categoryId = null)
+        public async Task<List<ProductBreifDTO>> FilterProductsAsync(
+            int? pageNumber,
+            int? itemPerPage,
+            decimal? maxPrice = null,
+            int? categoryId = null)
         {
-            var spec = new FilterProductSpecification(maxPrice, categoryId);
+            var spec = new FilterProductSpecification( pageNumber,
+             itemPerPage, maxPrice, categoryId);
             var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
             if (products == null || !products.Any())
             {

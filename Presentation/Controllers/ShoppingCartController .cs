@@ -57,5 +57,16 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<string>.SuccessResponse(null, "Item removed from cart successfully."));
         }
 
+        [HttpPut("{productId:int}")]
+        public async Task<IActionResult> UpdateItemQuantity(int productId, int newQuantity)
+        {
+            if (productId <= 0 || newQuantity <= 0)
+            {
+                return BadRequest("Product ID and new quantity must be greater than zero.");
+            }
+            await serviceManager.shoppingCartService.UpdateItemQuantityAsync(productId, newQuantity);
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Item quantity updated successfully."));
+        }
+
     }
 }

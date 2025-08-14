@@ -11,7 +11,10 @@ namespace Service.Specification_Implementation.E_CommerceSpecifications
 {
     public class FilterProductSpecification : Specification<Product, int>
     {
-        public FilterProductSpecification(decimal? maxPrice = null,
+        public FilterProductSpecification(
+            int? pageNumber,
+            int? itemPerPage,
+            decimal? maxPrice = null,
             int? categoryId = null)
         {
             if (maxPrice.HasValue)
@@ -23,6 +26,18 @@ namespace Service.Specification_Implementation.E_CommerceSpecifications
                 AddCriteria(s => s.CategoryId == categoryId.Value);
             }
             AddInclude(s => s.Category);
+            SetOrderBy(s => s.Price);
+
+            if (pageNumber.HasValue)
+            {
+                int skip = (pageNumber.Value - 1) * (itemPerPage ?? 10);
+                int take = itemPerPage ?? 10;
+                ApplyPaging(skip, take);
+            }
+            else
+            {
+                ApplyPaging(0, 10);
+            }
         }
     }
 }

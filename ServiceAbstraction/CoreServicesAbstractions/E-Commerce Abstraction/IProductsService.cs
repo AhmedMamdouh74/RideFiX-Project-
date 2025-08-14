@@ -11,6 +11,8 @@ namespace ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction
     public interface IProductsService 
     {
         public Task<List<ProductBreifDTO>> FilterProductsAsync(
+            int? pageNumber,
+            int? itemPerPage,
             decimal? maxPrice = null,
             int? categoryId = null);
 

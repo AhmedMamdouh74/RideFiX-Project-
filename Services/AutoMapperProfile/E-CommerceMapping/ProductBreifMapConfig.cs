@@ -13,7 +13,9 @@ namespace Service.AutoMapperProfile.E_CommerceMapping
     {
         public ProductBreifMapConfig()
         {
-            CreateMap<Product, ProductBreifDTO>().ReverseMap();
+            CreateMap<Product, ProductBreifDTO>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Id))
+                .ReverseMap();
               
         }
     }

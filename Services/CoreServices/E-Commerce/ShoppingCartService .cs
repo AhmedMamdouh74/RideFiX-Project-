@@ -121,6 +121,8 @@ namespace Service.CoreServices.E_Commerce
                 cartItems.Remove(itemToUpdate);
                 itemToUpdate.Quantity = newQuantity;
                 cartItems.Add(itemToUpdate);
+                var serializedCart = JsonSerializer.Serialize(cartItems);
+                await database.StringSetAsync(cartKey, serializedCart);
             }
             else
             {
