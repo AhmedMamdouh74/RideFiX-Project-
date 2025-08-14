@@ -31,6 +31,7 @@ namespace ServiceAbstraction
 
         IReverserRequestService reverserRequestService { get; }
         IAdminService adminService { get; }
+        IActivityReportService activityReportService { get; }
 
 
     }
