@@ -10,6 +10,7 @@ namespace SharedData.DTOs.Admin.TechnicianCategory
     public class CreateTCategoryDTO
     {
         public string? Name { get; set; }
+        public string? Description { get; set; }
     }
 
 }

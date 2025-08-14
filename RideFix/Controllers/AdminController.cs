@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
@@ -18,37 +19,70 @@ namespace RideFix.Controllers
 
         //  Users 
 
-        [HttpGet("users")]
-        [EndpointSummary("Get all users (both technicians and car owners)")]
+        [HttpGet("carOwners")]
+        [EndpointSummary("Get all car owner users")]
         [ProducesResponseType(200, Type = typeof(ApiResponse<List<ReadUsersDTO>>))]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllCarOwnerUsers()
         {
-            var users = await serviceManager.adminService.GetAllUsersAsync();
+            var users = await serviceManager.adminService.GetAllCarOwnersAsync();
             return Ok(ApiResponse<List<ReadUsersDTO>>.SuccessResponse(users, "Successful request"));
         }
 
-        [HttpDelete("users/{id}")]
-        [EndpointSummary("Soft delete a user by ID")]
+        [HttpGet("technicians")]
+        [EndpointSummary("Get all technician users")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse<List<ReadUsersDTO>>))]
+        public async Task<IActionResult> GetAllTechnicianUsers()
+        {
+            var users = await serviceManager.adminService.GetAllTechniciansAsync();
+            return Ok(ApiResponse<List<ReadUsersDTO>>.SuccessResponse(users, "Successful request"));
+        }
+
+        [HttpPost("carOwner/{id}")]
+        [EndpointSummary("ban car onwer by ID")]
         [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
         [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
-        public async Task<IActionResult> SoftDeleteUser(string id)
+        public async Task<IActionResult> BanCarOwnerUser(int id)
         {
-            var result = await serviceManager.adminService.SoftDeleteUserAsync(id);
-            if (!result)
-                return NotFound(ApiResponse<string>.FailResponse("User not found"));
+            await serviceManager.adminService.BanCarOwnerAsync(id);
+
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "User soft deleted successfully"));
         }
 
-        [HttpPost("users/{id}/restore")]
-        [EndpointSummary("Restore a previously soft deleted user by ID")]
+        [HttpPost("tecnician/{id}")]
+        [EndpointSummary("ban car onwer by ID")]
         [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
         [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
-        public async Task<IActionResult> RestoreUser(string id)
+        public async Task<IActionResult> BanTechnicianUser(int id)
         {
-            var result = await serviceManager.adminService.RestoreUserAsync(id);
-            if (!result)
-                return NotFound(ApiResponse<string>.FailResponse("User not found or not deleted"));
+            await serviceManager.adminService.BanTechnianAsync(id);
+
+
+            return Ok(ApiResponse<string>.SuccessResponse(null, "User soft deleted successfully"));
+        }
+
+        [HttpPost("carOwner/{id}/active")]
+        [EndpointSummary("active a previously baned user by ID")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
+        public async Task<IActionResult> ActiveCarOwnerUser(int id)
+        {
+            await serviceManager.adminService.ActivateCarOwonerAsync(id);
+
+
+            return Ok(ApiResponse<string>.SuccessResponse(null, "User restored successfully"));
+        }
+
+
+
+        [HttpPost("technician/{id}/active")]
+        [EndpointSummary("active a previously baned user by ID")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
+        public async Task<IActionResult> ActiveTechnicianUser(int id)
+        {
+            await serviceManager.adminService.ActivateTechnianAsync(id);
+
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "User restored successfully"));
         }
@@ -69,8 +103,8 @@ namespace RideFix.Controllers
         [ProducesResponseType(201, Type = typeof(ApiResponse<ReadTCategoryDTO>))]
         public async Task<IActionResult> CreateCategory(CreateTCategoryDTO dto)
         {
-            var category = await serviceManager.adminService.CreateCategoryAsync(dto);
-            return CreatedAtAction(nameof(GetAllCategories), ApiResponse<ReadTCategoryDTO>.SuccessResponse(category, "Category created successfully"));
+            await serviceManager.adminService.CreateCategoryAsync(dto);
+            return CreatedAtAction(nameof(GetAllCategories), ApiResponse<string>.SuccessResponse("", "Category created successfully"));
         }
 
         [HttpPut("categories/{id}")]
@@ -79,8 +113,8 @@ namespace RideFix.Controllers
         [ProducesResponseType(404, Type = typeof(ApiResponse<bool>))]
         public async Task<IActionResult> UpdateCategory(int id, UpdateTCategoryDTO dto)
         {
-            var updated = await serviceManager.adminService.UpdateCategoryAsync(id, dto);
-           
+            await serviceManager.adminService.UpdateCategoryAsync(id, dto);
+
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Category updated successfully"));
         }
@@ -91,24 +125,24 @@ namespace RideFix.Controllers
         [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> SoftDeleteCategory(int id)
         {
-            var result = await serviceManager.adminService.SoftDeleteCategoryAsync(id);
-            if (!result)
-                return NotFound(ApiResponse<string>.FailResponse("Category not found"));
+            await serviceManager.adminService.DeleteCategoryAsync(id);
+
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "Category soft deleted successfully"));
         }
 
-        [HttpPost("categories/{id}/restore")]
-        [EndpointSummary("Restore a previously soft deleted category by ID")]
-        [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
-        [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
-        public async Task<IActionResult> RestoreCategory(int id)
+        [HttpGet("users-count")]
+        public async Task<IActionResult> GetUsersCount()
         {
-            var result = await serviceManager.adminService.RestoreCategoryAsync(id);
-            if (!result)
-                return NotFound(ApiResponse<string>.FailResponse("Category not found or not deleted"));
-
-            return Ok(ApiResponse<string>.SuccessResponse(null, "Category restored successfully"));
+            var counts = await serviceManager.adminService.GetUsersCountAsync();
+            return Ok(counts);
         }
+        [HttpGet("requests-count")]
+        public async Task<IActionResult> GetRequestsCount()
+        {
+            var counts = await serviceManager.adminService.GetrequestsCountAsync();
+            return Ok(counts);
+        }
+
     }
 }
