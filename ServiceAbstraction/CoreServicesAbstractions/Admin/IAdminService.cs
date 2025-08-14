@@ -6,18 +6,24 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Admin
     public interface IAdminService
     {
         // Users
-        Task<List<ReadUsersDTO>> GetAllUsersAsync();
+        
         Task<List<ReadUsersDTO>> GetAllTechniciansAsync();
         Task<List<ReadUsersDTO>> GetAllCarOwnersAsync();
-        Task<bool> SoftDeleteUserAsync(string userId);
-        Task<bool> BanUserAsync(string userId);
-        Task<bool> RestoreUserAsync(string userId);
+        Task BanTechnianAsync(int userId);
+        Task BanCarOwnerAsync(int userId);
+        Task ActivateCarOwonerAsync(int userId);
+        Task ActivateTechnianAsync(int userId);
+        Task<Object> GetUsersCountAsync();
+
+        // requests
+        Task<Object> GetrequestsCountAsync();
+
 
         // Categories
         Task<List<ReadTCategoryDTO>> GetAllCategoriesAsync();
-        Task<ReadTCategoryDTO> CreateCategoryAsync(CreateTCategoryDTO dto);
-        Task<bool> UpdateCategoryAsync(int id, UpdateTCategoryDTO dto);
-        Task<bool> SoftDeleteCategoryAsync(int id);
-        Task<bool> RestoreCategoryAsync(int id);
+        Task CreateCategoryAsync(CreateTCategoryDTO dto);
+        Task UpdateCategoryAsync(int id, UpdateTCategoryDTO dto);
+        Task DeleteCategoryAsync(int id);
+       
     }
 }

@@ -17,6 +17,10 @@ namespace Services.Specification_Implementation
         {
             Criteria = _criteria;
         }
+        public Specification()
+        {
+            Criteria = null;
+        }
 
 
         public List<Expression<Func<T, object>>> Includes { get; } = [];

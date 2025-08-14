@@ -2,10 +2,13 @@
 {
     public class ReadUsersDTO
     {
-        public string Id { get; set; }
-        public string? FullName { get; set; }
-        public string? Role { get; set; }
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
+       
         public bool IsActivated { get; set; }
-        public string? rate {  get; set; }
+        public int? Rate {  get; set; }
+        public string? Image {  get; set; }
     }
 }
