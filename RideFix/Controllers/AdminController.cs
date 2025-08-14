@@ -1,9 +1,12 @@
 ﻿using Domain.Entities.CoreEntites.EmergencyEntities;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
+using SharedData.DTOs.ActivityDTOs;
 using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
 using SharedData.Wrapper;
+using System;
+using System.Collections.Generic;
 
 namespace RideFix.Controllers
 {
@@ -142,6 +145,28 @@ namespace RideFix.Controllers
         {
             var counts = await serviceManager.adminService.GetrequestsCountAsync();
             return Ok(counts);
+        }
+
+        [HttpGet("activities")]
+        [EndpointSummary("Get all system activities categorized by type")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse<CategorizedActivityReportDTO>))]
+        public async Task<IActionResult> GetCategorizedActivities([FromQuery] int hoursBack = 12)
+        {
+            try
+            {
+                if (hoursBack <= 0 || hoursBack > 168) 
+                {
+                    return BadRequest(ApiResponse<CategorizedActivityReportDTO>.FailResponse("Hours back must be between 1 and 168 (7 days)"));
+                }
+
+                var result = await serviceManager.activityReportService.GetCategorizedActivitiesAsync(hoursBack);
+                
+                return Ok(ApiResponse<CategorizedActivityReportDTO>.SuccessResponse(result, "تم جلب النشاطات المصنفة بنجاح"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<CategorizedActivityReportDTO>.FailResponse("حدث خطأ أثناء جلب النشاطات المصنفة"));
+            }
         }
 
     }

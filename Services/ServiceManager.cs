@@ -42,6 +42,7 @@ namespace Services
         public IMaintenanceTypesService maintenanceTypesService { get; }
         public IReverserRequestService reverserRequestService { get; }
         public IAdminService adminService { get; }
+        public IActivityReportService activityReportService { get; }
 
         #endregion
 
@@ -62,7 +63,8 @@ namespace Services
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
                     IReverserRequestService reverserRequestService,
-                    IAdminService adminService)
+                    IAdminService adminService,
+                    IActivityReportService activityReportService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -82,6 +84,7 @@ namespace Services
             this.maintenanceTypesService = maintenanceTypesService;
             this.reverserRequestService = reverserRequestService;
             this.adminService = adminService;
+            this.activityReportService = activityReportService;
         }
     }
 }

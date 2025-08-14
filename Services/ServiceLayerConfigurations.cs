@@ -57,6 +57,7 @@ namespace Services
             Services.AddScoped<IEmailService, EmailService>();
             Services.AddScoped<IReverserRequestService, ReverserRequestService>();
             Services.AddScoped<IAdminService, AdminService>();
+            Services.AddScoped<IActivityReportService, ActivityReportService>();
 
 
             return Services;

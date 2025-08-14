@@ -450,6 +450,8 @@ namespace Presistence.Migrations
                     b.ToTable("technicians");
                 });
 
+
+
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -1022,6 +1024,8 @@ namespace Presistence.Migrations
 
                     b.Navigation("ApplicationUser");
                 });
+
+
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
