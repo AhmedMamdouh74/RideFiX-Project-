@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Microsoft.IdentityModel.Tokens;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation.CarOwnerSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
@@ -11,6 +12,7 @@ using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using Services.Specification_Implementation.Emergency;
 using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
+using SharedData.Enums;
 
 namespace Service.CoreServices.Admin
 {
@@ -24,10 +26,10 @@ namespace Service.CoreServices.Admin
             unitOfWork = _unitOfWork;
             mapper = _mapper;
         }
-       
-      
 
-    
+
+
+
 
         #region Private Helpers
 
@@ -58,7 +60,7 @@ namespace Service.CoreServices.Admin
             setActivation(user);
 
             await unitOfWork.SaveChangesAsync();
-           
+
         }
 
 
@@ -130,12 +132,12 @@ namespace Service.CoreServices.Admin
 
         public async Task CreateCategoryAsync(CreateTCategoryDTO dto)
         {
-           var entity= mapper.Map<TCategory>(dto);
+            var entity = mapper.Map<TCategory>(dto);
             var repo = unitOfWork.GetRepository<TCategory, int>();
             await repo.AddAsync(entity);
             await unitOfWork.SaveChangesAsync();
 
-            
+
         }
 
         public async Task UpdateCategoryAsync(int id, UpdateTCategoryDTO dto)
@@ -145,7 +147,7 @@ namespace Service.CoreServices.Admin
 
             unitOfWork.GetRepository<TCategory, int>().Update(category);
             await unitOfWork.SaveChangesAsync();
-           
+
         }
 
         public async Task DeleteCategoryAsync(int id)
@@ -155,14 +157,14 @@ namespace Service.CoreServices.Admin
 
             unitOfWork.GetRepository<TCategory, int>().Update(category);
             await unitOfWork.SaveChangesAsync();
-           
+
         }
 
         public async Task<object> GetrequestsCountAsync()
         {
             var requestRepo = unitOfWork.GetRepository<EmergencyRequest, int>();
 
-            var allRequestsCount = await requestRepo.CountAsync( new EmergencyRequestTotalSpecification());
+            var allRequestsCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification());
 
             var waitingRequestsCount = await requestRepo.CountAsync(new WaitingRequestSpecification());
 
@@ -173,11 +175,69 @@ namespace Service.CoreServices.Admin
             };
         }
 
-        public Task<object> GetDashboardStatisticsAsync()
-        {
-            throw new NotImplementedException();
-        }
+
 
         #endregion
+        public async Task<object> GetDashboardStatisticsAsync()
+        {
+            var techRepo = unitOfWork
+               .GetRepository<Technician, int>();
+            var techniciansCount = await techRepo
+               .CountAsync(new TechniciansSpecification());
+
+            var carOwnerRepo = unitOfWork
+                .GetRepository<CarOwner, int>();
+            var carOwnersCount = await carOwnerRepo
+                .CountAsync(new CarOwnerSpecification());
+
+            var totalUsers = techniciansCount + carOwnersCount;
+            var firstDayOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+            var newTechCount = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayOfMonth));
+            var newCarOwnerCount = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayOfMonth));
+            var newUsersThisMonth = newTechCount + newCarOwnerCount;
+            var percentageNewThisMonth = totalUsers == 0 ? 0 : (double)newUsersThisMonth / totalUsers * 100;
+            var Technicians = await techRepo.GetAllWithSpecAsync(new TechnicianWithUserAndReviewsSpec());
+            var avgTechRate = Technicians.Any(t => t.reviews.Any()) ?
+                Math.Round(Technicians.Where(t => t.reviews.Any()).Average(t => t.reviews.Average(r => r.Rate)), 2)
+                : 0;
+
+
+
+
+
+            double GetUserPercent(int count) =>
+            totalUsers == 0 ? 0 : Math.Round((count / (double)totalUsers) * 100, 2);
+
+            // --- Requests ---
+            var totalRequests = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication());
+            var completedCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Completed));
+            var waitingCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Waiting));
+            var activeCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Answered));
+            var canceledCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Cancelled));
+
+            double GetRequestPercent(int count) =>
+            totalRequests == 0 ? 0 : Math.Round((count / (double)totalRequests) * 100, 2);
+
+
+
+
+            return new
+            {
+                Users = new
+                {
+                    Technicians = new { Count = techniciansCount, Percent = GetUserPercent(techniciansCount) },
+                    CarOwners = new { Count = carOwnersCount, Percent = GetUserPercent(carOwnersCount) },
+                    NewUsers = percentageNewThisMonth,
+                    Rates = avgTechRate
+                },
+                Requests = new
+                {
+                    Completed = new { Count = completedCount, Percent = GetRequestPercent(completedCount) },
+                    Waiting = new { Count = waitingCount, Percent = GetRequestPercent(waitingCount) },
+                    Active = new { Count = activeCount, Percent = GetRequestPercent(activeCount) },
+                    Canceled = new { Count = canceledCount, Percent = GetRequestPercent(canceledCount) }
+                }
+            };
+        }
     }
 }

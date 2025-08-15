@@ -168,6 +168,12 @@ namespace RideFix.Controllers
                 return StatusCode(500, ApiResponse<CategorizedActivityReportDTO>.FailResponse("حدث خطأ أثناء جلب النشاطات المصنفة"));
             }
         }
+        [HttpGet("dashboard-statistics")]
+        public async Task<IActionResult> GetDashboardStatistics()
+        {
+            var stats = await serviceManager.adminService.GetDashboardStatisticsAsync();
+            return Ok(ApiResponse<object>.SuccessResponse(stats,"successfull request"));
+        }
 
     }
 }
