@@ -12,6 +12,8 @@ using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
+using ServiceAbstraction.CoreServicesAbstractions.Reports;
 
 namespace Services
 {
@@ -41,9 +43,16 @@ namespace Services
 
         public IMaintenanceTypesService maintenanceTypesService { get; }
         public IReverserRequestService reverserRequestService { get; }
+
+        public IProductCategoryService productCategoryService { get; }
+        public IProductsService productsService { get; }
+        public IShoppingCartService shoppingCartService { get; } 
+
         public IAdminService adminService { get; }
         public IActivityReportService activityReportService { get; }
 
+
+        public IReportsServices reportsServices { get; }
         #endregion
 
         public ServiceManager(
@@ -63,8 +72,16 @@ namespace Services
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
                     IReverserRequestService reverserRequestService,
+
+                    IProductCategoryService productCategoryService,
+                    IProductsService productsService,
+                    IShoppingCartService shoppingCartService)
+                    IReverserRequestService reverserRequestService,
+                    IReportsServices reportsServices)
+
                     IAdminService adminService,
                     IActivityReportService activityReportService)
+
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -83,6 +100,10 @@ namespace Services
             this.emailService = emailService;
             this.maintenanceTypesService = maintenanceTypesService;
             this.reverserRequestService = reverserRequestService;
+            this.productCategoryService = productCategoryService;
+            this.productsService = productsService;
+            this.shoppingCartService = shoppingCartService;
+            this.reportsServices = reportsServices;
             this.adminService = adminService;
             this.activityReportService = activityReportService;
         }

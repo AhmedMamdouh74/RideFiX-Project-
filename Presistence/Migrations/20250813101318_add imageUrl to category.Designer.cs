@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250813101318_add imageUrl to category")]
+    partial class addimageUrltocategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,9 +212,6 @@ namespace Presistence.Migrations
                     b.Property<DateTime?>("EndTimeStamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCanCancelByTechnician")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
@@ -379,9 +379,6 @@ namespace Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -485,9 +482,6 @@ namespace Presistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -506,9 +500,6 @@ namespace Presistence.Migrations
                     b.Property<string>("IdentityImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActivated")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -554,9 +545,6 @@ namespace Presistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -568,43 +556,6 @@ namespace Presistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReportedUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ReportingUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportedUserId");
-
-                    b.HasIndex("ReportingUserId");
-
-                    b.HasIndex("RequestId");
-
-                    b.ToTable("reports");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
@@ -1081,33 +1032,6 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportedUser")
-                        .WithMany("Reported")
-                        .HasForeignKey("ReportedUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportingUser")
-                        .WithMany("Reporting")
-                        .HasForeignKey("ReportingUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", "Request")
-                        .WithMany("Reports")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportedUser");
-
-                    b.Navigation("ReportingUser");
-
-                    b.Navigation("Request");
-                });
-
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
                 {
                     b.HasOne("Domain.Entities.e_Commerce.Order", "Order")
@@ -1234,8 +1158,6 @@ namespace Presistence.Migrations
                 {
                     b.Navigation("EmergencyRequestTechnicians");
 
-                    b.Navigation("Reports");
-
                     b.Navigation("Review")
                         .IsRequired();
 
@@ -1269,10 +1191,6 @@ namespace Presistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
                 {
-                    b.Navigation("Reported");
-
-                    b.Navigation("Reporting");
-
                     b.Navigation("connections");
 
                     b.Navigation("messages");

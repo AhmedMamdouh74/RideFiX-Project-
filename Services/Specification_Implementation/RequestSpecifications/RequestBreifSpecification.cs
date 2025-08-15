@@ -12,13 +12,13 @@ namespace Service.Specification_Implementation.RequestSpecifications
     public class RequestBreifSpecification : Specification<EmergencyRequest, int>
     {
         public RequestBreifSpecification(int CarOwnerID)
-            : base(r => r.CarOwnerId == CarOwnerID 
-            && r.IsCompleted == true)
+            : base(r => r.CarOwnerId == CarOwnerID
+            && (r.IsCompleted == true || (r.IsCompleted == false && r.Technician != null)))
         {
             AddInclude(r => r.category);
             AddInclude(r => r.Technician);
             AddInclude(r => r.Technician.ApplicationUser);
-
+            SetOrderByDescending(x => x.Id);
         }
     }
     

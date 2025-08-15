@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Domain.Entities.Reporting;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities.IdentityEntities
@@ -27,5 +28,8 @@ namespace Domain.Entities.IdentityEntities
 
         public ICollection<Message> messages { get; set; } = new HashSet<Message>();
         public ICollection<UserConnectionIds> connections { get; set; } = new HashSet<UserConnectionIds>();
+
+        public ICollection<Report> Reported { get; set; } = new HashSet<Report>();
+        public ICollection<Report> Reporting { get; set; } = new HashSet<Report>();
     }
 }
