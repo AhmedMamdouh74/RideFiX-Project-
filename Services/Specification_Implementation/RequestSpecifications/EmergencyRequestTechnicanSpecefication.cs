@@ -15,7 +15,7 @@ namespace Service.Specification_Implementation.RequestSpecifications
         public EmergencyRequestTechnicanSpecefication(RequestQueryData requestQueryData)
         : base(r =>
  (!requestQueryData.CallState.HasValue || r.CallStatus == requestQueryData.CallState) &&
- (!requestQueryData.TechnicainId.HasValue || r.TechnicianId == requestQueryData.TechnicainId) && 
+ (!requestQueryData.TechnicainId.HasValue || r.TechnicianId == requestQueryData.TechnicainId) &&
  (!requestQueryData.IsCompleted.HasValue || r.EmergencyRequests.IsCompleted == requestQueryData.IsCompleted)
 
 
@@ -36,5 +36,10 @@ namespace Service.Specification_Implementation.RequestSpecifications
             AddInclude(req => req.EmergencyRequests.category);
 
         }
+        public EmergencyRequestTechnicanSpecefication(RequestState requestState) : base(r => r.CallStatus == requestState)
+        {
+        }
+        public EmergencyRequestTechnicanSpecefication() : base()
+        { }
     }
 }

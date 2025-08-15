@@ -22,5 +22,9 @@ namespace Service.Specification_Implementation.TechnicianSpecifications
             
 
         }
+        public TechnicianWithAppUserSpec(DateTime firstDayOfMonth) : base(t=>t.ApplicationUser.CreatedAt>= firstDayOfMonth)
+        {
+            AddInclude(t => t.ApplicationUser);
+        }
     }
 }

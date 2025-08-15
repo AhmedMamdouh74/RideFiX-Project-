@@ -17,6 +17,14 @@ namespace Service.Specification_Implementation.CarOwnerSpecifications
         {
             AddInclude(co => co.ApplicationUser);
         }
+        public CarOwnerSpecification() : base()
+        {
+
+        }
+        public CarOwnerSpecification(DateTime firstDayOfMonth) : base(c=>c.ApplicationUser.CreatedAt>= firstDayOfMonth)
+        {
+
+        }
     }
 
 }
