@@ -2,6 +2,7 @@
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
+using ServiceAbstraction.CoreServicesAbstractions.Reports;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace ServiceAbstraction
         IMaintenanceTypesService maintenanceTypesService { get; }
 
         IReverserRequestService reverserRequestService { get; }
+
+        IReportsServices reportsServices { get; }
 
 
     }

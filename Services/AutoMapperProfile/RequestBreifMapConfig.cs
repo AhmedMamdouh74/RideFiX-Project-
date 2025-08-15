@@ -22,7 +22,8 @@ namespace Service.AutoMapperProfile
                 src => src.Technician != null && src.Technician.ApplicationUser != null
                     ? src.Technician.ApplicationUser.Name
                     : null
-            ));
+            )).ForMember(dest => dest.status, opt => opt.MapFrom(
+                src => src.IsCompleted == true)) ;
         }
     }
 }
