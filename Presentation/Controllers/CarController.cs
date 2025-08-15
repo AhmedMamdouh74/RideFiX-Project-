@@ -30,6 +30,7 @@ namespace Presentation.Controllers
             return Ok(ApiResponse<CarDetailsDto>.SuccessResponse(Car, "Has a Car"));
         }
 
+
         [HttpPost]
         public async Task<IActionResult> AddNewCar([FromBody] CreateCarDto car)
         {
@@ -46,5 +47,6 @@ namespace Presentation.Controllers
             await serviceManager.carServices.DeleteCar();
             return Ok(ApiResponse<string>.SuccessResponse("Car deleted successfully"));
         }
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250814142103_Reports")]
+    partial class Reports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -376,9 +379,6 @@ namespace Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -450,8 +450,6 @@ namespace Presistence.Migrations
                     b.ToTable("technicians");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -503,9 +501,6 @@ namespace Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActivated")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -549,9 +544,6 @@ namespace Presistence.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -610,10 +602,6 @@ namespace Presistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1066,8 +1054,6 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ApplicationUser")
@@ -1094,7 +1080,7 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", "Request")
-                        .WithMany("Reports")
+                        .WithMany()
                         .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1231,8 +1217,6 @@ namespace Presistence.Migrations
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", b =>
                 {
                     b.Navigation("EmergencyRequestTechnicians");
-
-                    b.Navigation("Reports");
 
                     b.Navigation("Review")
                         .IsRequired();
