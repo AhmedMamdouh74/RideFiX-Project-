@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Service.Specification_Implementation.CategorySpecification;
 using ServiceAbstraction.CoreServicesAbstractions;
 using SharedData.DTOs;
 using System;
@@ -24,9 +25,12 @@ namespace Service.CoreServices.EmergencyReqServices
 
         public async Task<List<TCategoryDTO>> GetAllCategoriesAsync()
         {
+            var spec = new CategoryNotDeletedSpecification();
+
             var categoryDTOs = await unitOfWork.GetRepository<TCategory, int>()
-                .GetAllAsync();
+                .GetAllAsync(spec);
             var mappedCategories = mapper.Map<IEnumerable<TCategory>, IEnumerable<TCategoryDTO>>(categoryDTOs);
+        
             return mappedCategories.ToList();
         }
     }

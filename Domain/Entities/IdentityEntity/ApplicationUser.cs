@@ -23,7 +23,8 @@ namespace Domain.Entities.IdentityEntities
         public bool isDeleted {  get; set; }=false;
 
 
-
+        //public string ProfilePic { get; set; }
+        //public bool IsProfilePicUploaded { get; set; } = false;
         public ICollection<Message> messages { get; set; } = new HashSet<Message>();
         public ICollection<UserConnectionIds> connections { get; set; } = new HashSet<UserConnectionIds>();
     }

@@ -8,12 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Presentation\Presentation.csproj" />
     <ProjectReference Include="..\ServiceAbstraction\ServiceAbstraction.csproj" />
     <ProjectReference Include="..\Shared\SharedData.csproj" />
-    <PackageReference Include="Hangfire" Version="1.8.20" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.20" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.18" />
 	<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.6" />
@@ -30,9 +26,6 @@
 	<ItemGroup>
   <FrameworkReference Include="Microsoft.AspNetCore.App" />
 </ItemGroup>
-	<ItemGroup>
-	  <Folder Include="HelperMethods\CarMaintainanceHelperMethods\DueCalculateMethods\Methods\" />
-	</ItemGroup>
 
 
 
