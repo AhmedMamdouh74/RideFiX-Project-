@@ -12,5 +12,10 @@ namespace Services.Specification_Implementation.Emergency
             : base(c => categoryNames.Contains(c.Name))
         {
         }
+        public CategoriesByNameSpec()
+           : base(c => c.IsDeleted==false)
+        {
+        }
+
     }
 }

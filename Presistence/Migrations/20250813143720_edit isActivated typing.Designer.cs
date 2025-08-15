@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250813143720_edit isActivated typing")]
+    partial class editisActivatedtyping
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,8 +453,6 @@ namespace Presistence.Migrations
                     b.ToTable("technicians");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -550,9 +551,6 @@ namespace Presistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -564,156 +562,6 @@ namespace Presistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReportedUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ReportingUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportedUserId");
-
-                    b.HasIndex("ReportingUserId");
-
-                    b.HasIndex("RequestId");
-
-                    b.ToTable("reports");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("pCategory");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("orderState")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("totalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("orders");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("totalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("orderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("products");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1066,8 +914,6 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ApplicationUser")
@@ -1077,63 +923,6 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportedUser")
-                        .WithMany("Reported")
-                        .HasForeignKey("ReportedUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportingUser")
-                        .WithMany("Reporting")
-                        .HasForeignKey("ReportingUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", "Request")
-                        .WithMany("Reports")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportedUser");
-
-                    b.Navigation("ReportingUser");
-
-                    b.Navigation("Request");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
-                {
-                    b.HasOne("Domain.Entities.e_Commerce.Order", "Order")
-                        .WithMany("orderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.e_Commerce.Product", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
-                {
-                    b.HasOne("Domain.Entities.e_Commerce.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1232,8 +1021,6 @@ namespace Presistence.Migrations
                 {
                     b.Navigation("EmergencyRequestTechnicians");
 
-                    b.Navigation("Reports");
-
                     b.Navigation("Review")
                         .IsRequired();
 
@@ -1267,28 +1054,9 @@ namespace Presistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
                 {
-                    b.Navigation("Reported");
-
-                    b.Navigation("Reporting");
-
                     b.Navigation("connections");
 
                     b.Navigation("messages");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
-                {
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
-                {
-                    b.Navigation("orderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
 ﻿using Service.CoreServices.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
 using ServiceAbstraction.CoreServicesAbstractions.Reports;
@@ -31,11 +32,16 @@ namespace ServiceAbstraction
         IMaintenanceTypesService maintenanceTypesService { get; }
 
         IReverserRequestService reverserRequestService { get; }
+
         IProductCategoryService productCategoryService { get; }
         IProductsService productsService { get; }
         IShoppingCartService shoppingCartService { get; }
 
         IReportsServices reportsServices { get; }
+
+        IAdminService adminService { get; }
+        IActivityReportService activityReportService { get; }
+
 
 
     }

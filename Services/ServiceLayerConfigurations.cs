@@ -8,6 +8,7 @@ using Service.AutoMapperProfile;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
 using Service.CoreServices.Account;
+using Service.CoreServices.Admin;
 using Service.CoreServices.CarMservices;
 using Service.CoreServices.ChatServices;
 using Service.CoreServices.E_Commerce;
@@ -17,6 +18,7 @@ using ServiceAbstraction;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions.Reports;
 using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
@@ -65,6 +67,10 @@ namespace Services
 
 
             Services.AddScoped<IReportsServices, ReportsServices>();
+
+            Services.AddScoped<IAdminService, AdminService>();
+            Services.AddScoped<IActivityReportService, ActivityReportService>();
+
 
 
             return Services;

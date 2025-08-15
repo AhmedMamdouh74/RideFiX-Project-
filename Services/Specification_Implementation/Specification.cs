@@ -21,6 +21,9 @@ namespace Services.Specification_Implementation
         protected Specification()
         {
             
+        public Specification()
+        {
+            Criteria = null;
         }
 
 
