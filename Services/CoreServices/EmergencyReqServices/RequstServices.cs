@@ -118,12 +118,12 @@ namespace Service.CoreServices.EmergencyReqServices
             }
 
             var chatsession = await chatSessionService.GetChatSessionsByCarOwnerId(CarOwnerID);
-            if (chatsession == null)
+            if (chatsession != null)
             {
-                throw new ChatSessionNotFoundException();
+                //throw new ChatSessionNotFoundException();
+                chatsession.IsClosed = true;
+                await chatSessionService.update(chatsession);
             }
-            chatsession.IsClosed = true;
-            await chatSessionService.update(chatsession);
             await unitOfWork.SaveChangesAsync();
 
         }
