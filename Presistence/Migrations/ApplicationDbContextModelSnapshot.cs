@@ -209,6 +209,9 @@ namespace Presistence.Migrations
                     b.Property<DateTime?>("EndTimeStamp")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsCanCancelByTechnician")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
@@ -450,8 +453,6 @@ namespace Presistence.Migrations
                     b.ToTable("technicians");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -483,6 +484,9 @@ namespace Presistence.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -566,6 +570,43 @@ namespace Presistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportedUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReportingUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedUserId");
+
+                    b.HasIndex("ReportingUserId");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("reports");
+                });
+
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -573,6 +614,10 @@ namespace Presistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1025,8 +1070,6 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-
-
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ApplicationUser")
@@ -1036,6 +1079,33 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
+                {
+                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportedUser")
+                        .WithMany("Reported")
+                        .HasForeignKey("ReportedUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportingUser")
+                        .WithMany("Reporting")
+                        .HasForeignKey("ReportingUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", "Request")
+                        .WithMany("Reports")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportedUser");
+
+                    b.Navigation("ReportingUser");
+
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
@@ -1164,6 +1234,8 @@ namespace Presistence.Migrations
                 {
                     b.Navigation("EmergencyRequestTechnicians");
 
+                    b.Navigation("Reports");
+
                     b.Navigation("Review")
                         .IsRequired();
 
@@ -1197,6 +1269,10 @@ namespace Presistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
                 {
+                    b.Navigation("Reported");
+
+                    b.Navigation("Reporting");
+
                     b.Navigation("connections");
 
                     b.Navigation("messages");

@@ -12,5 +12,6 @@ namespace SharedData.DTOs.RequestsDTOs
         public string TechnicianName { get; set; }
         public string CategoryName { get; set; }
         public string Description { get; set; }
+        public bool status { get; set; }
     }
 }

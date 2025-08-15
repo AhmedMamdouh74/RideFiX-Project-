@@ -32,6 +32,7 @@ namespace Presistence
             {
                 query = specification.IsTracking.Value ? query.AsTracking() : query.AsNoTracking();
             }
+
             return query;
         }
     }

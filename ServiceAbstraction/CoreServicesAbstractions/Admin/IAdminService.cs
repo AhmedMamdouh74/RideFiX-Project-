@@ -24,6 +24,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Admin
         Task CreateCategoryAsync(CreateTCategoryDTO dto);
         Task UpdateCategoryAsync(int id, UpdateTCategoryDTO dto);
         Task DeleteCategoryAsync(int id);
-       
+        Task<object> GetDashboardStatisticsAsync();
+
     }
 }

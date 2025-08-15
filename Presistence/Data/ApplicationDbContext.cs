@@ -2,6 +2,7 @@
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.e_Commerce;
 using Domain.Entities.IdentityEntities;
+using Domain.Entities.Reporting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Presistence.Data.Configurations;
@@ -41,7 +42,6 @@ namespace Presistence.Data
         public DbSet<Order> orders { get; set; }
         public DbSet<OrderItem> orderItems { get; set; }
         public DbSet<Category> pCategory { get; set; }
-
-
+        public DbSet<Report> reports { get; set; }
     }
 }
