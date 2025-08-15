@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
@@ -54,6 +55,9 @@ namespace Service.CoreServices.EmergencyReqServices
             //this.serviceManager = serviceManager;
         }
 
+        #region Cancel methods
+
+        #region Cancel for Car Owner
         public async Task CancelAll(int CarOwnerID)
         {
             if (CarOwnerID <= 0)
@@ -72,9 +76,9 @@ namespace Service.CoreServices.EmergencyReqServices
                 throw new RequestAlreadyCompletedException();
             }
 
-            Request.IsCompleted = true;
+            //Request.IsCompleted = true;
 
-            var spec = new CancelledRquestSpecification(CarOwnerID , requestId);
+            var spec = new CancelledRquestSpecification(CarOwnerID, requestId);
             var emergencyRequests = await unitOfWork.EmergencyRequestRepository.GetAllAsync(spec);
             if (emergencyRequests == null || !emergencyRequests.Any())
             {
@@ -110,9 +114,9 @@ namespace Service.CoreServices.EmergencyReqServices
                     emergencyRequest.EmergencyRequests.EndTimeStamp = DateTime.UtcNow;
                     await unitOfWork.EmergencyRequestRepository.UpdateAsync(emergencyRequest);
                 }
-               
+
             }
-          
+
             var chatsession = await chatSessionService.GetChatSessionsByCarOwnerId(CarOwnerID);
             if (chatsession == null)
             {
@@ -123,7 +127,43 @@ namespace Service.CoreServices.EmergencyReqServices
             await unitOfWork.SaveChangesAsync();
 
         }
+        #endregion
 
+        #region Cancel for Technician
+        public async Task CancelForTechnician(int requestId)
+        {
+            var reqRepo = unitOfWork.GetRepository<EmergencyRequest, int>();
+            var emergencyRequest = await reqRepo.GetByIdAsync(requestId);
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            int entityId;
+            bool isValid = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value, out entityId);
+            if (emergencyRequest == null)
+            {
+                throw new RequestNotFoundException();
+            }
+            if (emergencyRequest.IsCanCancelByTechnician)
+            {
+                var techRepo = unitOfWork.EmergencyRequestRepository;
+                var spec = new techsForCancelSpecification(requestId, entityId);
+                var emergencyRequestTechnicians = await techRepo.GetAllAsync(spec);
+                foreach (var item in emergencyRequestTechnicians)
+                {
+                    item.CallStatus = RequestState.Cancelled;
+                }
+                await unitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentException("This request cannot be cancelled by the technician.");
+            }
+        }
+        #endregion
+
+        #endregion
         public async Task CompleteRequest(int requestId)
         {
             var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
@@ -146,7 +186,7 @@ namespace Service.CoreServices.EmergencyReqServices
                 await chatSessionService.CompleteChatSession(emergencyRequest.TechnicianId.Value, emergencyRequest.CarOwnerId);
                 await unitOfWork.SaveChangesAsync();
             }
-            
+
         }
 
         public async Task CreateRealRequest(RealRequestDTO request)
@@ -193,6 +233,8 @@ namespace Service.CoreServices.EmergencyReqServices
                     }
 
                     await unitOfWork.SaveChangesAsync();
+                    BackgroundJob.Schedule(() => AutoCancelAsync(emergancyRequest.Id), TimeSpan.FromHours(4));
+
                 }
                 else
                 {
@@ -203,7 +245,20 @@ namespace Service.CoreServices.EmergencyReqServices
             {
                 throw new RequestAlreadyFoundException();
             }
+
         }
+        public async Task AutoCancelAsync(int reqId)
+        {
+            var repo = unitOfWork.EmergencyRequestRepository;
+            var spec = new AutoCancelSpecification(reqId);
+            var techs = await repo.GetAllAsync(spec);
+            foreach (var item in techs)
+            {
+                item.CallStatus = RequestState.Cancelled;
+            }
+            await unitOfWork.SaveChangesAsync();
+        }
+
 
         public async Task<PreRequestDTO> CreateRequestAsync(CreatePreRequestDTO request)
         {
