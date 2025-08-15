@@ -173,6 +173,11 @@ namespace Service.CoreServices.Admin
             };
         }
 
+        public Task<object> GetDashboardStatisticsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }
