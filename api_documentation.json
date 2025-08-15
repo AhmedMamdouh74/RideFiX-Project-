@@ -1,0 +1,539 @@
+{
+  "$schema": "https://example.com/api-docs.schema.json",
+  "service": {
+    "name": "RideFix API",
+    "version": "1.0",
+    "baseUrl": "http://localhost:5038",
+    "authentication": {
+      "type": "JWT",
+      "header": "Authorization: Bearer <token>",
+      "note": "Some endpoints require authorization via JWT. WebSocket hubs accept access_token query param."
+    }
+  },
+  "errorHandling": {
+    "validation": {
+      "statusCode": 400,
+      "model": {
+        "statusCode": "number",
+        "message": "string",
+        "errors": [
+          {
+            "key": "string",
+            "errors": ["string"]
+          }
+        ]
+      }
+    },
+    "middlewareErrors": {
+      "model": { "statusCode": "number", "message": "string" },
+      "statuses": [400, 404, 409, 500]
+    },
+    "auth": {
+      "401": { "statusCode": 401, "message": "Unauthorized: Token is missing or invalid" },
+      "403": { "statusCode": 403, "message": "Forbidden: You are not allowed to access this resource" }
+    }
+  },
+  "wrappers": {
+    "ApiResponse<T>": {
+      "success": "boolean",
+      "message": "string | null",
+      "data": "T | null"
+    }
+  },
+  "dtos": {
+    "Account.LoginDto": { "Email": "string", "Password": "string" },
+    "Account.RegisterStep1Dto": {
+      "Email": "string (email)",
+      "Password": "string (min 6)",
+      "ConfirmPassword": "string (== Password)",
+      "SSN": "string (len 14)",
+      "Name": "string",
+      "BirthDate": "string (ISO 8601)",
+      "Address": "string",
+      "Gender": "string",
+      "Role": "CarOwner | Technician",
+      "PIN": "number (4-6 digits)",
+      "StartWorking": "string (HH:mm) | null",
+      "EndWorking": "string (HH:mm) | null",
+      "Description": "string | null",
+      "Categories": ["string"]
+    },
+    "Account.RegisterStep2Dto": {
+      "Email": "string",
+      "IdentityImage": "file",
+      "FaceImage": "file"
+    },
+    "Account.ReadUserDetailsDTO": {
+      "Name": "string | null",
+      "Email": "string | null",
+      "FaceImageUrl": "string | null",
+      "Government": "string | null",
+      "Category": ["string"] ,
+      "StartWorking": "string (HH:mm)",
+      "EndWorking": "string (HH:mm)",
+      "Address": "string | null",
+      "PhoneNumber": "string | null",
+      "Description": "string | null",
+      "Rate": "number"
+    },
+    "Car.CreateCarDto": {
+      "Vendor": "string",
+      "ModelName": "string",
+      "TypeOfCar": "string",
+      "TypeOfFuel": "string",
+      "ModelYear": "string",
+      "AvgKmPerMonth": "number"
+    },
+    "Car.CarDetailsDto": {
+      "Id": "number",
+      "Vendor": "string",
+      "ModelName": "string",
+      "TypeOfCar": "string",
+      "TypeOfFuel": "string",
+      "ModelYear": "string",
+      "AvgKmPerMonth": "number",
+      "TotalMaintenanceCost": "number",
+      "MaintenanceCount": "number",
+      "DaysSinceLastMaintenance": "number"
+    },
+    "CarMaintanance.CarMaintananceAllDTO": {
+      "CarId": "number | null",
+      "MaintenanceTypeId": "number",
+      "PerformedAt": "string (ISO 8601)",
+      "CarKMsAtTime": "number",
+      "MaintenanceCenter": "string",
+      "Cost": "number",
+      "Comment": "string | null"
+    },
+    "CarMaintanance.MaintenanceSummaryDTO": {
+      "MaintenanceTypeName": "string",
+      "Status": "MaintenanceEnum",
+      "LastMaintenanceDate": "string | null",
+      "NextExpectedMaintenance": "string | null"
+    },
+    "CarMaintanance.MaintananceHistory": {
+      "PerformedAt": "string",
+      "NextMaintenanceDue": "string",
+      "CarKMsAtTime": "number",
+      "MaintenanceCenter": "string",
+      "Comment": "string | null",
+      "Cost": "number"
+    },
+    "MTypes.MaintenanceTypeDTO": { "Id": "number", "Name": "string" },
+    "MTypes.MaintenanceTypeDetailsDto": { "Id": "number", "Name": "string", "RepeatEveryKM": "number | null", "RepeatEveryDays": "number | null" },
+    "Requests.CreatePreRequestDTO": {
+      "categoryId": "number (>0)",
+      "CarOwnerId": "number (>0)",
+      "Latitude": "number (-90..90)",
+      "Longitude": "number (-180..180)"
+    },
+    "Requests.RealRequestDTO": {
+      "TechnicianIDs": ["number"],
+      "Description": "string",
+      "ImageUrl": ["string"] ,
+      "categoryId": "number (>0)",
+      "CarOwnerId": "number (>0)",
+      "Latitude": "number (-90..90)",
+      "Longitude": "number (-180..180)",
+      "pin": "number (4-6 digits)"
+    },
+    "Requests.RequestBreifDTO": {
+      "Id": "number",
+      "TechnicianName": "string",
+      "CategoryName": "string",
+      "Description": "string"
+    },
+    "Requests.RequestDetailsDTO": {
+      "City": "string",
+      "Description": "string",
+      "TechnicianName": "string",
+      "Rate": "number | null",
+      "Comment": "string | null",
+      "CategoryName": "string",
+      "RequestDate": "string (date)"
+    },
+    "Chat.ChatBreifDTO": { "lastmessage": "string", "name": "string", "imgurl": "string", "chatsessionid": "number" },
+    "Chat.ChatDetailsDTO": { "Id": "number", "name": "string", "imgurl": "string", "IsClosed": "boolean", "EndAt": "string", "messages": ["MessegeDTO"] },
+    "ChatSession.ChatSessionAllDTO": { "Id": "number", "StartAt": "string", "EndAt": "string | null", "IsClosed": "boolean", "CarOwnerId": "number", "TechnicianId": "number", "messages": ["MessegeAllDTO"] },
+    "Messages.MessegeDTO": { "Text": "string", "SentAt": "string", "ApplicationId": "string" },
+    "Messages.MessegeAllDTO": { "Text": "string", "SentAt": "string", "IsSeen": "boolean", "ChatSessionId": "number", "ApplicationId": "string" },
+    "Messages.MessegeMiniDTO": { "Text": "string", "SentAt": "string", "ApplicationId": "string", "IsSeen": "boolean" },
+    "Notifications.NotificationDto": { "Name": "string", "GovernmentName": "string", "RequestId": "number" },
+    "Technicians.FilteredTechniciansDTO": { "Id": "number", "Name": "string", "FaceImageURL": "string", "StartWorking": "string", "EndWorking": "string", "Description": "string", "TCategories": ["TCategoryDTO"], "reviews": "ReviewDTO" },
+    "Technicians.TechnicianDTO": { "ID": "number", "Name": "string", "StartWorking": "string", "EndWorking": "string", "Description": "string", "FaceImageUrl": "string", "Categories": ["TCategoryDTO"], "Reviews": ["ReviewDetailsDTO"], "government": "string" },
+    "Technicians.TechReverseRequestDTO": { "ReverseRequestId": "number", "TechnicianId": "number", "TimeStamp": "string", "CarOwnerRequestId": "number" },
+    "Technicians.EmergencyRequestDetailsDTO": { "IsCompleted": "boolean", "TechnicianId": "number", "RequestId": "number", "CarOwnerId": "number", "Description": "string | null", "CarOwnerName": "string | null", "FaceImageUrl": "string | null", "RequestImageUrl": "string | null", "RequestState": "RequestState | null", "TimeStamp": "string", "EndTimeStamp": "string | null", "Category": "string | null", "Latitude": "number", "Longitude": "number" },
+    "Technicians.TechnicianApplyEmergencyRequestDTO": { "RequestId": "number", "UserId": "number", "TimeStamp": "string", "Pin": "number" },
+    "Technicians.TechnicianUpdateEmergencyRequestDTO": { "TechnicianId": "number", "RequestId": "number", "RequestState": "RequestState (1|2)", "Pin": "number (4-6)" },
+    "Admin.ReadUsersDTO": { "Id": "string", "FullName": "string | null", "Role": "string | null", "IsActivated": "boolean", "rate": "string | null" },
+    "Admin.ReadTCategoryDTO": { "Id": "number", "Name": "string | null", "IsDeleted": "boolean" },
+    "Admin.CreateTCategoryDTO": { "Name": "string | null" },
+    "Admin.UpdateTCategoryDTO": { "Name": "string" },
+    "TCategoryDTO": { "ID": "number", "Name": "string" }
+  },
+  "enums": {
+    "RequestState": ["Answered", "Rejected", "Waiting", "Cancelled", "Completed", "Applied"],
+    "MaintenanceEnum": ["NoInfo", "NoNeeded", "Needed"],
+    "Government": ["القاهرة","الجيزة","الإسكندرية","القليوبية","بورسعيد","السويس","الدقهلية","الشرقية","أسيوط","الغربية","المنوفية","البحيرة","الفيوم","المنيا","قنا","سوهاج","الأقصر","أسوان","مطروح","دمياط","الإسماعيلية"]
+  },
+  "endpoints": [
+    {
+      "name": "Account - Register Step 1",
+      "method": "POST",
+      "path": "/api/Account/register-step1",
+      "authRequired": false,
+      "consumes": "application/json",
+      "requestBody": "Account.RegisterStep1Dto",
+      "responses": {
+        "200": { "content": { "application/json": { "schema": { "message": "string" } } } },
+        "400": { "content": { "application/json": { "schema": "validation" } } }
+      }
+    },
+    {
+      "name": "Account - Register Step 2",
+      "method": "POST",
+      "path": "/api/Account/register-step2",
+      "authRequired": false,
+      "consumes": "multipart/form-data",
+      "requestBody": "Account.RegisterStep2Dto",
+      "responses": { "200": { "content": { "application/json": { "schema": { "message": "string" } } } }, "400": {} }
+    },
+    {
+      "name": "Account - Login",
+      "method": "POST",
+      "path": "/api/Account/login",
+      "authRequired": false,
+      "consumes": "application/json",
+      "requestBody": "Account.LoginDto",
+      "responses": { "200": { "content": { "application/json": { "schema": { "token": "string" } } } }, "401": {} }
+    },
+    {
+      "name": "Account - Check Email",
+      "method": "GET",
+      "path": "/api/Account/check-email",
+      "authRequired": false,
+      "query": { "email": "string" },
+      "responses": { "200": { "content": { "application/json": { "schema": "boolean" } } } }
+    },
+    {
+      "name": "Account - Technician Details",
+      "method": "GET",
+      "path": "/api/Account/technicianDetails/{technicianId}",
+      "authRequired": false,
+      "params": { "technicianId": "number" },
+      "responses": { "200": { "content": { "application/json": { "schema": "ApiResponse<Account.ReadUserDetailsDTO>" } } } , "404": {} }
+    },
+    {
+      "name": "Admin - Get Users",
+      "method": "GET",
+      "path": "/api/Admin/users",
+      "authRequired": false,
+      "responses": { "200": { "content": { "application/json": { "schema": "ApiResponse<List<Admin.ReadUsersDTO>>" } } } }
+    },
+    {
+      "name": "Admin - Soft Delete User",
+      "method": "DELETE",
+      "path": "/api/Admin/users/{id}",
+      "authRequired": false,
+      "params": { "id": "string" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "404": { "schema": "ApiResponse<string>" } }
+    },
+    {
+      "name": "Admin - Restore User",
+      "method": "POST",
+      "path": "/api/Admin/users/{id}/restore",
+      "authRequired": false,
+      "params": { "id": "string" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "404": { "schema": "ApiResponse<string>" } }
+    },
+    {
+      "name": "Admin - Get Categories",
+      "method": "GET",
+      "path": "/api/Admin/categories",
+      "authRequired": false,
+      "responses": { "200": { "schema": "ApiResponse<List<Admin.ReadTCategoryDTO>>" } }
+    },
+    {
+      "name": "Admin - Create Category",
+      "method": "POST",
+      "path": "/api/Admin/categories",
+      "authRequired": false,
+      "requestBody": "Admin.CreateTCategoryDTO",
+      "responses": { "201": { "schema": "ApiResponse<Admin.ReadTCategoryDTO>" } }
+    },
+    {
+      "name": "Admin - Update Category",
+      "method": "PUT",
+      "path": "/api/Admin/categories/{id}",
+      "authRequired": false,
+      "params": { "id": "number" },
+      "requestBody": "Admin.UpdateTCategoryDTO",
+      "responses": { "200": { "schema": "ApiResponse<bool>" }, "404": { "schema": "ApiResponse<bool>" } }
+    },
+    {
+      "name": "Admin - Soft Delete Category",
+      "method": "DELETE",
+      "path": "/api/Admin/categories/{id}",
+      "authRequired": false,
+      "params": { "id": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "404": { "schema": "ApiResponse<string>" } }
+    },
+    {
+      "name": "Admin - Restore Category",
+      "method": "POST",
+      "path": "/api/Admin/categories/{id}/restore",
+      "authRequired": false,
+      "params": { "id": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "404": { "schema": "ApiResponse<string>" } }
+    },
+    {
+      "name": "Car - Get Details",
+      "method": "GET",
+      "path": "/api/Car",
+      "authRequired": false,
+      "responses": { "200": { "schema": "ApiResponse<Car.CarDetailsDto>" } }
+    },
+    {
+      "name": "Car - Add New",
+      "method": "POST",
+      "path": "/api/Car",
+      "authRequired": false,
+      "requestBody": "Car.CreateCarDto",
+      "responses": { "200": { "schema": "ApiResponse<Car.CreateCarDto>" }, "400": {} }
+    },
+    {
+      "name": "Car - Delete",
+      "method": "DELETE",
+      "path": "/api/Car",
+      "authRequired": false,
+      "responses": { "200": { "schema": "ApiResponse<string>" } }
+    },
+    {
+      "name": "CarOwner - Check Request",
+      "method": "GET",
+      "path": "/api/CarOwner",
+      "authRequired": false,
+      "query": { "Id": "number" },
+      "responses": { "200": { "schema": "ApiResponse<Requests.RequestBreifDTO>" } }
+    },
+    {
+      "name": "Category - Get All",
+      "method": "GET",
+      "path": "/api/Category",
+      "authRequired": false,
+      "responses": { "200": { "schema": "ApiResponse<List<TCategoryDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Chat - Get All",
+      "method": "GET",
+      "path": "/api/Chat/GetAllChats",
+      "authRequired": true,
+      "responses": { "200": { "schema": "ApiResponse<List<Chat.ChatBreifDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Chat - Get By Id",
+      "method": "GET",
+      "path": "/api/Chat/GetChatById",
+      "authRequired": true,
+      "query": { "chatsessionid": "number" },
+      "responses": { "200": { "schema": "ApiResponse<Chat.ChatDetailsDTO>" }, "400": {}, "404": {} }
+    },
+    {
+      "name": "Chat - Load Current",
+      "method": "GET",
+      "path": "/api/Chat/LoadCurrentChat",
+      "authRequired": true,
+      "responses": { "200": { "schema": "ApiResponse<ChatSession.ChatSessionAllDTO>" }, "404": {} }
+    },
+    {
+      "name": "MaintainanceTypes - Get All",
+      "method": "GET",
+      "path": "/api/MaintainanceTypes",
+      "authRequired": false,
+      "responses": { "200": { "schema": "ApiResponse<List<MTypes.MaintenanceTypeDTO>>" } }
+    },
+    {
+      "name": "Request - Create",
+      "method": "POST",
+      "path": "/api/Request",
+      "authRequired": false,
+      "requestBody": "Requests.RealRequestDTO",
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "Request - Cancel All",
+      "method": "DELETE",
+      "path": "/api/Request/CancelAll/{CarOwnerID}",
+      "authRequired": false,
+      "params": { "CarOwnerID": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "Request - Get Brief",
+      "method": "GET",
+      "path": "/api/Request/RequestBreifDTOs/{carOwnerID}",
+      "authRequired": false,
+      "params": { "carOwnerID": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Requests.RequestBreifDTO>>" }, "400": {}, "404": {} }
+    },
+    {
+      "name": "Request - Get Details",
+      "method": "GET",
+      "path": "/api/Request/RequestDetails/{requestId}",
+      "authRequired": false,
+      "params": { "requestId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<Requests.RequestDetailsDTO>" }, "400": {}, "404": {} }
+    },
+    {
+      "name": "Request - Complete",
+      "method": "POST",
+      "path": "/api/Request/CompleteRequest/{requestId}",
+      "authRequired": false,
+      "params": { "requestId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "ReverseRequest - List",
+      "method": "GET",
+      "path": "/api/ReverseRequest",
+      "authRequired": true,
+      "responses": { "200": { "schema": "ApiResponse<List<Notifications.NotificationDto>>" }, "404": {} }
+    },
+    {
+      "name": "ReverseRequest - Accept",
+      "method": "POST",
+      "path": "/api/ReverseRequest/accept/{requestId}",
+      "authRequired": true,
+      "params": { "requestId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "ReverseRequest - Reject",
+      "method": "POST",
+      "path": "/api/ReverseRequest/reject/{requestId}",
+      "authRequired": true,
+      "params": { "requestId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "Review - Add",
+      "method": "POST",
+      "path": "/api/Review",
+      "authRequired": false,
+      "requestBody": "Reviews.AddReviewDTO",
+      "responses": { "200": { "schema": "ApiResponse<string>" }, "400": {} }
+    },
+    {
+      "name": "Technician - Filtered List",
+      "method": "POST",
+      "path": "/api/Technician",
+      "authRequired": false,
+      "requestBody": "Requests.CreatePreRequestDTO",
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.FilteredTechniciansDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Technician - By Id",
+      "method": "GET",
+      "path": "/api/Technician/{id}",
+      "authRequired": false,
+      "params": { "id": "number" },
+      "responses": { "200": { "schema": "ApiResponse<Technicians.TechnicianDTO>" }, "404": {} }
+    },
+    {
+      "name": "CarMaintanance - Add Record",
+      "method": "POST",
+      "path": "/api/CarMaintanance",
+      "authRequired": true,
+      "requestBody": "CarMaintanance.CarMaintananceAllDTO",
+      "responses": { "200": { "schema": "ApiResponse<null>" }, "400": {} }
+    },
+    {
+      "name": "CarMaintanance - Summary",
+      "method": "GET",
+      "path": "/api/CarMaintanance",
+      "authRequired": true,
+      "responses": { "200": { "schema": "ApiResponse<List<CarMaintanance.MaintenanceSummaryDTO>>" } }
+    },
+    {
+      "name": "CarMaintanance - History By Id",
+      "method": "GET",
+      "path": "/api/CarMaintanance/history/{maintananceId}",
+      "authRequired": false,
+      "params": { "maintananceId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<CarMaintanance.MaintananceHistory>>" }, "400": {}, "404": {} }
+    },
+    {
+      "name": "Technician Emergency - Details",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/details/{requestId}/{technicianId}",
+      "authRequired": true,
+      "params": { "requestId": "number", "technicianId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<Technicians.EmergencyRequestDetailsDTO>" }, "404": {}, "400": {} }
+    },
+    {
+      "name": "Technician Emergency - Accepted",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/accepted/{technicalId}",
+      "authRequired": true,
+      "params": { "technicalId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.EmergencyRequestDetailsDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Technician Emergency - Active",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/active/{technicianId}",
+      "authRequired": true,
+      "params": { "technicianId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.EmergencyRequestDetailsDTO>>" }, "404": {}, "400": {} }
+    },
+    {
+      "name": "Technician Emergency - Assigned",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/assigned/{technicianId}",
+      "authRequired": true,
+      "params": { "technicianId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.EmergencyRequestDetailsDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Technician Emergency - Update",
+      "method": "PUT",
+      "path": "/api/TRequestEmergency",
+      "authRequired": true,
+      "requestBody": "Technicians.TechnicianUpdateEmergencyRequestDTO",
+      "responses": { "200": { "schema": "ApiResponse<bool>" }, "400": {} }
+    },
+    {
+      "name": "Technician Emergency - Apply",
+      "method": "POST",
+      "path": "/api/TRequestEmergency",
+      "authRequired": true,
+      "requestBody": "Technicians.TechnicianApplyEmergencyRequestDTO",
+      "responses": { "200": { "schema": "ApiResponse<bool>" }, "400": {} }
+    },
+    {
+      "name": "Technician Emergency - Completed",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/completed/{technicianId}",
+      "authRequired": true,
+      "params": { "technicianId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.EmergencyRequestDetailsDTO>>" }, "404": {} }
+    },
+    {
+      "name": "Technician Emergency - Applied",
+      "method": "GET",
+      "path": "/api/TRequestEmergency/applied/{techId}",
+      "authRequired": true,
+      "params": { "techId": "number" },
+      "responses": { "200": { "schema": "ApiResponse<List<Technicians.TechReverseRequestDTO>>" }, "404": {}, "400": {} }
+    }
+  ],
+  "realtime": {
+    "signalR": [
+      { "hub": "/chathub", "auth": "access_token in query string", "notes": "Used for chat operations" },
+      { "hub": "/requestWatchDogHub", "auth": "access_token in query string", "notes": "Used for monitoring requests" },
+      { "hub": "/notificationhub", "auth": "access_token in query string", "notes": "Notifications for users" }
+    ]
+  }
+}
+
+

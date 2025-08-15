@@ -9,6 +9,7 @@ namespace Service.Exception_Implementation.BadRequestExceptions
     public class CarBadRequestException:Exception
     {
         public CarBadRequestException() : base("Invalid input Data") { }
+        public CarBadRequestException(string message) : base(message) { }
 
     }
 }

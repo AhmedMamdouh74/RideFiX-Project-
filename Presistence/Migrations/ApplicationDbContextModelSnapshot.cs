@@ -33,6 +33,9 @@ namespace Presistence.Migrations
                     b.Property<int>("AvgKmPerMonth")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("LastMaintenanceDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("MaintenanceCount")
                         .HasColumnType("int");
 
@@ -66,7 +69,7 @@ namespace Presistence.Migrations
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
-                    b.ToTable("Car");
+                    b.ToTable("cars");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.CarMaintenanceRecord", b =>
@@ -86,12 +89,18 @@ namespace Presistence.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("MaintenanceCenter")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaintenanceTypeId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("NextMaintenanceDue")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("PerformedAt")
                         .HasColumnType("datetime2");
@@ -102,7 +111,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("MaintenanceTypeId");
 
-                    b.ToTable("CarMaintenanceRecord");
+                    b.ToTable("carMaintenanceRecords");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
@@ -367,6 +376,9 @@ namespace Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -438,6 +450,8 @@ namespace Presistence.Migrations
                     b.ToTable("technicians");
                 });
 
+
+
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.Property<string>("ApplicationUserId")
@@ -489,6 +503,9 @@ namespace Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActivated")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -533,6 +550,9 @@ namespace Presistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -544,6 +564,115 @@ namespace Presistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("pCategory");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("orderState")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("totalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("orders");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("totalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("orderItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("products");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -714,7 +843,7 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", "MaintenanceType")
-                        .WithMany()
+                        .WithMany("CarMaintenanceRecords")
                         .HasForeignKey("MaintenanceTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -896,6 +1025,8 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+
+
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
                 {
                     b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ApplicationUser")
@@ -905,6 +1036,36 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
+                {
+                    b.HasOne("Domain.Entities.e_Commerce.Order", "Order")
+                        .WithMany("orderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.e_Commerce.Product", "Product")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
+                {
+                    b.HasOne("Domain.Entities.e_Commerce.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -978,6 +1139,11 @@ namespace Presistence.Migrations
                     b.Navigation("CarMaintenanceRecords");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
+                {
+                    b.Navigation("CarMaintenanceRecords");
+                });
+
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.CarOwner", b =>
                 {
                     b.Navigation("Car");
@@ -1034,6 +1200,21 @@ namespace Presistence.Migrations
                     b.Navigation("connections");
 
                     b.Navigation("messages");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
+                {
+                    b.Navigation("orderItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

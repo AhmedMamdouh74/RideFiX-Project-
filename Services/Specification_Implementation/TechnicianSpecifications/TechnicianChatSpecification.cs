@@ -13,9 +13,9 @@ namespace Service.Specification_Implementation.TechnicianSpecifications
     {
         public TechnicianChatSpecification(int UserId) : base(s => s.TechnicianId == UserId && s.IsClosed == true)
         {
-            AddInclude(t => t.Technician);
             AddInclude(t => t.massages);
-            AddInclude(t => t.Technician.ApplicationUser);
+            AddInclude(t => t.CarOwner);
+            AddInclude(t => t.CarOwner.ApplicationUser);
 
         }
         public static IQueryable<ChatSession> ApplyMessageSorting(IQueryable<ChatSession> query)

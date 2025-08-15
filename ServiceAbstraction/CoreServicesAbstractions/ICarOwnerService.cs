@@ -14,5 +14,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
         public Task<RequestBreifDTO> IsRequested(int Id);
         public Task<CarOwnerDto> GetById(int Id);
 
+
     }
 }

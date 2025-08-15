@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Contracts;
 using Service.CoreServices.CarMservices;
-using Service.CoreServices.TechniciansServices;
+
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 
 namespace Services
@@ -36,6 +37,12 @@ namespace Services
         public ICarServices carServices { get; }
 
         public ICarMaintananceService carMaintananceService { get; }
+        public IEmailService emailService { get; }
+
+        public IMaintenanceTypesService maintenanceTypesService { get; }
+        public IReverserRequestService reverserRequestService { get; }
+        public IAdminService adminService { get; }
+        public IActivityReportService activityReportService { get; }
 
         #endregion
 
@@ -52,7 +59,12 @@ namespace Services
                     IUserConnectionIdService userConnectionIdService,
                     IChatSessionService chatSessionService,
                     ICarServices carServices,
-                    ICarMaintananceService carMaintananceService)
+                    ICarMaintananceService carMaintananceService,
+                    IMaintenanceTypesService maintenanceTypesService,
+                    IEmailService emailService,
+                    IReverserRequestService reverserRequestService,
+                    IAdminService adminService,
+                    IActivityReportService activityReportService)
         {
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -67,6 +79,12 @@ namespace Services
             this.chatSessionService = chatSessionService;
             this.carServices = carServices;
             this.carMaintananceService = carMaintananceService;
+            this.maintenanceTypesService = maintenanceTypesService;
+            this.emailService = emailService;
+            this.maintenanceTypesService = maintenanceTypesService;
+            this.reverserRequestService = reverserRequestService;
+            this.adminService = adminService;
+            this.activityReportService = activityReportService;
         }
     }
 }

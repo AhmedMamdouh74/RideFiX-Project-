@@ -1,6 +1,7 @@
 ﻿using Service.CoreServices.CarMservices;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
+using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,6 @@ namespace ServiceAbstraction
         ITechnicianRequestEmergency technicianRequestEmergency { get; }
         ICategoryService categoryService { get; }
         IReviewService reviewService { get; }
-
         ICarOwnerService carOwnerService { get; }
         IUserProfileService userProfileService { get; }
         IUserConnectionIdService userConnectionIdService { get; }
@@ -26,6 +26,13 @@ namespace ServiceAbstraction
         IMessegeService messegeService { get; }
         ICarServices carServices { get; }
         ICarMaintananceService carMaintananceService { get; }
+        IEmailService emailService { get; }
+        IMaintenanceTypesService maintenanceTypesService { get; }
+
+        IReverserRequestService reverserRequestService { get; }
+        IAdminService adminService { get; }
+        IActivityReportService activityReportService { get; }
+
 
     }
 }

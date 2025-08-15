@@ -29,5 +29,22 @@ namespace Presentation.Controllers
             var Car = await serviceManager.carServices.GetCarDetailsAsync();
             return Ok(ApiResponse<CarDetailsDto>.SuccessResponse(Car, "Has a Car"));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewCar([FromBody] CreateCarDto car)
+        {
+            if (car == null)
+            {
+                return BadRequest(ApiResponse<CreateCarDto>.FailResponse("Car data is null"));
+            }
+            await serviceManager.carServices.AddNewCar(car);
+            return Ok(ApiResponse<CreateCarDto>.SuccessResponse(car, "Car added successfully"));
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCar()
+        {
+            await serviceManager.carServices.DeleteCar();
+            return Ok(ApiResponse<string>.SuccessResponse("Car deleted successfully"));
+        }
     }
 }

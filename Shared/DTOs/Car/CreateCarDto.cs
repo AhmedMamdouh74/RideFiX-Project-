@@ -16,4 +16,5 @@ namespace SharedData.DTOs.Car
         public int AvgKmPerMonth { get; set; }
     }
 
-}
+
+    }

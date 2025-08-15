@@ -18,5 +18,11 @@ namespace Service.Specification_Implementation.RequestSpecifications
         {
             AddInclude(x => x.EmergencyRequestTechnicians);
         }
+        public WaitingRequestSpecification() : base(
+                       
+                       req=>req.EmergencyRequestTechnicians.Any(y => y.CallStatus == RequestState.Waiting))
+        {
+           
+        }
     }
 }
