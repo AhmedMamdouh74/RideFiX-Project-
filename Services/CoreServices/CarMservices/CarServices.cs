@@ -29,9 +29,9 @@ namespace Service.CoreServices.CarMservices
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task AddNewCar(CreateCarDto car)
+        public async Task AddNewCar(CreateCarDto cardto)
         {
-            if (car == null)
+            if (cardto == null)
             {
                 throw new CarBadRequestException();
             }
@@ -46,9 +46,21 @@ namespace Service.CoreServices.CarMservices
             {
                 throw new CarBadRequestException("there ids no ownerId");
             }
+            if (ownerId <= 0)
+            {
+                throw new CarBadRequestException();
+            }
+            var spec = new CarIdSpecification(ownerId);
+            var car = await unitOfWork.GetRepository<Car, int>().GetAllAsync(spec);
+            if (car != null && car.Any())
+            {
+                throw new CarBadRequestException("you already have a car");
+            }
             var carRepo = unitOfWork.GetRepository<Car, int>();
-            var carEntity = mapper.Map<Car>(car);
+            var carEntity = mapper.Map<Car>(cardto);
             carEntity.OwnerId = ownerId;
+            await carRepo.AddAsync(carEntity);
+            await unitOfWork.SaveChangesAsync();
 
         }
 
@@ -119,5 +131,24 @@ namespace Service.CoreServices.CarMservices
             car.MaintenanceCount++;
             car.LastMaintenanceDate = date;
         }
+
+        public async Task DeleteCar()
+        {
+            var user = httpContextAccessor.HttpContext;
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+            var flag = int.TryParse(user.User.Claims.FirstOrDefault(s => s.Type == "Id")?.Value
+                        , out var ownerId);
+            if (!flag)
+            {
+                throw new CarBadRequestException("there is no ownerId");
+            }
+            int carID = await GetCarIdByOwnerId(ownerId);
+            await unitOfWork.GetRepository<Car, int>().DeleteAsync(carID);
+            await unitOfWork.SaveChangesAsync();
+           
+            }
     }
 }

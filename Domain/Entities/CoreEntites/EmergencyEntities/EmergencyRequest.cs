@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities.Reporting;
 using SharedData.Enums;
 
 namespace Domain.Entities.CoreEntites.EmergencyEntities
@@ -21,7 +22,7 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public int categoryId { get; set; }
 
         //endPoint
-        public DateOnly? CompeletRequestDate { get; set; } 
+        public DateOnly? CompeletRequestDate { get; set; }
 
         //navigations
         public int? TechnicianId { get; set; }
@@ -36,11 +37,12 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
 
         public ICollection<EmergencyRequestTechnicians> EmergencyRequestTechnicians { get; set; } = new HashSet<EmergencyRequestTechnicians>();
         // this is for technician to make reverse request to car owner
-        public ICollection<TechReverseRequest> TechReverseRequests { get; set; } = new HashSet<TechReverseRequest>();   
+        public ICollection<TechReverseRequest> TechReverseRequests { get; set; } = new HashSet<TechReverseRequest>();
         public int CarOwnerId { get; set; }
         public CarOwner CarOwner { get; set; }
         public ICollection<RequestAttachment>? requestAttachments { get; set; } = new HashSet<RequestAttachment>();
         public TCategory category { get; set; }
+        public ICollection<Report> Reports { get; set; } = new HashSet<Report>();
 
         public bool IsCanCancelByTechnician { get; set; } = true;
     }

@@ -1,0 +1,29 @@
+﻿using SharedData.DTOs.Admin.TechnicianCategory;
+using SharedData.DTOs.Admin.Users;
+
+namespace ServiceAbstraction.CoreServicesAbstractions.Admin
+{
+    public interface IAdminService
+    {
+        // Users
+        
+        Task<List<ReadUsersDTO>> GetAllTechniciansAsync();
+        Task<List<ReadUsersDTO>> GetAllCarOwnersAsync();
+        Task BanTechnianAsync(int userId);
+        Task BanCarOwnerAsync(int userId);
+        Task ActivateCarOwonerAsync(int userId);
+        Task ActivateTechnianAsync(int userId);
+        Task<Object> GetUsersCountAsync();
+
+        // requests
+        Task<Object> GetrequestsCountAsync();
+
+
+        // Categories
+        Task<List<ReadTCategoryDTO>> GetAllCategoriesAsync();
+        Task CreateCategoryAsync(CreateTCategoryDTO dto);
+        Task UpdateCategoryAsync(int id, UpdateTCategoryDTO dto);
+        Task DeleteCategoryAsync(int id);
+       
+    }
+}

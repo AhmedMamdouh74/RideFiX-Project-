@@ -18,5 +18,8 @@ namespace Service.Specification_Implementation.RequestSpecifications
             AddInclude(e => e.Technician);
 
         }
+        public EmergencyRequestTotalSpecification() : base() 
+        {
+        }
     }
 }
