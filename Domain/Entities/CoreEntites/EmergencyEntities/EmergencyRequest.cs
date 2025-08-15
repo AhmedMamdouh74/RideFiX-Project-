@@ -41,5 +41,7 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public CarOwner CarOwner { get; set; }
         public ICollection<RequestAttachment>? requestAttachments { get; set; } = new HashSet<RequestAttachment>();
         public TCategory category { get; set; }
+
+        public bool IsCanCancelByTechnician { get; set; } = true;
     }
 }
