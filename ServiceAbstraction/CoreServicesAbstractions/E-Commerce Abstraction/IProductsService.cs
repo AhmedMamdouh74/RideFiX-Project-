@@ -17,5 +17,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction
             int? categoryId = null);
 
         public Task<CartItemDto> GetProductByIdAsync(int productId);
+        public Task<ProductWithRatesDTO> GetProductDetailsByIdAsync(int productId);
     }
 }

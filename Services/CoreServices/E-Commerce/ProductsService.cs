@@ -53,5 +53,21 @@ namespace Service.CoreServices.E_Commerce
             var productDto = mapper.Map<CartItemDto>(Product);
             return productDto;
         }
+
+        public async Task<ProductWithRatesDTO> GetProductDetailsByIdAsync(int productId)
+        {
+            if (productId <= 0)
+            {
+                throw new ProductArgumentException("Product ID must be greater than zero.");
+            }
+            var spec = new ProductSpecification(productId);
+            var Product = await unitOfWork.GetRepository<Product, int>().GetByIdAsync(spec);
+            if (Product == null)
+            {
+                throw new ProductArgumentException($"Product with ID {productId} not found.");
+            }
+            var productDto = mapper.Map<ProductWithRatesDTO>(Product);
+            return productDto;
+        }
     }
 }

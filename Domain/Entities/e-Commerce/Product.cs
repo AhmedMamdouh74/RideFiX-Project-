@@ -19,6 +19,7 @@ namespace Domain.Entities.e_Commerce
         public Category Category { get; set; }
         // Navigation property for order items that include this product
         public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
+        public ICollection<Rate> ProductRates { get; set; } = new List<Rate>();
 
     }
 }

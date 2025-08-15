@@ -52,6 +52,22 @@ namespace Presentation.Controllers
             }
             return Ok(ApiResponse<CartItemDto>.SuccessResponse(product, "Requests successfully created"));
         }
+
+        [HttpGet]
+        [Route("details/{productId:int}")]
+        public async Task<IActionResult> GetProductDetailsById(int productId)
+        {
+            if (productId <= 0)
+            {
+                return BadRequest("Product ID must be greater than zero.");
+            }
+            var product = await serviceManager.productsService.GetProductDetailsByIdAsync(productId);
+            if (product == null)
+            {
+                return NotFound($"Product with ID {productId} not found.");
+            }
+            return Ok(ApiResponse<ProductWithRatesDTO>.SuccessResponse(product, "Requests successfully created"));
+        }
     }
 }
 
