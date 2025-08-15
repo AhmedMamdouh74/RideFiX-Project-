@@ -21,6 +21,7 @@ namespace Domain.Entities.IdentityEntities
         public int PIN { get; set; }
         public bool IsActivated { get; set; }=true;
         public bool isDeleted {  get; set; }=false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
 
