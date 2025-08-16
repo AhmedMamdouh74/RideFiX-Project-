@@ -71,12 +71,17 @@ namespace Services
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
-                    IReverserRequestService reverserRequestService,
 
                     IProductCategoryService productCategoryService,
                     IProductsService productsService,
                     IShoppingCartService shoppingCartService,
+
+                    IReverserRequestService reverserRequestService,
                     IReportsServices reportsServices,
+
+
+                    IReportsServices reportsServices,
+
                     IAdminService adminService,
                     IActivityReportService activityReportService)
 
