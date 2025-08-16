@@ -68,6 +68,21 @@ namespace Presentation.Controllers
             }
             return Ok(ApiResponse<ProductWithRatesDTO>.SuccessResponse(product, "Requests successfully created"));
         }
+        [HttpGet]
+        [Route("search")]
+        public async Task<IActionResult> ProductSearchByName(string productName)
+        {
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                return BadRequest("Product name cannot be empty.");
+            }
+            var products = await serviceManager.productsService.ProductSearchByName(productName);
+            if (products == null || !products.Any())
+            {
+                return NotFound($"No products found with name {productName}.");
+            }
+            return Ok(ApiResponse<List<ProductBreifDTO>>.SuccessResponse(products, "Requests successfully created"));
+        }
     }
 }
 
