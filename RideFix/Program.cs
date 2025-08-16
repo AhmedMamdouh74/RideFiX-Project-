@@ -1,35 +1,19 @@
 ﻿
-using System.Text;
 using Domain.Contracts;
-using Domain.Contracts;
-using Domain.Entities.CoreEntites.CarMaintenance_Entities;
-using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
-using Domain.Entities.IdentityEntities;
-using Domain.Entities.IdentityEntities;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Hubs;
 using Presistence;
-using Presistence;
-using Presistence;
-using Presistence.Data;
-using Presistence.Data;
 using Presistence.Data;
 using RideFix.CustomMiddlewares;
 using Services;
-using SharedData.Enums;
-using Microsoft.EntityFrameworkCore;
-using Presentation.Hubs;
-using Hangfire;
-using Hangfire.MemoryStorage;
 using StackExchange.Redis;
+using System.Text;
 
 namespace RideFix
 {
@@ -161,7 +145,7 @@ namespace RideFix
 
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken)
-                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub") 
+                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub")
                     || path.StartsWithSegments("/notificationhub"))
                     {
                         context.Token = accessToken;

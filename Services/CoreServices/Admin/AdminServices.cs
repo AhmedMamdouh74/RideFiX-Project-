@@ -58,7 +58,7 @@ namespace Service.CoreServices.Admin
             if (user == null) throw new UsersNotFoundException(notFoundMessage);
 
             setActivation(user);
-
+            repo.Update(user);
             await unitOfWork.SaveChangesAsync();
 
         }
@@ -103,16 +103,16 @@ namespace Service.CoreServices.Admin
             => GetUsersAsync(new TechnicianWithUserAndReviewsSpec(), "there is no technicians");
 
         public Task BanTechnianAsync(int userId)
-            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = false);
+            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(userId), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = false);
 
         public Task BanCarOwnerAsync(int userId)
-            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = false);
+            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(userId), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = false);
 
         public Task ActivateTechnianAsync(int userId)
-            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = true);
+            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(userId), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = true);
 
         public Task ActivateCarOwonerAsync(int userId)
-            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = true);
+            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(userId), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = true);
 
         #endregion
 
