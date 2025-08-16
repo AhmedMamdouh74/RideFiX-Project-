@@ -18,8 +18,7 @@ namespace Services.Specification_Implementation
         {
             Criteria = _criteria;
         }
-        protected Specification()
-        {
+        
             
         public Specification()
         {
