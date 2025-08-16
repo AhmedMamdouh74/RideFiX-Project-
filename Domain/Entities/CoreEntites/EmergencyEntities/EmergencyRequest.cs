@@ -43,5 +43,7 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public ICollection<RequestAttachment>? requestAttachments { get; set; } = new HashSet<RequestAttachment>();
         public TCategory category { get; set; }
         public ICollection<Report> Reports { get; set; } = new HashSet<Report>();
+
+        public bool IsCanCancelByTechnician { get; set; } = true;
     }
 }

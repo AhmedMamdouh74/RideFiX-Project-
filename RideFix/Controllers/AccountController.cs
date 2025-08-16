@@ -54,6 +54,8 @@ namespace RideFix.Controllers
 
             if (token == null)
                 return Unauthorized("Invalid email or password");
+            if (string.Equals(token, "banned", StringComparison.OrdinalIgnoreCase))
+                return Forbid();
 
             return Ok(new { token });
         }

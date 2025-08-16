@@ -75,7 +75,11 @@ namespace Services
                     IProductCategoryService productCategoryService,
                     IProductsService productsService,
                     IShoppingCartService shoppingCartService,
+
                     IReverserRequestService reverserRequestService,
+                    IReportsServices reportsServices,
+
+
                     IReportsServices reportsServices,
 
                     IAdminService adminService,

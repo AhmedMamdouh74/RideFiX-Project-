@@ -55,8 +55,9 @@ namespace Service.CoreServices.Account
         {
             int   roleEntityId = 0;
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password)) 
+            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password) ) 
                 return null;
+            if (!user.IsActivated) return "banned";
             var roles = await _userManager.GetRolesAsync(user);
 
             if (roles.Contains("CarOwner"))

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815145340_add CreatedAt prop in applicationUser()")]
+    partial class addCreatedAtpropinapplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,9 +211,6 @@ namespace Presistence.Migrations
 
                     b.Property<DateTime?>("EndTimeStamp")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCanCancelByTechnician")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
@@ -570,43 +570,6 @@ namespace Presistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReportedUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ReportingUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportedUserId");
-
-                    b.HasIndex("ReportingUserId");
-
-                    b.HasIndex("RequestId");
-
-                    b.ToTable("reports");
-                });
-
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -614,10 +577,6 @@ namespace Presistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -718,40 +677,6 @@ namespace Presistence.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("products");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Rate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ProductRate");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1115,33 +1040,6 @@ namespace Presistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
-                {
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportedUser")
-                        .WithMany("Reported")
-                        .HasForeignKey("ReportedUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ReportingUser")
-                        .WithMany("Reporting")
-                        .HasForeignKey("ReportingUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", "Request")
-                        .WithMany("Reports")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportedUser");
-
-                    b.Navigation("ReportingUser");
-
-                    b.Navigation("Request");
-                });
-
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
                 {
                     b.HasOne("Domain.Entities.e_Commerce.Order", "Order")
@@ -1170,25 +1068,6 @@ namespace Presistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Domain.Entities.e_Commerce.Rate", b =>
-                {
-                    b.HasOne("Domain.Entities.e_Commerce.Product", "Product")
-                        .WithMany("ProductRates")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.IdentityEntities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1287,8 +1166,6 @@ namespace Presistence.Migrations
                 {
                     b.Navigation("EmergencyRequestTechnicians");
 
-                    b.Navigation("Reports");
-
                     b.Navigation("Review")
                         .IsRequired();
 
@@ -1322,10 +1199,6 @@ namespace Presistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
                 {
-                    b.Navigation("Reported");
-
-                    b.Navigation("Reporting");
-
                     b.Navigation("connections");
 
                     b.Navigation("messages");
@@ -1344,8 +1217,6 @@ namespace Presistence.Migrations
             modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
                 {
                     b.Navigation("OrderItems");
-
-                    b.Navigation("ProductRates");
                 });
 #pragma warning restore 612, 618
         }

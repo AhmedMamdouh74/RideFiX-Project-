@@ -30,6 +30,7 @@ namespace Presentation.Controllers
             {
                 return NotFound("No categories found.");
             }
+            
             return Ok(ApiResponse<List<TCategoryDTO>>.SuccessResponse(categories.ToList() , "available categories"));
         }
 

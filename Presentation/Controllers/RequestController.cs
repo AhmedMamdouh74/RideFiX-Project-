@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RequestController : ControllerBase
@@ -86,6 +87,16 @@ namespace Presentation.Controllers
 
         }
 
+        [HttpDelete("CancelReqTechs")]
+        public async Task<IActionResult> CancelTechRec(int reqId)
+        {
+            if (reqId <= 0)
+            {
+                return BadRequest("Invalid Car Owner ID.");
+            }
+            await serviceManager.requestServices.CancelForTechnician(reqId);
+            return Ok(ApiResponse<string>.SuccessResponse(null, "All requests cancelled successfully."));
+        }
         //[HttpGet("request/{id}")]
         //public async Task<IActionResult> IsPresentRequest(int id)
         //{
