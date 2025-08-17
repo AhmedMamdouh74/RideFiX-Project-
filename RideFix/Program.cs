@@ -1,32 +1,20 @@
 ﻿
 using System.Text;
 using Domain.Contracts;
-using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
-using Domain.Entities.IdentityEntities;
-using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Hubs;
 using Presistence;
-using Presistence;
-using Presistence;
-using Presistence.Data;
-using Presistence.Data;
 using Presistence.Data;
 using RideFix.CustomMiddlewares;
 using Services;
 using SharedData.Enums;
-using Microsoft.EntityFrameworkCore;
-using Presentation.Hubs;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using StackExchange.Redis;
@@ -54,8 +42,10 @@ namespace RideFix
             });
 
 
+            builder.Services.AddControllers()
+    .AddApplicationPart(typeof(Presentation.Controllers.CarController).Assembly);
 
-            builder.Services.AddControllers();
+            //builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -238,6 +228,7 @@ namespace RideFix
 
             //EMAIL
             app.UseHangfireDashboard();
+            app.UseStaticFiles();
 
             app.MapControllers();
 
