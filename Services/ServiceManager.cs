@@ -53,6 +53,7 @@ namespace Services
 
 
         public IReportsServices reportsServices { get; }
+        public IPaymentService paymentService { get; }
         #endregion
 
         public ServiceManager(
@@ -78,12 +79,9 @@ namespace Services
 
                     IReverserRequestService reverserRequestService,
                     IReportsServices reportsServices,
-
-
-                    IReportsServices reportsServices,
-
                     IAdminService adminService,
-                    IActivityReportService activityReportService)
+                    IActivityReportService activityReportService,
+                    IPaymentService paymentService)
 
         {
             this.requestServices = requestServices;
@@ -109,6 +107,7 @@ namespace Services
             this.reportsServices = reportsServices;
             this.adminService = adminService;
             this.activityReportService = activityReportService;
+            this.paymentService = paymentService;
         }
     }
 }

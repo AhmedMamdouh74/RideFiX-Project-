@@ -7,6 +7,7 @@ using Service.CoreServices.CarMservices;
 using Service.CoreServices.ChatServices;
 using Service.CoreServices.E_Commerce;
 using Service.CoreServices.EmergencyReqServices;
+using Service.CoreServices.PaymentService;
 using Service.CoreServices.ReportsServices;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -62,7 +63,7 @@ namespace Services
 
             Services.AddScoped<IAdminService, AdminService>();
             Services.AddScoped<IActivityReportService, ActivityReportService>();
-
+            Services.AddScoped<IPaymentService, PaymentService>();
 
 
             return Services;

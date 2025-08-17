@@ -43,6 +43,6 @@ namespace ServiceAbstraction
         IActivityReportService activityReportService { get; }
 
 
-
+        public IPaymentService paymentService { get; }
     }
 }
