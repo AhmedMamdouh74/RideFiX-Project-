@@ -53,5 +53,37 @@ namespace Service.CoreServices.E_Commerce
             var productDto = mapper.Map<CartItemDto>(Product);
             return productDto;
         }
+
+        public async Task<ProductWithRatesDTO> GetProductDetailsByIdAsync(int productId)
+        {
+            if (productId <= 0)
+            {
+                throw new ProductArgumentException("Product ID must be greater than zero.");
+            }
+            var spec = new ProductSpecification(productId);
+            var Product = await unitOfWork.GetRepository<Product, int>().GetByIdAsync(spec);
+            if (Product == null)
+            {
+                throw new ProductArgumentException($"Product with ID {productId} not found.");
+            }
+            var productDto = mapper.Map<ProductWithRatesDTO>(Product);
+            return productDto;
+        }
+
+        public async Task<List<ProductBreifDTO>> ProductSearchByName(string productName)
+        {
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                throw new ProductArgumentException("Product name cannot be null or empty.");
+            }
+            var spec = new ProductSearchSpecification(productName);
+            var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
+            if (products == null || !products.Any())
+            {
+                return new List<ProductBreifDTO>();
+            }
+            var productsDto = mapper.Map<List<ProductBreifDTO>>(products);
+            return productsDto;
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace Services.Specification_Implementation
         {
             Criteria = _criteria;
         }
+
         public Specification()
         {
             Criteria = null;

@@ -1,5 +1,4 @@
 ﻿
-using System.Text;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
@@ -18,6 +17,7 @@ using SharedData.Enums;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using StackExchange.Redis;
+using System.Text;
 
 namespace RideFix
 {
@@ -151,7 +151,7 @@ namespace RideFix
 
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken)
-                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub") 
+                    && path.StartsWithSegments("/requestWatchDogHub") || path.StartsWithSegments("/chathub")
                     || path.StartsWithSegments("/notificationhub"))
                     {
                         context.Token = accessToken;

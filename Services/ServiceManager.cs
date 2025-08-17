@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Domain.Contracts;
-using Service.CoreServices.CarMservices;
+﻿using Service.CoreServices.CarMservices;
 
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -46,7 +39,7 @@ namespace Services
 
         public IProductCategoryService productCategoryService { get; }
         public IProductsService productsService { get; }
-        public IShoppingCartService shoppingCartService { get; } 
+        public IShoppingCartService shoppingCartService { get; }
 
         public IAdminService adminService { get; }
         public IActivityReportService activityReportService { get; }
@@ -71,12 +64,15 @@ namespace Services
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
-                    IReverserRequestService reverserRequestService,
 
                     IProductCategoryService productCategoryService,
                     IProductsService productsService,
                     IShoppingCartService shoppingCartService,
+
+                    IReverserRequestService reverserRequestService,
+
                     IReportsServices reportsServices,
+
                     IAdminService adminService,
                     IActivityReportService activityReportService)
 
