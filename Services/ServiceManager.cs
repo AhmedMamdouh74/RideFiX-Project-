@@ -43,6 +43,7 @@ namespace Services
 
         public IAdminService adminService { get; }
         public IActivityReportService activityReportService { get; }
+        public IRateService rateService { get; }
 
 
         public IReportsServices reportsServices { get; }
@@ -72,11 +73,12 @@ namespace Services
                     IReverserRequestService reverserRequestService,
 
                     IReportsServices reportsServices,
-
+                    IRateService rateService,
                     IAdminService adminService,
                     IActivityReportService activityReportService)
 
         {
+            this.rateService = rateService;
             this.requestServices = requestServices;
             this.technicianService = technicianService;
             this.technicianRequestEmergency = _tech;
