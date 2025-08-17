@@ -13,5 +13,7 @@ namespace SharedData.DTOs.E_CommerceDTOs
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public string ImageUrl { get; set; }
+        public double AverageRating { get; set; }
+        public int TotalRatings { get; set; }
     }
 }
