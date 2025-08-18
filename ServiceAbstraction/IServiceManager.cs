@@ -36,6 +36,7 @@ namespace ServiceAbstraction
         IProductCategoryService productCategoryService { get; }
         IProductsService productsService { get; }
         IShoppingCartService shoppingCartService { get; }
+        IOrderService orderService { get; }
 
         IReportsServices reportsServices { get; }
 
