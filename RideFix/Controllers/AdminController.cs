@@ -53,7 +53,7 @@ namespace RideFix.Controllers
         }
 
         [HttpPost("tecnician/{id}")]
-        [EndpointSummary("ban car onwer by ID")]
+        [EndpointSummary("ban tecnician by ID")]
         [ProducesResponseType(200, Type = typeof(ApiResponse<string>))]
         [ProducesResponseType(404, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> BanTechnicianUser(int id)

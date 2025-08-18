@@ -1,10 +1,4 @@
-﻿using Domain.Contracts;
-using Domain.Contracts.ReposatoriesContract;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Presentation.Hubs;
-using Service.AutoMapperProfile;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Service.AutoMapperProfile;
 using Service.CoreServices;
 using Service.CoreServices.Account;
@@ -13,16 +7,15 @@ using Service.CoreServices.CarMservices;
 using Service.CoreServices.ChatServices;
 using Service.CoreServices.E_Commerce;
 using Service.CoreServices.EmergencyReqServices;
+using Service.CoreServices.PaymentService;
 using Service.CoreServices.ReportsServices;
-using ServiceAbstraction;
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
 using ServiceAbstraction.CoreServicesAbstractions.Account;
 using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using ServiceAbstraction.CoreServicesAbstractions.CarMservices;
-using ServiceAbstraction.CoreServicesAbstractions.Reports;
 using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
-using Services.AutoMapperProfile;
+using ServiceAbstraction.CoreServicesAbstractions.Reports;
 
 
 
@@ -36,7 +29,7 @@ namespace Services
             Services.AddScoped<IServiceManager, ServiceManager>();
             Services.AddAutoMapper(typeof(RegisterMapping));
             Services.AddScoped<IFileService, FileService>();
-           
+
             Services.AddHttpClient(); // تحضير الـ HttpClient في الـ DI
             Services.AddScoped<IFaceRecognitionService, FaceRecognitionService>(); Services.AddScoped<IAuthService, AuthService>();
             Services.AddMemoryCache();
@@ -54,7 +47,7 @@ namespace Services
             Services.AddScoped<IMessegeService, MessegeService>();
             Services.AddScoped<IChatService, ChatService>();
             Services.AddScoped<IUserConnectionIdService, UserConnectionIdService>();
-            Services.AddScoped<IChatSessionService , ChatSessionService>();
+            Services.AddScoped<IChatSessionService, ChatSessionService>();
             Services.AddScoped<ICarServices, CarServices>();
             Services.AddScoped<ICarMaintananceService, CarMaintananceService>();
             Services.AddScoped<IMaintenanceTypesService, MaintenanceTypesService>();
@@ -65,12 +58,13 @@ namespace Services
             Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 
 
+            Services.AddScoped<IRateService, RateService>();
 
             Services.AddScoped<IReportsServices, ReportsServices>();
 
             Services.AddScoped<IAdminService, AdminService>();
             Services.AddScoped<IActivityReportService, ActivityReportService>();
-
+            Services.AddScoped<IPaymentService, PaymentService>();
 
 
             return Services;

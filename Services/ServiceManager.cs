@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Domain.Contracts;
-using Service.CoreServices.CarMservices;
+﻿using Service.CoreServices.CarMservices;
 
 using ServiceAbstraction;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -46,13 +39,15 @@ namespace Services
 
         public IProductCategoryService productCategoryService { get; }
         public IProductsService productsService { get; }
-        public IShoppingCartService shoppingCartService { get; } 
+        public IShoppingCartService shoppingCartService { get; }
 
         public IAdminService adminService { get; }
         public IActivityReportService activityReportService { get; }
+        public IRateService rateService { get; }
 
 
         public IReportsServices reportsServices { get; }
+        public IPaymentService paymentService { get; }
         #endregion
 
         public ServiceManager(
@@ -71,16 +66,22 @@ namespace Services
                     ICarMaintananceService carMaintananceService,
                     IMaintenanceTypesService maintenanceTypesService,
                     IEmailService emailService,
-                    IReverserRequestService reverserRequestService,
 
                     IProductCategoryService productCategoryService,
                     IProductsService productsService,
                     IShoppingCartService shoppingCartService,
+
+                    IReverserRequestService reverserRequestService,
+
                     IReportsServices reportsServices,
+                    IRateService rateService,
+
                     IAdminService adminService,
-                    IActivityReportService activityReportService)
+                    IActivityReportService activityReportService,
+                    IPaymentService paymentService)
 
         {
+            this.rateService = rateService;
             this.requestServices = requestServices;
             this.technicianService = technicianService;
             this.technicianRequestEmergency = _tech;
@@ -104,6 +105,7 @@ namespace Services
             this.reportsServices = reportsServices;
             this.adminService = adminService;
             this.activityReportService = activityReportService;
+            this.paymentService = paymentService;
         }
     }
 }

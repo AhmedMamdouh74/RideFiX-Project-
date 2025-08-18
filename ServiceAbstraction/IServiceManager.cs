@@ -41,8 +41,9 @@ namespace ServiceAbstraction
 
         IAdminService adminService { get; }
         IActivityReportService activityReportService { get; }
+        IRateService rateService { get; }
 
 
-
+        public IPaymentService paymentService { get; }
     }
 }

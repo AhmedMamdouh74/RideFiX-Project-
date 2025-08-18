@@ -3,7 +3,6 @@ using Domain.Contracts;
 using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
-using Microsoft.IdentityModel.Tokens;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation.CarOwnerSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
@@ -58,7 +57,7 @@ namespace Service.CoreServices.Admin
             if (user == null) throw new UsersNotFoundException(notFoundMessage);
 
             setActivation(user);
-
+            repo.Update(user);
             await unitOfWork.SaveChangesAsync();
 
         }
@@ -103,16 +102,16 @@ namespace Service.CoreServices.Admin
             => GetUsersAsync(new TechnicianWithUserAndReviewsSpec(), "there is no technicians");
 
         public Task BanTechnianAsync(int userId)
-            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = false);
+            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(userId), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = false);
 
         public Task BanCarOwnerAsync(int userId)
-            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = false);
+            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(userId), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = false);
 
         public Task ActivateTechnianAsync(int userId)
-            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = true);
+            => SetUserActivationAsync<Technician>(new TechnicianWithUserAndReviewsSpec(userId), userId, "there is no technician with this id", t => t.ApplicationUser.IsActivated = true);
 
         public Task ActivateCarOwonerAsync(int userId)
-            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = true);
+            => SetUserActivationAsync<CarOwner>(new CarOwnerWithUserAndReviewsSpec(userId), userId, "there is no car owner with this id", c => c.ApplicationUser.IsActivated = true);
 
         #endregion
 
@@ -160,13 +159,18 @@ namespace Service.CoreServices.Admin
 
         }
 
+
+
+
+
+        #endregion
         public async Task<object> GetrequestsCountAsync()
         {
             var requestRepo = unitOfWork.GetRepository<EmergencyRequest, int>();
 
             var allRequestsCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification());
 
-            var waitingRequestsCount = await requestRepo.CountAsync(new WaitingRequestSpecification());
+            var waitingRequestsCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification(RequestState.Waiting));
 
             return new
             {
@@ -174,52 +178,60 @@ namespace Service.CoreServices.Admin
                 WaitingRequestsCount = waitingRequestsCount
             };
         }
-
-
-
-        #endregion
         public async Task<object> GetDashboardStatisticsAsync()
         {
-            var techRepo = unitOfWork
-               .GetRepository<Technician, int>();
-            var techniciansCount = await techRepo
-               .CountAsync(new TechniciansSpecification());
+            var techRepo = unitOfWork.GetRepository<Technician, int>();
+            var carOwnerRepo = unitOfWork.GetRepository<CarOwner, int>();
 
-            var carOwnerRepo = unitOfWork
-                .GetRepository<CarOwner, int>();
-            var carOwnersCount = await carOwnerRepo
-                .CountAsync(new CarOwnerSpecification());
-
+            var techniciansCount = await techRepo.CountAsync(new TechniciansSpecification());
+            var carOwnersCount = await carOwnerRepo.CountAsync(new CarOwnerSpecification());
             var totalUsers = techniciansCount + carOwnersCount;
-            var firstDayOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-            var newTechCount = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayOfMonth));
-            var newCarOwnerCount = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayOfMonth));
-            var newUsersThisMonth = newTechCount + newCarOwnerCount;
-            var percentageNewThisMonth = totalUsers == 0 ? 0 : (double)newUsersThisMonth / totalUsers * 100;
+
+            // --- Dates ---
+            var firstDayThisMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+            var firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
+            var firstDayNextMonth = firstDayThisMonth.AddMonths(1);
+
+            // --- New users this month ---
+            var newTechCountThisMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayThisMonth));
+            var newCarOwnerCountThisMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayThisMonth));
+            var newUsersThisMonth = newTechCountThisMonth + newCarOwnerCountThisMonth;
+
+            // --- New users last month (between firstDayLastMonth and firstDayThisMonth) ---
+            var newTechCountLastMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayLastMonth, firstDayThisMonth));
+            var newCarOwnerCountLastMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayLastMonth, firstDayThisMonth));
+            var newUsersLastMonth = newTechCountLastMonth + newCarOwnerCountLastMonth;
+            // % growth difference
+            double diffNewUsersPercent;
+            if (newUsersLastMonth == 0)
+            {
+                diffNewUsersPercent = newUsersThisMonth > 0 ? 100 : 0; // avoid divide by zero
+            }
+            else
+            {
+                diffNewUsersPercent = Math.Round(((double)(newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100, 2);
+            }
+
+
+            // --- Avg Tech Rate ---
             var Technicians = await techRepo.GetAllWithSpecAsync(new TechnicianWithUserAndReviewsSpec());
-            var avgTechRate = Technicians.Any(t => t.reviews.Any()) ?
-                Math.Round(Technicians.Where(t => t.reviews.Any()).Average(t => t.reviews.Average(r => r.Rate)), 2)
+            var avgTechRate = Technicians.Any(t => t.reviews.Any())
+                ? Math.Round(Technicians.Where(t => t.reviews.Any()).Average(t => t.reviews.Average(r => r.Rate)), 2)
                 : 0;
 
-
-
-
-
             double GetUserPercent(int count) =>
-            totalUsers == 0 ? 0 : Math.Round((count / (double)totalUsers) * 100, 2);
+                totalUsers == 0 ? 0 : Math.Round((count / (double)totalUsers) * 100, 2);
 
             // --- Requests ---
-            var totalRequests = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication());
-            var completedCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Completed));
-            var waitingCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Waiting));
-            var activeCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Answered));
-            var canceledCount = await unitOfWork.GetRepository<EmergencyRequestTechnicians, int>().CountAsync(new EmergencyRequestTechnicanSpecefication(RequestState.Cancelled));
+            var requestRepo = unitOfWork.GetRepository<EmergencyRequest, int>();
+            var totalRequests = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification());
+            var completedCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification(RequestState.Completed));
+            var waitingCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification(RequestState.Waiting));
+            var activeCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification(RequestState.Answered));
+            var canceledCount = await requestRepo.CountAsync(new EmergencyRequestTotalSpecification(RequestState.Cancelled));
 
             double GetRequestPercent(int count) =>
-            totalRequests == 0 ? 0 : Math.Round((count / (double)totalRequests) * 100, 2);
-
-
-
+                totalRequests == 0 ? 0 : Math.Round((count / (double)totalRequests) * 100, 2);
 
             return new
             {
@@ -227,7 +239,12 @@ namespace Service.CoreServices.Admin
                 {
                     Technicians = new { Count = techniciansCount, Percent = GetUserPercent(techniciansCount) },
                     CarOwners = new { Count = carOwnersCount, Percent = GetUserPercent(carOwnersCount) },
-                    NewUsers = percentageNewThisMonth,
+                    Growth = new
+                    {
+                        ThisMonth = newUsersThisMonth,
+                        LastMonth = newUsersLastMonth,
+                        Difference = diffNewUsersPercent
+                    },
                     Rates = avgTechRate
                 },
                 Requests = new
@@ -239,5 +256,6 @@ namespace Service.CoreServices.Admin
                 }
             };
         }
+
     }
 }

@@ -14,10 +14,13 @@ namespace Services.Specification_Implementation
     {
         #region Includes
         public Expression<Func<T, bool>> Criteria { get; private set; }
+        public List<string> IncludeStrings { get; } = new List<string>();
+
         public Specification(Expression<Func<T, bool>> _criteria)
         {
             Criteria = _criteria;
         }
+
         public Specification()
         {
             Criteria = null;
@@ -30,6 +33,11 @@ namespace Services.Specification_Implementation
         public void AddInclude(Expression<Func<T, object>> includeExpression)
         {
             Includes.Add(includeExpression);
+        }
+
+        public void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
         }
         #endregion
 
