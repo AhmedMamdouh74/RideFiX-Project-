@@ -46,6 +46,8 @@ namespace Presistence.Data
         public DbSet<Category> pCategory { get; set; }
         public DbSet<Report> reports { get; set; }
         public DbSet<Rate> ProductRate { get; set; }
+
         public DbSet<CoinChargeEntity> CoinChargeEntities { get; set; }
+
     }
 }
