@@ -4,6 +4,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Hangfire;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
+using Service.Specification_Implementation.CarOwnerSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -216,7 +217,10 @@ namespace Service.CoreServices.EmergencyReqServices
                 default:
                     throw new TechnicianBadRequestException($"Unsupported RequestState '{dto.RequestState}'.");
             }
-
+            var spec = new CarOwnerWithAppUserSpecification(request.CarOwnerId);
+            var carowner =await  unitOfWork.GetRepository<CarOwner, int>().GetByIdAsync(spec);
+            technician.ApplicationUser.Coins -= 50;
+            carowner.ApplicationUser.Coins -= 50;
             await unitOfWork.SaveChangesAsync();
             BackgroundJob.Schedule(() => DisableCancelAsync(dto.RequestId), TimeSpan.FromMinutes(5));
 
