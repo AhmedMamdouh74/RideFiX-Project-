@@ -44,6 +44,6 @@ namespace ServiceAbstraction
         IRateService rateService { get; }
 
 
-
+        public IPaymentService paymentService { get; }
     }
 }
