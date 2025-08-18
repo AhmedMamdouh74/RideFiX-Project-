@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Domain.Entities.credit;
 using Domain.Entities.e_Commerce;
 using Domain.Entities.IdentityEntities;
 using Domain.Entities.PaymentEntites;
