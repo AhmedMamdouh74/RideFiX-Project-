@@ -20,18 +20,18 @@ namespace Presentation.Controllers
             _serviceManager = serviceManager;
         }
 
-        [HttpGet("PaymentInt/{Id}")]
-        public async Task<IActionResult> ProcessPayment(int Id)
+        [HttpGet("PaymentInt/{coins}")]
+        public async Task<IActionResult> ProcessPayment(int coins)
         {
-            var result = await _serviceManager.paymentService.CreateOrUpdatePaymentIntentRideCoinsAsync(Id);
+            var result = await _serviceManager.paymentService.CreateOrUpdatePaymentIntentRideCoinsAsync(coins);
             return Ok(result);
         }
 
-        [HttpPost("InitializePayment")]
-        public async Task<IActionResult> InitializePayment(int coins)
-        {
-            var Id = await _serviceManager.paymentService.CreateChargeEntityAsync(coins);
-            return Ok(Id);
-        }
+        //[HttpPost("InitializePayment")]
+        //public async Task<IActionResult> InitializePayment(int coins)
+        //{
+        //    var Id = await _serviceManager.paymentService.CreateChargeEntityAsync(coins);
+        //    return Ok(Id);
+        //}
     }
 }

@@ -22,8 +22,9 @@ namespace Service.CoreServices.PaymentService
             this.configuration = configuration;
         }
 
-        public async Task<RideCoinsPaymentDto> CreateOrUpdatePaymentIntentRideCoinsAsync(int CoinChargeId)
+        public async Task<RideCoinsPaymentDto> CreateOrUpdatePaymentIntentRideCoinsAsync(int coins)
         {
+            var CoinChargeId = await CreateChargeEntityAsync(coins);
             // Config Stripe
             StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
             // Get Coin Top Up
