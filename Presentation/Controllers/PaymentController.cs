@@ -25,7 +25,7 @@ namespace Presentation.Controllers
         [HttpGet("PaymentInt/{coins}")]
         public async Task<IActionResult> ProcessPayment(int coins)
         {
-            var result = await _serviceManager.paymentService.CreateOrUpdatePaymentIntentRideCoinsAsync(coins);
+             var result = await _serviceManager.paymentService.CreateOrUpdatePaymentIntentRideCoinsAsync(coins);
             return Ok(result);
         }
 

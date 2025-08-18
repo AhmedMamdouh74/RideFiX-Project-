@@ -69,7 +69,7 @@ namespace Presistence.Migrations
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
-                    b.ToTable("cars");
+                    b.ToTable("cars", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.CarMaintenanceRecord", b =>
@@ -111,7 +111,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("MaintenanceTypeId");
 
-                    b.ToTable("carMaintenanceRecords");
+                    b.ToTable("carMaintenanceRecords", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
@@ -134,7 +134,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MaintenanceTypes");
+                    b.ToTable("MaintenanceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.CarOwner", b =>
@@ -153,7 +153,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("carOwners");
+                    b.ToTable("carOwners", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.ChatSession", b =>
@@ -185,7 +185,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("chatSessions");
+                    b.ToTable("chatSessions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", b =>
@@ -238,7 +238,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("categoryId");
 
-                    b.ToTable("emergencyRequests");
+                    b.ToTable("emergencyRequests", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequestTechnicians", b =>
@@ -259,7 +259,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("EmergencyRequestTechnicians");
+                    b.ToTable("EmergencyRequestTechnicians", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Message", b =>
@@ -294,7 +294,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ChatSessionId");
 
-                    b.ToTable("messages");
+                    b.ToTable("messages", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.MessageAttachment", b =>
@@ -310,7 +310,7 @@ namespace Presistence.Migrations
                     b.HasIndex("MessageId")
                         .IsUnique();
 
-                    b.ToTable("MessageAttachment");
+                    b.ToTable("MessageAttachment", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.RequestAttachment", b =>
@@ -323,7 +323,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("EmergencyRequestId", "AttachmentUrl");
 
-                    b.ToTable("RequestAttachment");
+                    b.ToTable("RequestAttachment", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Review", b =>
@@ -364,7 +364,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("reviews");
+                    b.ToTable("reviews", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.TCategory", b =>
@@ -389,7 +389,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories");
+                    b.ToTable("categories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.TechReverseRequest", b =>
@@ -418,7 +418,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("TechReverseRequest");
+                    b.ToTable("TechReverseRequest", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Technician", b =>
@@ -450,7 +450,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("technicians");
+                    b.ToTable("technicians", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
@@ -463,7 +463,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("ApplicationUserId", "ConnectionId");
 
-                    b.ToTable("UserConnectionIds");
+                    b.ToTable("UserConnectionIds", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
@@ -595,7 +595,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CoinChargeEntities");
+                    b.ToTable("CoinChargeEntities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
@@ -632,7 +632,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("reports");
+                    b.ToTable("reports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.credit.CoinTopUp", b =>
@@ -673,7 +673,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("coinChargeEntityId");
 
-                    b.ToTable("CoinTopUps");
+                    b.ToTable("CoinTopUps", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
@@ -694,7 +694,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("pCategory");
+                    b.ToTable("pCategory", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
@@ -717,7 +717,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("orders");
+                    b.ToTable("orders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
@@ -746,7 +746,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("orderItems");
+                    b.ToTable("orderItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
@@ -786,7 +786,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("products");
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Rate", b =>
@@ -820,7 +820,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProductRate");
+                    b.ToTable("ProductRate", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
