@@ -38,7 +38,7 @@ namespace Service.CoreServices.EmergencyReqServices
             var rechRequestRepo = unitOfWork.GetRepository<TechReverseRequest, int>();
             TechReverseRequest isTechnicanExists = await rechRequestRepo.GetByIdAsync(new TechReverseRequestSpec(emergencyRequestDTO.RequestId, emergencyRequestDTO.UserId));
 
-            if (requestToUpdate != null && isTechnicanExists == null)
+            if (requestToUpdate != null && isTechnicanExists == null && technician.ApplicationUser.Coins >= 50 )
             {
                 requestToUpdate.TechReverseRequests.Add(new TechReverseRequest
                 {
@@ -165,8 +165,13 @@ namespace Service.CoreServices.EmergencyReqServices
             if (technician is null)
                 throw new TechnicianBadRequestException("Invalid technician credentials: TechnicianId or PIN is incorrect.");
 
-            // 2) Load request + links 
-            var request = await LoadRequestWithLinksAsync(dto.RequestId);
+            if (technician.ApplicationUser.Coins < 50)
+            {
+                throw new NoSufeciantAmountOfMoneyBadRequestException();
+            }
+
+                // 2) Load request + links 
+                var request = await LoadRequestWithLinksAsync(dto.RequestId);
             if (request is null)
                 throw new TRequestNotFoundException($"Emergency request with Id={dto.RequestId} was not found.");
 
