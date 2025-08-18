@@ -4,6 +4,7 @@ using Domain.Entities.CoreEntites.EmergencyEntities;
 using Hangfire;
 using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
+using Service.Specification_Implementation.CarOwnerSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions;
@@ -216,7 +217,10 @@ namespace Service.CoreServices.EmergencyReqServices
                 default:
                     throw new TechnicianBadRequestException($"Unsupported RequestState '{dto.RequestState}'.");
             }
-
+            var spec = new CarOwnerWithAppUserSpecification(request.CarOwnerId);
+            var carowner =await  unitOfWork.GetRepository<CarOwner, int>().GetByIdAsync(spec);
+            technician.ApplicationUser.Coins -= 50;
+            carowner.ApplicationUser.Coins -= 50;
             await unitOfWork.SaveChangesAsync();
             BackgroundJob.Schedule(() => DisableCancelAsync(dto.RequestId), TimeSpan.FromMinutes(5));
 
@@ -230,7 +234,7 @@ namespace Service.CoreServices.EmergencyReqServices
         }
 
 
-        // helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
+        #region helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
 
         private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
         {
@@ -256,7 +260,7 @@ namespace Service.CoreServices.EmergencyReqServices
             var spec = new TechnicianActiveAnsweredRequestsSpec(technicianId);
             var active = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(spec);
 
-            return active.Count(r => !r.IsCompleted) >= 2;
+            return active.Count(r => !r.IsCompleted) >= 1;
         }
 
         private bool AnotherTechnicianAlreadyAccepted(EmergencyRequest request)
@@ -288,6 +292,7 @@ namespace Service.CoreServices.EmergencyReqServices
                     l.CallStatus = RequestState.Rejected;
             }
         }
+        #endregion
 
 
 

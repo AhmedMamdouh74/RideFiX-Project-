@@ -164,6 +164,7 @@ namespace Service.CoreServices.EmergencyReqServices
         #endregion
 
         #endregion
+
         public async Task CompleteRequest(int requestId)
         {
             var emergencyRequest = await unitOfWork.GetRepository<EmergencyRequest, int>().GetByIdAsync(requestId);
