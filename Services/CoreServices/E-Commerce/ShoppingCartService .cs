@@ -130,7 +130,7 @@ namespace Service.CoreServices.E_Commerce
             }
 
         }
-        private string GetUserId ()
+        public string GetUserId ()
         {
             var user = httpContextAccessor.HttpContext?.User;
             if (user == null || !user.Identity.IsAuthenticated)
