@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts;
 using Domain.Entities.credit;
+using Domain.Entities.IdentityEntities;
 using Domain.Entities.PaymentEntites;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Service.CoreServices.E_Commerce;
 using Service.Exception_Implementation.ArgumantNullException;
@@ -22,11 +24,17 @@ namespace Service.CoreServices.PaymentService
         private readonly IUnitOfWork unitOfWork;
         private IConfiguration configuration;
         private readonly IShoppingCartService shoppingCartService;
-        public PaymentService(IUnitOfWork unitOfWork, IConfiguration configuration, IShoppingCartService shoppingCartService)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public PaymentService(IUnitOfWork unitOfWork,
+            IConfiguration configuration, 
+            IShoppingCartService shoppingCartService,
+            UserManager<ApplicationUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.configuration = configuration;
             this.shoppingCartService = shoppingCartService;
+            _userManager = userManager;
         }
 
         public async Task<RideCoinsPaymentDto> CreateOrUpdatePaymentIntentRideCoinsAsync(int coins)
@@ -88,7 +96,6 @@ namespace Service.CoreServices.PaymentService
             return coinChargeEntity.Id;
         }
 
-
         public async Task CreateTransaction(int CoinChargeId)
         {
             if (CoinChargeId <= 0)
@@ -105,12 +112,21 @@ namespace Service.CoreServices.PaymentService
             {
                 throw new PaymentArgumentException("Coin Charge Entity not found");
             }
+            ApplicationUser applicationUser = await GetApplicationUser();
+            applicationUser.Coins += coinChargeEntity.Coins;
+
+            var result = await _userManager.UpdateAsync(applicationUser);
+            if(!result.Succeeded)
+            {
+                throw new PaymentArgumentException("can not save in data base");
+            }
             var coinTopUp = new CoinTopUp()
             {
                 UserId = shoppingCartService.GetUserId(),
                 coinChargeEntityId = coinChargeEntity.Id
             };
             await unitOfWork.GetRepository<CoinTopUp, int>().AddAsync(coinTopUp);
+
             //coinChargeEntity.IsPaid = true;
             await unitOfWork.SaveChangesAsync();
 
@@ -130,6 +146,33 @@ namespace Service.CoreServices.PaymentService
             }
             return coinTopUp.FirstOrDefault();
 
+        }
+
+        public async Task<ApplicationUser> GetApplicationUser()
+        {
+            string userId = shoppingCartService.GetUserId();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new PaymentArgumentException("User ID cannot be null or empty.");
+            }
+            var applicationUser = await _userManager.FindByIdAsync(userId);
+            if (applicationUser == null)
+            {
+                throw new PaymentArgumentException("User not found.");
+            }
+            if (applicationUser.Coins < 0)
+            {
+                throw new PaymentArgumentException("Personal coins cannot be negative.");
+            }
+            return applicationUser;
+
+        }
+
+        public async Task<int> GetPersonalCoins()
+        {
+            var applicationUser = await GetApplicationUser();
+            return applicationUser.Coins;
+           
         }
     }
 }
