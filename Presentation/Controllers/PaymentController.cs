@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities.credit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using SharedData.DTOs.Payment;
+using SharedData.Wrapper;
 
 namespace Presentation.Controllers
 {
@@ -32,6 +34,13 @@ namespace Presentation.Controllers
         {
             var Id = await _serviceManager.paymentService.CreateChargeEntityAsync(coins);
             return Ok(Id);
+        }
+
+        [HttpPost("createTransaction/{Id}")]
+        public async Task<IActionResult> GetPaymentIntent(int Id)
+        {
+            await _serviceManager.paymentService.CreateTransaction(Id);
+            return Ok(ApiResponse<CoinTopUp>.SuccessResponse(null, "Transaction successfully created"));
         }
     }
 }

@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts;
+using Domain.Entities.credit;
 using Domain.Entities.PaymentEntites;
 using Microsoft.Extensions.Configuration;
+using Service.CoreServices.E_Commerce;
+using Service.Exception_Implementation.ArgumantNullException;
+using Service.Specification_Implementation.PaymentSpecification;
 using ServiceAbstraction.CoreServicesAbstractions;
+using ServiceAbstraction.CoreServicesAbstractions.E_Commerce_Abstraction;
 using SharedData.DTOs.Payment;
 using Stripe;
 
@@ -16,10 +21,12 @@ namespace Service.CoreServices.PaymentService
     {
         private readonly IUnitOfWork unitOfWork;
         private IConfiguration configuration;
-        public PaymentService(IUnitOfWork unitOfWork, IConfiguration configuration)
+        private readonly IShoppingCartService shoppingCartService;
+        public PaymentService(IUnitOfWork unitOfWork, IConfiguration configuration, IShoppingCartService shoppingCartService)
         {
             this.unitOfWork = unitOfWork;
             this.configuration = configuration;
+            this.shoppingCartService = shoppingCartService;
         }
 
         public async Task<RideCoinsPaymentDto> CreateOrUpdatePaymentIntentRideCoinsAsync(int CoinChargeId)
@@ -78,6 +85,50 @@ namespace Service.CoreServices.PaymentService
             await repository.AddAsync(coinChargeEntity);
             await unitOfWork.SaveChangesAsync();
             return coinChargeEntity.Id;
+        }
+
+
+        public async Task CreateTransaction(int CoinChargeId)
+        {
+            if (CoinChargeId <= 0)
+            {
+                throw new PaymentArgumentException("Invalid Coin Charge ID");
+            }
+            var coin = await GetCoinTopUpByChargeEntityId(CoinChargeId);
+            if (coin != null)
+            {
+                throw new PaymentArgumentException("Coin Top Up already exists for this charge entity");
+            }
+            var coinChargeEntity = await unitOfWork.GetRepository<CoinChargeEntity, int>().GetByIdAsync(CoinChargeId);
+            if (coinChargeEntity == null)
+            {
+                throw new PaymentArgumentException("Coin Charge Entity not found");
+            }
+            var coinTopUp = new CoinTopUp()
+            {
+                UserId = shoppingCartService.GetUserId(),
+                coinChargeEntityId = coinChargeEntity.Id
+            };
+            await unitOfWork.GetRepository<CoinTopUp, int>().AddAsync(coinTopUp);
+            //coinChargeEntity.IsPaid = true;
+            await unitOfWork.SaveChangesAsync();
+
+        }
+
+        public async Task<CoinTopUp> GetCoinTopUpByChargeEntityId(int ChargeEntityId)
+        {
+            if (ChargeEntityId <= 0)
+            {
+                throw new PaymentArgumentException("Invalid Charge Entity ID");
+            }
+            var spec = new GetPaymentEntentIdSpecification(ChargeEntityId);
+            var coinTopUp = await unitOfWork.GetRepository<CoinTopUp, int>().GetAllAsync(spec);
+            if (coinTopUp == null || !coinTopUp.Any())
+            {
+                return null;
+            }
+            return coinTopUp.FirstOrDefault();
+
         }
     }
 }
