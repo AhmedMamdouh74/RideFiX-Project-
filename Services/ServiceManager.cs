@@ -47,6 +47,9 @@ namespace Services
 
 
         public IReportsServices reportsServices { get; }
+        public IPaymentService paymentService { get; }
+
+        public IOrderService orderService { get; }
         #endregion
 
         public ServiceManager(
@@ -71,13 +74,16 @@ namespace Services
                     IShoppingCartService shoppingCartService,
 
                     IReverserRequestService reverserRequestService,
-
+                    IOrderService orderService,
                     IReportsServices reportsServices,
                     IRateService rateService,
+
                     IAdminService adminService,
-                    IActivityReportService activityReportService)
+                    IActivityReportService activityReportService,
+                    IPaymentService paymentService)
 
         {
+            this.orderService = orderService;
             this.rateService = rateService;
             this.requestServices = requestServices;
             this.technicianService = technicianService;
@@ -102,6 +108,7 @@ namespace Services
             this.reportsServices = reportsServices;
             this.adminService = adminService;
             this.activityReportService = activityReportService;
+            this.paymentService = paymentService;
         }
     }
 }

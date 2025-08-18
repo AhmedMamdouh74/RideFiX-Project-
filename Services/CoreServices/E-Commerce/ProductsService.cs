@@ -134,5 +134,7 @@ namespace Service.CoreServices.E_Commerce
             var productsDto = mapper.Map<List<ProductBreifDTO>>(products);
             return productsDto;
         }
+
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817092246_ add payment history")]
+    partial class addpaymenthistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -481,9 +484,6 @@ namespace Presistence.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Coins")
-                        .HasColumnType("int");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -511,9 +511,6 @@ namespace Presistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActivated")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsProfilePicUploaded")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -546,8 +543,8 @@ namespace Presistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ProfilePic")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RideCoins")
+                        .HasColumnType("int");
 
                     b.Property<string>("SSN")
                         .IsRequired()
@@ -579,34 +576,6 @@ namespace Presistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.PaymentEntites.CoinChargeEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<long>("AmountCents")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ClientSecret")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Coins")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentIntentId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CoinChargeEntities");
-                });
-
             modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
                 {
                     b.Property<int>("Id")
@@ -633,9 +602,6 @@ namespace Presistence.Migrations
                     b.Property<int>("RequestId")
                         .HasColumnType("int");
 
-                    b.Property<int>("reportState")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ReportedUserId");
@@ -655,18 +621,41 @@ namespace Presistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<long>("AmountCents")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Coins")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsApplied")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StripePaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StripeSessionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("coinChargeEntityId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("coinChargeEntityId");
-
-                    b.ToTable("CoinTopUps");
+                    b.ToTable("CoinTopUp");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
@@ -1202,17 +1191,6 @@ namespace Presistence.Migrations
                     b.Navigation("ReportingUser");
 
                     b.Navigation("Request");
-                });
-
-            modelBuilder.Entity("Domain.Entities.credit.CoinTopUp", b =>
-                {
-                    b.HasOne("Domain.Entities.PaymentEntites.CoinChargeEntity", "coinChargeEntity")
-                        .WithMany()
-                        .HasForeignKey("coinChargeEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("coinChargeEntity");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
