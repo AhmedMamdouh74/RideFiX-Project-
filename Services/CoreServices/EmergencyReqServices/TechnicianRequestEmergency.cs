@@ -260,7 +260,7 @@ namespace Service.CoreServices.EmergencyReqServices
             var spec = new TechnicianActiveAnsweredRequestsSpec(technicianId);
             var active = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(spec);
 
-            return active.Count(r => !r.IsCompleted) >= 2;
+            return active.Count(r => !r.IsCompleted) >= 1;
         }
 
         private bool AnotherTechnicianAlreadyAccepted(EmergencyRequest request)
