@@ -3,14 +3,19 @@ using Domain.Contracts;
 using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
+using Domain.Entities.Reporting;
+using Microsoft.AspNetCore.Mvc;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation.CarOwnerSpecifications;
+using Service.Specification_Implementation.ChatSessionsSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using Services.Specification_Implementation.Emergency;
 using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
+using SharedData.DTOs.MessegeDTOs;
+using SharedData.DTOs.ReportDtos;
 using SharedData.Enums;
 
 namespace Service.CoreServices.Admin
@@ -164,6 +169,8 @@ namespace Service.CoreServices.Admin
 
 
         #endregion
+
+        #region requests
         public async Task<object> GetrequestsCountAsync()
         {
             var requestRepo = unitOfWork.GetRepository<EmergencyRequest, int>();
@@ -178,6 +185,9 @@ namespace Service.CoreServices.Admin
                 WaitingRequestsCount = waitingRequestsCount
             };
         }
+        #endregion
+
+        #region Dashbord Statistics
         public async Task<object> GetDashboardStatisticsAsync()
         {
             var techRepo = unitOfWork.GetRepository<Technician, int>();
@@ -193,24 +203,12 @@ namespace Service.CoreServices.Admin
             var firstDayNextMonth = firstDayThisMonth.AddMonths(1);
 
             // --- New users this month ---
-            var newTechCountThisMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayThisMonth));
-            var newCarOwnerCountThisMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayThisMonth));
-            var newUsersThisMonth = newTechCountThisMonth + newCarOwnerCountThisMonth;
+            int newUsersThisMonth = await GetNewUsersForThisMonth(techRepo, carOwnerRepo, firstDayThisMonth);
 
             // --- New users last month (between firstDayLastMonth and firstDayThisMonth) ---
-            var newTechCountLastMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayLastMonth, firstDayThisMonth));
-            var newCarOwnerCountLastMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayLastMonth, firstDayThisMonth));
-            var newUsersLastMonth = newTechCountLastMonth + newCarOwnerCountLastMonth;
+            int newUsersLastMonth = await GetNewUsersForLastMonth(techRepo, carOwnerRepo, firstDayThisMonth, firstDayLastMonth);
             // % growth difference
-            double diffNewUsersPercent;
-            if (newUsersLastMonth == 0)
-            {
-                diffNewUsersPercent = newUsersThisMonth > 0 ? 100 : 0; // avoid divide by zero
-            }
-            else
-            {
-                diffNewUsersPercent = Math.Round(((double)(newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100, 2);
-            }
+            double diffNewUsersPercent = CountNewUsersFromPastMonthInPrecent(newUsersThisMonth, newUsersLastMonth);
 
 
             // --- Avg Tech Rate ---
@@ -256,6 +254,105 @@ namespace Service.CoreServices.Admin
                 }
             };
         }
+
+        private static async Task<int> GetNewUsersForLastMonth(IGenericRepository<Technician, int> techRepo, IGenericRepository<CarOwner, int> carOwnerRepo, DateTime firstDayThisMonth, DateTime firstDayLastMonth)
+        {
+            var newTechCountLastMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayLastMonth, firstDayThisMonth));
+            var newCarOwnerCountLastMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayLastMonth, firstDayThisMonth));
+            var newUsersLastMonth = newTechCountLastMonth + newCarOwnerCountLastMonth;
+            return newUsersLastMonth;
+        }
+
+        private static async Task<int> GetNewUsersForThisMonth(IGenericRepository<Technician, int> techRepo, IGenericRepository<CarOwner, int> carOwnerRepo, DateTime firstDayThisMonth)
+        {
+            var newTechCountThisMonth = await techRepo.CountAsync(new TechnicianWithAppUserSpec(firstDayThisMonth));
+            var newCarOwnerCountThisMonth = await carOwnerRepo.CountAsync(new CarOwnerSpecification(firstDayThisMonth));
+            var newUsersThisMonth = newTechCountThisMonth + newCarOwnerCountThisMonth;
+            return newUsersThisMonth;
+        }
+
+        private static double CountNewUsersFromPastMonthInPrecent(int newUsersThisMonth, int newUsersLastMonth)
+        {
+            double diffNewUsersPercent;
+            if (newUsersLastMonth == 0)
+            {
+                diffNewUsersPercent = newUsersThisMonth > 0 ? 100 : 0; // avoid divide by zero
+            }
+            else
+            {
+                diffNewUsersPercent = Math.Round(((double)(newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100, 2);
+            }
+
+            return diffNewUsersPercent;
+        }
+        #endregion
+
+        #region reports
+        public async Task<object> GetReportsAsync()
+        {
+            var reportRepo = unitOfWork.GetRepository<Report, int>();
+            var techRepo = unitOfWork.GetRepository<Technician, int>();
+            var carOwnerRepo = unitOfWork.GetRepository<CarOwner, int>();
+            var chatRepo = unitOfWork.GetRepository<ChatSession, int>();
+
+            var reports = await reportRepo.GetAllAsync();
+            if (reports == null || !reports.Any())
+                throw new ReportNotFoundException("There are no reports in DB");
+
+            var technicians = await techRepo.GetAllAsync(new TechniciansSpecification());
+            var carOwners = await carOwnerRepo.GetAllAsync(new CarOwnerSpecification());
+
+            var reportDTOs = await Task.WhenAll(reports.Select(async report =>
+            {
+                // Find ReportingUser
+                var reportingTech = technicians.FirstOrDefault(t => t.ApplicationUserId == report.ReportingUserId);
+                var reportingCarOwner = carOwners.FirstOrDefault(c => c.ApplicationUserId == report.ReportingUserId);
+
+                // Find ReportedUser
+                var reportedTech = technicians.FirstOrDefault(t => t.ApplicationUserId == report.ReportedUserId);
+                var reportedCarOwner = carOwners.FirstOrDefault(c => c.ApplicationUserId == report.ReportedUserId);
+
+                // IDs for chat lookup
+                var techId = reportingTech?.Id ?? reportedTech?.Id ?? 0;
+                var carOwnerId = reportingCarOwner?.Id ?? reportedCarOwner?.Id ?? 0;
+
+                // Get chats between this pair
+                var chats = await chatRepo.GetAllAsync(new ChatSessionBetweenParticipantsSpec(carOwnerId, techId));
+               
+
+                return new ReadReportDTO
+                {
+                    Description = report.Description,
+                    CreatedAt = report.CreatedAt,
+                    ReportingUserId = report.ReportingUserId,
+                    ReportingUserRole = reportingTech != null ? "Technician" : "CarOwner",
+                    ReportingEntityId = reportingTech?.Id ?? reportingCarOwner?.Id ?? 0,
+                    ReportedUserId = report.ReportedUserId,
+                    ReportedUserRole = reportedTech != null ? "Technician" : "CarOwner",
+                    ReportedEntityId = reportedTech?.Id ?? reportedCarOwner?.Id ?? 0,
+                    RequestId = report.RequestId,
+                    TechnicianName = reportedTech != null ? reportedTech.ApplicationUser.Name : reportingTech?.ApplicationUser.Name,
+                    CarOwnerName = reportedCarOwner != null? reportedCarOwner?.ApplicationUser.Name :reportingCarOwner?.ApplicationUser.Name,
+
+
+                    Messages = chats.SelectMany(c => c.massages).Select(m => new ReadMessageDTO
+                    {
+                        MessageId = m.Id,
+                        Text = m.Text,
+                        SentAt = m.SentAt,
+                        IsSeen = m.IsSeen,
+                        SenderId = m.ApplicationId,
+                        SenderName = m.ApplicationUser?.Name
+
+                    }).ToList()
+                };
+            }));
+
+            return new { Reports = reportDTOs };
+        }
+
+        #endregion
+
 
     }
 }
