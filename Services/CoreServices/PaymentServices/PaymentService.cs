@@ -64,5 +64,20 @@ namespace Service.CoreServices.PaymentService
                 PaymentIntentId = coinPaidRequest.PaymentIntentId
             };
         }
+
+        public async Task<int> CreateChargeEntityAsync(int Coins)
+        {
+            var repository = unitOfWork.GetRepository<CoinChargeEntity, int>();
+            var coinChargeEntity = new CoinChargeEntity
+            {
+                Coins = Coins,
+                AmountCents = Coins * 100, // Assuming 1 coin = 1 USD
+                ClientSecret = null,
+                PaymentIntentId = null
+            };
+            await repository.AddAsync(coinChargeEntity);
+            await unitOfWork.SaveChangesAsync();
+            return coinChargeEntity.Id;
+        }
     }
 }

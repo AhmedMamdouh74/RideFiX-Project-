@@ -10,5 +10,6 @@ namespace ServiceAbstraction.CoreServicesAbstractions
     public interface IPaymentService
     {
         public Task<RideCoinsPaymentDto> CreateOrUpdatePaymentIntentRideCoinsAsync(int CoinChargeId);
+        public Task<int> CreateChargeEntityAsync(int Coins);
     }
 }
