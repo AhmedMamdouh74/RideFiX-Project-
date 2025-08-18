@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Presistence.Data;
 
@@ -11,9 +12,11 @@ using Presistence.Data;
 namespace Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250818103935_ add tranaction history")]
+    partial class addtranactionhistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,7 +72,7 @@ namespace Presistence.Migrations
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
-                    b.ToTable("cars", (string)null);
+                    b.ToTable("cars");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.CarMaintenanceRecord", b =>
@@ -111,7 +114,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("MaintenanceTypeId");
 
-                    b.ToTable("carMaintenanceRecords", (string)null);
+                    b.ToTable("carMaintenanceRecords");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.CarMaintenance_Entities.MaintenanceTypes", b =>
@@ -134,7 +137,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MaintenanceTypes", (string)null);
+                    b.ToTable("MaintenanceTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.CarOwner", b =>
@@ -153,7 +156,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("carOwners", (string)null);
+                    b.ToTable("carOwners");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.ChatSession", b =>
@@ -185,7 +188,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("chatSessions", (string)null);
+                    b.ToTable("chatSessions");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequest", b =>
@@ -238,7 +241,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("categoryId");
 
-                    b.ToTable("emergencyRequests", (string)null);
+                    b.ToTable("emergencyRequests");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.EmergencyRequestTechnicians", b =>
@@ -259,7 +262,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("EmergencyRequestTechnicians", (string)null);
+                    b.ToTable("EmergencyRequestTechnicians");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Message", b =>
@@ -294,7 +297,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ChatSessionId");
 
-                    b.ToTable("messages", (string)null);
+                    b.ToTable("messages");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.MessageAttachment", b =>
@@ -310,7 +313,7 @@ namespace Presistence.Migrations
                     b.HasIndex("MessageId")
                         .IsUnique();
 
-                    b.ToTable("MessageAttachment", (string)null);
+                    b.ToTable("MessageAttachment");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.RequestAttachment", b =>
@@ -323,7 +326,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("EmergencyRequestId", "AttachmentUrl");
 
-                    b.ToTable("RequestAttachment", (string)null);
+                    b.ToTable("RequestAttachment");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Review", b =>
@@ -364,7 +367,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("reviews", (string)null);
+                    b.ToTable("reviews");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.TCategory", b =>
@@ -389,7 +392,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.TechReverseRequest", b =>
@@ -418,7 +421,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("TechReverseRequest", (string)null);
+                    b.ToTable("TechReverseRequest");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.Technician", b =>
@@ -450,7 +453,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("technicians", (string)null);
+                    b.ToTable("technicians");
                 });
 
             modelBuilder.Entity("Domain.Entities.CoreEntites.EmergencyEntities.UserConnectionIds", b =>
@@ -463,7 +466,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("ApplicationUserId", "ConnectionId");
 
-                    b.ToTable("UserConnectionIds", (string)null);
+                    b.ToTable("UserConnectionIds");
                 });
 
             modelBuilder.Entity("Domain.Entities.IdentityEntities.ApplicationUser", b =>
@@ -510,9 +513,6 @@ namespace Presistence.Migrations
                     b.Property<bool>("IsActivated")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsProfilePicUploaded")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -542,9 +542,6 @@ namespace Presistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("ProfilePic")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SSN")
                         .IsRequired()
@@ -601,7 +598,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CoinChargeEntities", (string)null);
+                    b.ToTable("CoinChargeEntities");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reporting.Report", b =>
@@ -638,7 +635,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("reports", (string)null);
+                    b.ToTable("reports");
                 });
 
             modelBuilder.Entity("Domain.Entities.credit.CoinTopUp", b =>
@@ -679,7 +676,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("coinChargeEntityId");
 
-                    b.ToTable("CoinTopUps", (string)null);
+                    b.ToTable("CoinTopUps");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Category", b =>
@@ -700,7 +697,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("pCategory", (string)null);
+                    b.ToTable("pCategory");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Order", b =>
@@ -723,7 +720,7 @@ namespace Presistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("orders", (string)null);
+                    b.ToTable("orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.OrderItem", b =>
@@ -752,7 +749,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("orderItems", (string)null);
+                    b.ToTable("orderItems");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Product", b =>
@@ -792,7 +789,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("products", (string)null);
+                    b.ToTable("products");
                 });
 
             modelBuilder.Entity("Domain.Entities.e_Commerce.Rate", b =>
@@ -826,7 +823,7 @@ namespace Presistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProductRate", (string)null);
+                    b.ToTable("ProductRate");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
