@@ -225,7 +225,7 @@ namespace Service.CoreServices.EmergencyReqServices
         }
 
 
-        // helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
+        #region helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
 
         private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
         {
@@ -283,6 +283,7 @@ namespace Service.CoreServices.EmergencyReqServices
                     l.CallStatus = RequestState.Rejected;
             }
         }
+        #endregion
 
 
 
