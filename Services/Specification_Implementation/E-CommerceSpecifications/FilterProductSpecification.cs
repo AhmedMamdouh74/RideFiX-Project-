@@ -34,6 +34,12 @@ namespace Service.Specification_Implementation.E_CommerceSpecifications
                 int take = itemPerPage ?? 10;
                 ApplyPaging(skip, take);
             }
+            
+            else if (itemPerPage.HasValue)
+            {
+                ApplyPaging(0, itemPerPage.Value);
+            }
+          
             else
             {
                 ApplyPaging(0, 10);
