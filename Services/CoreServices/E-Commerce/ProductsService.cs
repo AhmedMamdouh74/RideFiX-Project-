@@ -80,6 +80,7 @@ namespace Service.CoreServices.E_Commerce
 
             var spec = new ProductSpecification(productId);
             var product = await unitOfWork.GetRepository<Product, int>().GetByIdAsync(spec);
+            Console.WriteLine(product.Id);
             if (product == null)
             {
                 throw new ProductArgumentException($"Product with ID {productId} not found.");
@@ -87,7 +88,6 @@ namespace Service.CoreServices.E_Commerce
 
             var productDto = mapper.Map<ProductWithRatesDTO>(product);
 
-            // حساب الريتات
             if (product.ProductRates != null && product.ProductRates.Any())
             {
                 productDto.TotalRatings = product.ProductRates.Count;
