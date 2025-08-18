@@ -234,7 +234,7 @@ namespace Service.CoreServices.EmergencyReqServices
         }
 
 
-        // helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
+        #region helper methods to apply clean code for UpdateRequestFromCarOwnerAsync()
 
         private async Task<Technician?> LoadTechnicianWithPinAsync(int technicianId, int pin)
         {
@@ -260,7 +260,7 @@ namespace Service.CoreServices.EmergencyReqServices
             var spec = new TechnicianActiveAnsweredRequestsSpec(technicianId);
             var active = await unitOfWork.GetRepository<EmergencyRequest, int>().GetAllAsync(spec);
 
-            return active.Count(r => !r.IsCompleted) >= 2;
+            return active.Count(r => !r.IsCompleted) >= 1;
         }
 
         private bool AnotherTechnicianAlreadyAccepted(EmergencyRequest request)
@@ -292,6 +292,7 @@ namespace Service.CoreServices.EmergencyReqServices
                     l.CallStatus = RequestState.Rejected;
             }
         }
+        #endregion
 
 
 
