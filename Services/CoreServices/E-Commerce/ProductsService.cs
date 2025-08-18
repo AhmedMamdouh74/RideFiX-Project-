@@ -97,7 +97,10 @@ namespace Service.CoreServices.E_Commerce
                 {
                     Value = r.Value,
                     Comment = r.Comment,
-                    CreatedAt = r.CreatedAt
+                    CreatedAt = r.CreatedAt,
+                    UserName = r.ApplicationUser.Name,
+                    UserId = r.ApplicationUser.Id
+
                 }).ToList();
             }
 

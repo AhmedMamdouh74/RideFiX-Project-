@@ -17,6 +17,10 @@ namespace Presistence
             {
                 query = query.Include(include);
             }
+            foreach (var includeStr in specification.IncludeStrings)
+            {
+                query = query.Include(includeStr); 
+            }
             if (specification.OrderBy != null)
             {
                 query = query.OrderBy(specification.OrderBy);
