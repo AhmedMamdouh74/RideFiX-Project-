@@ -510,6 +510,9 @@ namespace Presistence.Migrations
                     b.Property<bool>("IsActivated")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsProfilePicUploaded")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -539,6 +542,9 @@ namespace Presistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePic")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SSN")
                         .IsRequired()

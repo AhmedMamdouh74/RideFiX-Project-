@@ -25,6 +25,10 @@ namespace Service.Specification_Implementation.CarOwnerSpecifications
         {
 
         }
+        public CarOwnerSpecification(DateTime startDate,DateTime endDate) : base(c => c.ApplicationUser.CreatedAt >= startDate && c.ApplicationUser.CreatedAt < endDate)
+        {
+
+        }
     }
 
 }

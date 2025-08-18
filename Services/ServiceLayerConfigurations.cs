@@ -58,6 +58,7 @@ namespace Services
             Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 
 
+            Services.AddScoped<IRateService, RateService>();
 
             Services.AddScoped<IReportsServices, ReportsServices>();
 
