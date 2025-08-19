@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Hangfire;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
@@ -38,12 +39,14 @@ namespace Service.CoreServices.EmergencyReqServices
         private readonly IChatSessionService chatSessionService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ICarOwnerService carOwnerService;
+        private readonly IWebHostEnvironment env;
         public RequstServices(IUnitOfWork _unitOfWork,
             IMapper _mapper,
             ITechnicianService technicianService,
             IChatSessionService chatSessionService,
             IHttpContextAccessor httpContextAccessor,
-            ICarOwnerService carOwnerService)
+            ICarOwnerService carOwnerService,
+            IWebHostEnvironment env)
         {
 
             unitOfWork = _unitOfWork;
@@ -52,7 +55,8 @@ namespace Service.CoreServices.EmergencyReqServices
             this.chatSessionService = chatSessionService;
             this.httpContextAccessor = httpContextAccessor;
             this.carOwnerService = carOwnerService;
-            //this.serviceManager = serviceManager;
+            this.env = env;
+
         }
 
         #region Cancel methods
@@ -213,8 +217,32 @@ namespace Service.CoreServices.EmergencyReqServices
                         IsCompleted = false,
                         TimeStamp = DateTime.UtcNow,
                         EndTimeStamp = null,
-                        categoryId = request.categoryId
+                        categoryId = request.categoryId,
+                        requestAttachments = new List<RequestAttachment>()
                     };
+                    if (request.Attachments != null && request.Attachments.Any())
+                    {
+                        var uploadPath = Path.Combine(env.WebRootPath, "uploads");
+
+                        if (!Directory.Exists(uploadPath))
+                            Directory.CreateDirectory(uploadPath);
+
+                        foreach (var file in request.Attachments)
+                        {
+                            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                            emergancyRequest.requestAttachments.Add(new RequestAttachment
+                            {
+                               AttachmentUrl = filePath,
+
+                            });
+                        }
+                    }
                     await unitOfWork.GetRepository<EmergencyRequest, int>().AddAsync(emergancyRequest);
                     await unitOfWork.SaveChangesAsync();
 

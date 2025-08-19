@@ -35,6 +35,23 @@ namespace Service.CoreServices.CarMservices
             {
                 throw new CarBadRequestException();
             }
+            int ownerId = GetCarOwnerId();
+            var spec = new CarIdSpecification(ownerId);
+            var car = await unitOfWork.GetRepository<Car, int>().GetAllAsync(spec);
+            if (car != null && car.Any())
+            {
+                throw new CarBadRequestException("you already have a car");
+            }
+            var carRepo = unitOfWork.GetRepository<Car, int>();
+            var carEntity = mapper.Map<Car>(cardto);
+            carEntity.OwnerId = ownerId;
+            await carRepo.AddAsync(carEntity);
+            await unitOfWork.SaveChangesAsync();
+
+        }
+
+        private int GetCarOwnerId()
+        {
             var user = httpContextAccessor.HttpContext;
             if (user == null)
             {
@@ -50,18 +67,8 @@ namespace Service.CoreServices.CarMservices
             {
                 throw new CarBadRequestException();
             }
-            var spec = new CarIdSpecification(ownerId);
-            var car = await unitOfWork.GetRepository<Car, int>().GetAllAsync(spec);
-            if (car != null && car.Any())
-            {
-                throw new CarBadRequestException("you already have a car");
-            }
-            var carRepo = unitOfWork.GetRepository<Car, int>();
-            var carEntity = mapper.Map<Car>(cardto);
-            carEntity.OwnerId = ownerId;
-            await carRepo.AddAsync(carEntity);
-            await unitOfWork.SaveChangesAsync();
 
+            return ownerId;
         }
 
         public async Task<CarDetailsDto> GetCarDetailsAsync()
@@ -150,5 +157,23 @@ namespace Service.CoreServices.CarMservices
             await unitOfWork.SaveChangesAsync();
            
             }
+
+        public async Task EditCarKm(int AvgKmPerMonth)
+        {
+            if (AvgKmPerMonth <= 0)
+            {
+                throw new CarBadRequestException("AvgKmPerMonth must be greater than 0");
+            }
+            int carOwnerId = GetCarOwnerId();
+            int carId = await GetCarIdByOwnerId(carOwnerId);
+            var car = await unitOfWork.GetRepository<Car, int>().GetByIdAsync(carId);
+            if (car == null)
+            {
+                throw new CarNotFoundException();
+            }
+            car.AvgKmPerMonth = AvgKmPerMonth;
+            await unitOfWork.SaveChangesAsync();
+
+        }
     }
 }

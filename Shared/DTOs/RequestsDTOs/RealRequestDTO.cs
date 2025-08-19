@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -28,6 +29,8 @@ namespace SharedData.DTOs.RequestsDTOs
 
         [Required(ErrorMessage = "PIN is required.")]
         public int pin { get; set; }
+
+        public List<IFormFile> Attachments { get; set; }
 
     }
 }
