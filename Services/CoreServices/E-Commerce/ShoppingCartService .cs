@@ -112,7 +112,7 @@ namespace Service.CoreServices.E_Commerce
                     );
                 }
                 var cartItem = mapper.Map<CartItemDto>(product);
-                product.Quantity = quantity; 
+                cartItem.Quantity = quantity; 
                 cart.Add(cartItem);
             }
 
