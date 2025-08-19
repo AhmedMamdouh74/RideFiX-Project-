@@ -4,11 +4,12 @@ using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.Reporting;
-using Microsoft.AspNetCore.Mvc;
+using Service.Exception_Implementation.BadRequestExceptions;
 using Service.Exception_Implementation.NotFoundExceptions;
 using Service.Specification_Implementation.CarOwnerSpecifications;
 using Service.Specification_Implementation.ChatSessionsSpecifications;
 using Service.Specification_Implementation.RequestSpecifications;
+using Service.Specification_Implementation.ReviewSpecification;
 using Service.Specification_Implementation.TechnicianSpecifications;
 using ServiceAbstraction.CoreServicesAbstractions.Admin;
 using Services.Specification_Implementation.Emergency;
@@ -16,7 +17,9 @@ using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
 using SharedData.DTOs.MessegeDTOs;
 using SharedData.DTOs.ReportDtos;
+using SharedData.DTOs.TechnicianDTOs;
 using SharedData.Enums;
+
 
 namespace Service.CoreServices.Admin
 {
@@ -83,6 +86,17 @@ namespace Service.CoreServices.Admin
         #endregion
 
         #region Users
+        public async Task<List<ReadTechnicianReviewDTO>> GetTechnicianReviewAsync(int technicianId)
+        {
+            var spec = new ReviewSpecification(technicianId);
+            var repo = unitOfWork.GetRepository<Domain.Entities.CoreEntites.EmergencyEntities.Review, int>();
+            var result = await repo.GetAllAsync(spec);
+
+            if (result == null || !result.Any())
+                throw new ReviewsNotFoundException("there is no reviews for this technician");
+            return mapper.Map<List<ReadTechnicianReviewDTO>>(result);
+
+        }
         public async Task<object> GetUsersCountAsync()
         {
             var techniciansCount = await unitOfWork
@@ -301,9 +315,13 @@ namespace Service.CoreServices.Admin
 
             var technicians = await techRepo.GetAllAsync(new TechniciansSpecification());
             var carOwners = await carOwnerRepo.GetAllAsync(new CarOwnerSpecification());
+            var dtos = new List<ReadReportDTO>();
 
-            var reportDTOs = await Task.WhenAll(reports.Select(async report =>
+
+
+            foreach (var report in reports)
             {
+
                 // Find ReportingUser
                 var reportingTech = technicians.FirstOrDefault(t => t.ApplicationUserId == report.ReportingUserId);
                 var reportingCarOwner = carOwners.FirstOrDefault(c => c.ApplicationUserId == report.ReportingUserId);
@@ -318,24 +336,29 @@ namespace Service.CoreServices.Admin
 
                 // Get chats between this pair
                 var chats = await chatRepo.GetAllAsync(new ChatSessionBetweenParticipantsSpec(carOwnerId, techId));
-               
+                var chatList = chats.ToList();
 
-                return new ReadReportDTO
+
+
+
+                dtos.Add(new ReadReportDTO
                 {
                     Description = report.Description,
                     CreatedAt = report.CreatedAt,
+                    ReportState = report.reportState,
                     ReportingUserId = report.ReportingUserId,
                     ReportingUserRole = reportingTech != null ? "Technician" : "CarOwner",
                     ReportingEntityId = reportingTech?.Id ?? reportingCarOwner?.Id ?? 0,
                     ReportedUserId = report.ReportedUserId,
                     ReportedUserRole = reportedTech != null ? "Technician" : "CarOwner",
                     ReportedEntityId = reportedTech?.Id ?? reportedCarOwner?.Id ?? 0,
-                    RequestId = report.RequestId,
-                    TechnicianName = reportedTech != null ? reportedTech.ApplicationUser.Name : reportingTech?.ApplicationUser.Name,
-                    CarOwnerName = reportedCarOwner != null? reportedCarOwner?.ApplicationUser.Name :reportingCarOwner?.ApplicationUser.Name,
+                    ReportId = report.Id,
+                    TechnicianName = (reportingTech ?? reportedTech)?.ApplicationUser.Name,
+                    CarOwnerName = (reportingCarOwner ?? reportedCarOwner)?.ApplicationUser.Name,
 
 
-                    Messages = chats.SelectMany(c => c.massages).Select(m => new ReadMessageDTO
+
+                    Messages = chatList.SelectMany(c => c.massages).Select(m => new ReadMessageDTO
                     {
                         MessageId = m.Id,
                         Text = m.Text,
@@ -345,11 +368,45 @@ namespace Service.CoreServices.Admin
                         SenderName = m.ApplicationUser?.Name
 
                     }).ToList()
-                };
-            }));
+                });
+            }
 
-            return new { Reports = reportDTOs };
+
+
+            return new { Reports = dtos };
         }
+
+        public async Task UpdateReportStateAsync(UpdateReportDTO reportDTO)
+        {
+            var report = await unitOfWork.GetRepository<Report, int>().GetByIdAsync(reportDTO.ReportId);
+            if (report == null) throw new ReportNotFoundException("there is no report with this id");
+            switch (reportDTO.ReportState)
+            {
+                case ReportState.Approved:
+                    {
+                        report.reportState = ReportState.Approved;
+
+                    }
+
+
+                    break;
+                case ReportState.Rejected:
+                    {
+                        report.reportState = ReportState.Rejected;
+
+                    }
+                    break;
+                default:
+
+                    throw new TechnicianBadRequestException($"Unsupported RequestState '{reportDTO.ReportState}'.");
+
+
+
+            }
+            await unitOfWork.SaveChangesAsync();
+        }
+
+
 
         #endregion
 

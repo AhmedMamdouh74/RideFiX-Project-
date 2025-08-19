@@ -13,6 +13,7 @@ using SharedData.Wrapper;
 
 namespace Presentation.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CarController : ControllerBase

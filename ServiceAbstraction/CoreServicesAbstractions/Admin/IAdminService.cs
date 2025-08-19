@@ -1,6 +1,8 @@
 ﻿using SharedData.DTOs.Admin.TechnicianCategory;
 using SharedData.DTOs.Admin.Users;
 using SharedData.DTOs.ReportDtos;
+using SharedData.DTOs.TechnicianDTOs;
+using SharedData.Enums;
 
 namespace ServiceAbstraction.CoreServicesAbstractions.Admin
 {
@@ -15,6 +17,7 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Admin
         Task ActivateCarOwonerAsync(int userId);
         Task ActivateTechnianAsync(int userId);
         Task<Object> GetUsersCountAsync();
+        Task<List<ReadTechnicianReviewDTO>> GetTechnicianReviewAsync(int technicianId);
 
         // requests
         Task<Object> GetrequestsCountAsync();
@@ -27,7 +30,8 @@ namespace ServiceAbstraction.CoreServicesAbstractions.Admin
         Task DeleteCategoryAsync(int id);
         Task<object> GetDashboardStatisticsAsync();
         // report
-        Task<object> GetReportsAsync();     
+        Task<object> GetReportsAsync();
+        Task UpdateReportStateAsync(UpdateReportDTO reportDTO);
 
     }
 }
