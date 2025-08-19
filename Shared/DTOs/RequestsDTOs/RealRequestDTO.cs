@@ -30,7 +30,7 @@ namespace SharedData.DTOs.RequestsDTOs
         [Required(ErrorMessage = "PIN is required.")]
         public int pin { get; set; }
 
-        public List<IFormFile> Attachments { get; set; }
+        public List<IFormFile>? Attachments { get; set; }
 
     }
 }

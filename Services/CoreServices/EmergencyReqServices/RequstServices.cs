@@ -231,14 +231,14 @@ namespace Service.CoreServices.EmergencyReqServices
                         {
                             var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
                             var filePath = Path.Combine(uploadPath, fileName);
-
+                            var dataBasePath = Path.Combine("uploads/", fileName);
                             using (var stream = new FileStream(filePath, FileMode.Create))
                             {
                                 await file.CopyToAsync(stream);
                             }
                             emergancyRequest.requestAttachments.Add(new RequestAttachment
                             {
-                               AttachmentUrl = filePath,
+                               AttachmentUrl = dataBasePath,
 
                             });
                         }
