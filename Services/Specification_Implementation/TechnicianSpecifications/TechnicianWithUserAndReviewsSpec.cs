@@ -21,6 +21,9 @@ namespace Service.Specification_Implementation.TechnicianSpecifications
             {
                
                 AddInclude(t => t.ApplicationUser);
+               
+                
+                
             }
         }
     }

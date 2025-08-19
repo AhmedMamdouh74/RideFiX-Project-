@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,8 +15,6 @@ namespace SharedData.DTOs.RequestsDTOs
         public string Description { get; set; }
         public HashSet<string>? ImageUrl { get; set; }
 
-
-
         [Range(1, int.MaxValue, ErrorMessage = "CategoryId must be greater than 0.")]
         public int categoryId { get; set; }
 
@@ -30,6 +29,8 @@ namespace SharedData.DTOs.RequestsDTOs
 
         [Required(ErrorMessage = "PIN is required.")]
         public int pin { get; set; }
+
+        public List<IFormFile>? Attachments { get; set; }
 
     }
 }

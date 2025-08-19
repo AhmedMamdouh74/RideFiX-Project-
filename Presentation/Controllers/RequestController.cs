@@ -24,7 +24,7 @@ namespace Presentation.Controllers
             serviceManager = _serviceManager;
         }
         [HttpPost]
-        public async Task<IActionResult> CreateRequest(RealRequestDTO request)
+        public async Task<IActionResult> CreateRequest([FromForm] RealRequestDTO request)
         {
             if (request == null)
             {

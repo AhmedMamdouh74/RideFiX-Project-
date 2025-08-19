@@ -1,4 +1,5 @@
-﻿using SharedData.Enums;
+﻿using Microsoft.AspNetCore.Http;
+using SharedData.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,7 +23,9 @@ namespace SharedData.DTOs.RequestsDTOs
         [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180.")]
         public double Longitude { get; set; }
 
-       
+        public List<IFormFile>? Attachments { get; set; }
+
+
 
     }
 }
