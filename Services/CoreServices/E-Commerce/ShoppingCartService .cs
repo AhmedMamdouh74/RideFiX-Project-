@@ -111,7 +111,7 @@ namespace Service.CoreServices.E_Commerce
                         $"Not enough stock for product {product.ProductName}. Available: {product.Quantity}"
                     );
                 }
-
+                var cartItem = mapper.Map<CartItemDto>(product);
                 product.Quantity = quantity; 
                 cart.Add(product);
             }

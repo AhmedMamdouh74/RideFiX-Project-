@@ -55,6 +55,7 @@ namespace Service.CoreServices.E_Commerce
 
             foreach (var item in cartItems)
             {
+
                 var product = await unitOfWork.GetRepository<Domain.Entities.e_Commerce.Product, int>()
                     .GetByIdAsync(item.ProductId);
 
