@@ -8,16 +8,9 @@ using Services.Specification_Implementation;
 
 namespace Service.Specification_Implementation.E_CommerceSpecifications
 {
-    public class OrdersWithItemsSpecification : Specification<Order, int>
+    public class OrdersByUserSpecification : Specification<Order, int>
     {
-        public OrdersWithItemsSpecification() : base(x => 1 == 1)
-        {
-            AddInclude(x => x.orderItems);
-            AddInclude("orderItems.Product");
-
-        }
-
-        public OrdersWithItemsSpecification(int orderId) : base(o => o.Id == orderId)
+        public OrdersByUserSpecification(string userId) : base(o => o.UserId == userId)
         {
             AddInclude(x => x.orderItems);
             AddInclude("orderItems.Product");
