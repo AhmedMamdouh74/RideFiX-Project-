@@ -113,7 +113,7 @@ namespace Service.CoreServices.E_Commerce
                 }
                 var cartItem = mapper.Map<CartItemDto>(product);
                 product.Quantity = quantity; 
-                cart.Add(product);
+                cart.Add(cartItem);
             }
 
             var serializedCart = JsonSerializer.Serialize(cart);
