@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities.CoreEntites.CarMaintenance_Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
@@ -46,6 +47,19 @@ namespace Presentation.Controllers
         {
             await serviceManager.carServices.DeleteCar();
             return Ok(ApiResponse<string>.SuccessResponse("Car deleted successfully"));
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> EditCarKm( int newCarKm)
+        {
+            if (newCarKm <= 0)
+            {
+                return BadRequest(ApiResponse<Car>.FailResponse("Invalid km value"));
+            }
+
+
+            await serviceManager.carServices.EditCarKm(newCarKm);
+            return Ok(ApiResponse<Car>.SuccessResponse(null, "Car km updated successfully"));
         }
 
     }

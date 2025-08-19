@@ -14,5 +14,6 @@ namespace Service.CoreServices.CarMservices
         public Task DeleteCar();
         public Task<int> GetCarIdByOwnerId(int ownerId);
         public Task SetCarStats(DateTime date, decimal cost, int CarId);
+        public Task EditCarKm(int AvgKmPerMonth);
     }
 }
