@@ -50,7 +50,8 @@ namespace Service.CoreServices.E_Commerce
         //        throw new InvalidOperationException($"Product with ID {productId} not found.");
         //    }
 
-        //    if ( product.Quantity >= quantity) {
+        //    if (product.Quantity >= quantity)
+        //    {
         //        if (existingItem != null)
         //        {
 
@@ -70,6 +71,56 @@ namespace Service.CoreServices.E_Commerce
         //    var serializedCart = JsonSerializer.Serialize(Cart);
         //    await database.StringSetAsync(cartKey, serializedCart);
         //}
+        //public async Task AddToCartAsync(int productId, int quantity)
+        //{
+        //    if (productId <= 0 || quantity <= 0)
+        //    {
+        //        throw new ShoppingCartArgumentException("Product ID and quantity must be greater than zero.");
+        //    }
+
+        //    string userId = GetUserId();
+        //    string cartKey = $"cart:{userId}";
+
+        //    var cart = await GetCartItemsAsync();
+        //    var existingItem = cart.FirstOrDefault(item => item.ProductId == productId);
+
+        //    var product = await productsService.GetProductByIdAsync(productId);
+        //    if (product == null)
+        //    {
+        //        throw new InvalidOperationException($"Product with ID {productId} not found.");
+        //    }
+
+        //    if (existingItem != null)
+        //    {
+
+        //        int newQuantity = existingItem.Quantity + quantity;
+
+        //        if (newQuantity > product.StockQuantity)
+        //        {
+        //            throw new InvalidOperationException(
+        //                $"Not enough stock for product {product.ProductName}. Available: {product.Quantity}"
+        //            );
+        //        }
+
+        //        existingItem.Quantity = newQuantity;
+        //    }
+        //    else
+        //    {
+        //        if (quantity > product.StockQuantity)
+        //        {
+        //            throw new InvalidOperationException(
+        //                $"Not enough stock for product {product.ProductName}. Available: {product.StockQuantity}"
+        //            );
+        //        }
+        //        var cartItem = mapper.Map<CartItemDto>(product);
+        //        cartItem.Quantity = quantity;
+        //        cart.Add(cartItem);
+        //    }
+
+        //    var serializedCart = JsonSerializer.Serialize(cart);
+        //    await database.StringSetAsync(cartKey, serializedCart);
+        //}
+
         public async Task AddToCartAsync(int productId, int quantity)
         {
             if (productId <= 0 || quantity <= 0)
@@ -80,24 +131,26 @@ namespace Service.CoreServices.E_Commerce
             string userId = GetUserId();
             string cartKey = $"cart:{userId}";
 
+            // جيب الكارت الحالي من Redis
             var cart = await GetCartItemsAsync();
-            var existingItem = cart.FirstOrDefault(item => item.ProductId == productId);
 
+            // جيب الـ Product من الداتا بيز
             var product = await productsService.GetProductByIdAsync(productId);
             if (product == null)
             {
                 throw new InvalidOperationException($"Product with ID {productId} not found.");
             }
 
+            // ✅ التحقق من المخزون بيكون من الـ Product نفسه
+            var existingItem = cart.FirstOrDefault(item => item.ProductId == productId);
             if (existingItem != null)
             {
-            
                 int newQuantity = existingItem.Quantity + quantity;
 
-                if (newQuantity > product.Quantity)
+                if (newQuantity > product.StockQuantity)
                 {
                     throw new InvalidOperationException(
-                        $"Not enough stock for product {product.ProductName}. Available: {product.Quantity}"
+                        $"Not enough stock for product {product.ProductName}. Available: {product.StockQuantity}"
                     );
                 }
 
@@ -105,17 +158,20 @@ namespace Service.CoreServices.E_Commerce
             }
             else
             {
-                if (quantity > product.Quantity)
+                if (quantity > product.StockQuantity)
                 {
                     throw new InvalidOperationException(
-                        $"Not enough stock for product {product.ProductName}. Available: {product.Quantity}"
+                        $"Not enough stock for product {product.ProductName}. Available: {product.StockQuantity}"
                     );
                 }
+
+                // ✅ بعد ما نتأكد من المخزون نحول لـ DTO
                 var cartItem = mapper.Map<CartItemDto>(product);
-                cartItem.Quantity = quantity; 
+                cartItem.Quantity = quantity; // الكمية اللي المستخدم عايزها
                 cart.Add(cartItem);
             }
 
+            // رجع الكارت لـ Redis
             var serializedCart = JsonSerializer.Serialize(cart);
             await database.StringSetAsync(cartKey, serializedCart);
         }

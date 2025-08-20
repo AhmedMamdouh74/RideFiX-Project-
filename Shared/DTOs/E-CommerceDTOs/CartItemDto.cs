@@ -16,5 +16,7 @@ namespace SharedData.DTOs.E_CommerceDTOs
         public string ImageUrl { get; set; }
         public double AverageRating { get; set; }
         public int TotalRatings { get; set; }
+        public int StockQuantity { get; set; }
+
     }
 }
