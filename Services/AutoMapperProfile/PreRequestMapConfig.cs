@@ -22,7 +22,7 @@ namespace Service.AutoMapperProfile
               .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.EmergencyRequests.Longitude))
               .ForMember(dest => dest.TimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.TimeStamp))
               .ForMember(dest => dest.EndTimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.EndTimeStamp))
-             
+
               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.EmergencyRequests.Description))
               .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.Name))
               .ForMember(dest => dest.FaceImageUrl, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.FaceImageUrl))
