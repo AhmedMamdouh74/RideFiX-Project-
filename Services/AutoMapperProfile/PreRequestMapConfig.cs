@@ -16,14 +16,13 @@ namespace Service.AutoMapperProfile
 
             CreateMap<EmergencyRequestTechnicians, EmergencyRequestDetailsDTO>()
               .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.EmergencyRequestId))
-              .ForMember(dest => dest.AttachmentUrl, opt => opt.MapFrom(src => src.EmergencyRequests.requestAttachments.Select(r => r.AttachmentUrl).SingleOrDefault()))
               .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.EmergencyRequests.category.Name))
               .ForMember(dest => dest.CarOwnerId, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwnerId))
               .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.EmergencyRequests.Latitude))
               .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.EmergencyRequests.Longitude))
               .ForMember(dest => dest.TimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.TimeStamp))
               .ForMember(dest => dest.EndTimeStamp, opt => opt.MapFrom(src => src.EmergencyRequests.EndTimeStamp))
-             
+
               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.EmergencyRequests.Description))
               .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.Name))
               .ForMember(dest => dest.FaceImageUrl, opt => opt.MapFrom(src => src.EmergencyRequests.CarOwner.ApplicationUser.FaceImageUrl))
@@ -32,7 +31,6 @@ namespace Service.AutoMapperProfile
             .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.category.Name))
             .ForMember(dest => dest.CarOwnerName, opt => opt.MapFrom(src => src.CarOwner.ApplicationUser.Name))
-            .ForMember(dest => dest.AttachmentUrl, opt => opt.MapFrom(src => src.requestAttachments.Select(r=>r.AttachmentUrl).SingleOrDefault()))
             .ForMember(dest => dest.FaceImageUrl, opt => opt.MapFrom(src => src.CarOwner.ApplicationUser.FaceImageUrl));
 
 
