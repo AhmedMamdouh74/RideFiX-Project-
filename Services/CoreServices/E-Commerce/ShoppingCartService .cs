@@ -165,13 +165,11 @@ namespace Service.CoreServices.E_Commerce
                     );
                 }
 
-                // ✅ بعد ما نتأكد من المخزون نحول لـ DTO
                 var cartItem = mapper.Map<CartItemDto>(product);
-                cartItem.Quantity = quantity; // الكمية اللي المستخدم عايزها
+                cartItem.Quantity = quantity; 
                 cart.Add(cartItem);
             }
 
-            // رجع الكارت لـ Redis
             var serializedCart = JsonSerializer.Serialize(cart);
             await database.StringSetAsync(cartKey, serializedCart);
         }
@@ -233,9 +231,21 @@ namespace Service.CoreServices.E_Commerce
             var itemToUpdate = cartItems.FirstOrDefault(item => item.ProductId == productId);
             if (itemToUpdate != null)
             {
-                cartItems.Remove(itemToUpdate);
+                var product = await productsService.GetProductByIdAsync(productId);
+                if (product == null)
+                {
+                    throw new ItemNotFoundException($"Product with ID {productId} not found.");
+                }
+
+                if (newQuantity > product.StockQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Not enough stock for product {product.ProductName}. Available: {product.StockQuantity}"
+                    );
+                }
+
                 itemToUpdate.Quantity = newQuantity;
-                cartItems.Add(itemToUpdate);
+
                 var serializedCart = JsonSerializer.Serialize(cartItems);
                 await database.StringSetAsync(cartKey, serializedCart);
             }
@@ -243,8 +253,8 @@ namespace Service.CoreServices.E_Commerce
             {
                 throw new ItemNotFoundException($"Item with Product ID {productId} not found in the cart.");
             }
-
         }
+
         public string GetUserId ()
         {
             var user = httpContextAccessor.HttpContext?.User;
