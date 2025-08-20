@@ -26,6 +26,8 @@ namespace Service.Specification_Implementation.RequestSpecifications
             AddInclude(r => r.EmergencyRequests);
             AddInclude(r => r.EmergencyRequests.CarOwner.ApplicationUser);
             AddInclude(r => r.EmergencyRequests.category);
+           
+
 
         }
         public EmergencyRequestTechnicanSpecefication(int technicianId, RequestState requestState) : base(req => req.TechnicianId != technicianId && req.CallStatus == requestState)

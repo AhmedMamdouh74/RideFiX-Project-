@@ -14,6 +14,7 @@ namespace Service.Specification_Implementation.RequestSpecifications
             AddInclude(ert => ert.EmergencyRequests.category);
             AddInclude(ert => ert.EmergencyRequests.CarOwner);
             AddInclude(ert => ert.EmergencyRequests.CarOwner.ApplicationUser);
+            AddInclude(ert => ert.EmergencyRequests.requestAttachments);
         }
     }
 }

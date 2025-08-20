@@ -27,5 +27,6 @@ namespace SharedData.DTOs.TechnicianEmergencyRequestDTOs
         public string? Category {  get; set; }
         public Double Latitude { get; set; }
         public Double Longitude { get; set; }
+        public string? AttachmentUrl { get; set; }
     }
 }
