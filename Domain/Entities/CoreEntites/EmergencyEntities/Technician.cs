@@ -19,7 +19,9 @@ namespace Domain.Entities.CoreEntites.EmergencyEntities
         public ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
         public ICollection<TCategory> TCategories { get; set; } = new List<TCategory>();
         public ICollection<Review> reviews { get; set; } = new List<Review>();
-        public ICollection<EmergencyRequest> EmergencyRequests { get; set; } = new List<EmergencyRequest>();    
+        public ICollection<EmergencyRequest> EmergencyRequests { get; set; } = new List<EmergencyRequest>();
+        public ICollection<EmergencyRequestTechnicians> EmergencyRequestTechnicians { get; set; } =  new HashSet<EmergencyRequestTechnicians>();
+        public ICollection<TechReverseRequest> TechReverseRequests { get; set; } = new List<TechReverseRequest>();
         public Government government { get; set; }
     }
 }

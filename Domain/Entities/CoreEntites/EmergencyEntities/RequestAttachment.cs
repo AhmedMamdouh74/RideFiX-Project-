@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.CoreEntites.EmergencyEntities
 {
-    public class RequestAttachment
+    public class RequestAttachment : BaseEntity<int>
     {
         public string AttachmentUrl { get; set; }
 

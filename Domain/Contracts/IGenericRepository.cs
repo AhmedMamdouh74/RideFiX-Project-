@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts.SpecificationContracts;
@@ -20,5 +21,10 @@ namespace Domain.Contracts
         Task<IEnumerable<T>> GetAllAsync(ISpecification<T, TK> specification);
         Task<T> GetByIdAsync(ISpecification<T, TK> specification);
         Task<int> CountAsync(ISpecification<T, TK> specification);
+        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T, TK> spec);
+
+        public IQueryable<T> GetAllQueryable(ISpecification<T, TK> spec);
+
     }
 }

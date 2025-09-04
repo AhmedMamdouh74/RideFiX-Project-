@@ -10,5 +10,7 @@ namespace SharedData.DTOs.TechnicianEmergencyRequestDTOs
     {
         public int RequestId { get; set; }
         public int UserId { get; set; }
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+        public int Pin { get; set; }
     }
 }

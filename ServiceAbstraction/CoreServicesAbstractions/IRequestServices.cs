@@ -13,6 +13,16 @@ namespace ServiceAbstraction.CoreServicesAbstractions
         public Task<PreRequestDTO> CreateRequestAsync(CreatePreRequestDTO request);
         public Task CancelAll(int id);
         public Task CreateRealRequest(RealRequestDTO request);
+        public Task<List<RequestBreifDTO>> RequestBreifDTOs(int carOwnerID);
+        public Task<RequestDetailsDTO> RequestDetailsDTOs(int requestId);
+        public Task CompleteRequest (int requestId);
+
+        public Task<bool> IsPresent(RealRequestDTO request);
+        public Task<EmergencyTechnicianID> EmergencyTechnicianID(int requestId);
+        public Task<int> GetCurrentRequestId();
+        public Task CancelForTechnician(int requestId);
+
+
 
     }
 }

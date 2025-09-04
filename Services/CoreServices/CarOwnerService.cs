@@ -1,14 +1,19 @@
-﻿using AutoMapper;
-using Domain.Contracts;
-using Domain.Entities.CoreEntites.EmergencyEntities;
-using ServiceAbstraction.CoreServicesAbstractions;
-using SharedData.DTOs;
-using SharedData.DTOs.RequestsDTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Domain.Contracts;
+using Domain.Entities.CoreEntites.EmergencyEntities;
+using Service.Exception_Implementation.NotFoundExceptions;
+using Service.Specification_Implementation;
+using Service.Specification_Implementation.RequestSpecifications;
+using ServiceAbstraction.CoreServicesAbstractions;
+using SharedData.DTOs;
+using SharedData.DTOs.CarOwnerDTOs;
+using SharedData.DTOs.RequestsDTOs;
+using SharedData.Enums;
 
 namespace Service.CoreServices
 {
@@ -22,19 +27,51 @@ namespace Service.CoreServices
             mapper = _mapper;
         }
 
+        public async Task<RequestBreifDTO> IsRequested(int Id)
+        {
+            var Repo = unitOfWork.GetRepository<EmergencyRequest, int>();
+            var spec = new NotCompletedRequestSpecification(Id);
+            var notCompletedRequests = await Repo.GetAllAsync(spec);
+            if (notCompletedRequests.Any())
+            {
+                foreach (var request in notCompletedRequests)
+                {
+                    if (request.EmergencyRequestTechnicians != null)
+                    {
+                        foreach (var tech in request.EmergencyRequestTechnicians)
+                        {
+                            var flag = false;
+                            if (tech.CallStatus == RequestState.Answered || tech.CallStatus == RequestState.Waiting)
+                            {
+                                return mapper.Map<RequestBreifDTO>(request);
+                            }
+                        }
+                    }
 
-        //public async Task<bool> ConfirmPIN(ConfirmPIN_DTO PinRequest)
-        //{
-        //    var user = await unitOfWork.GetRepository<CarOwner, int>().GetByIdAsync(PinRequest.CarOwnerId);
-        //    if (user == null)
-        //    {
-        //        throw new ArgumentException("Car Owner not found");
-        //    }else if (user.ApplicationUser.PIN != PinRequest.PIN)
-        //    {
-        //        throw new ArgumentException("Invalid PIN provided for the Car Owner");
-        //    }
-        //    return true;
+                    if (request.TechReverseRequests != null)
+                    {
+                        foreach (var rev in request.TechReverseRequests)
+                        {
+                            if (rev.CallState == RequestState.Answered)
+                            {
+                                return mapper.Map<RequestBreifDTO>(request);
+                            }
+                        }
+                    }
+                }
+            }
+            throw new RequestNotFoundException();
+        }
 
-        //}
+        public async Task<CarOwnerDto> GetById(int Id)
+        {
+            var Repo = unitOfWork.GetRepository<CarOwner, int>();
+            var carOwner = await Repo.GetByIdAsync(Id);
+            return new CarOwnerDto()
+            {
+                CarOwnerId = carOwner.Id,
+                UserId = carOwner.ApplicationUserId
+            };
+        }
     }
 }

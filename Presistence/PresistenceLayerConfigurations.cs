@@ -1,15 +1,18 @@
 ﻿
 using Domain.Contracts;
+using Domain.Contracts.ReposatoriesContract;
+using Domain.Entities.CoreEntites.EmergencyEntities;
 using Domain.Entities.IdentityEntities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Presistence.Data;
-using Presistence.unitofwork;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Presistence.Data;
+using Presistence.Repositories;
+using Presistence.unitofwork;
 
 
 
@@ -26,7 +29,8 @@ namespace Presistence
                     ));
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped<IDataSeeding, DataSeeding>();
-
+            Services.AddScoped<IEmergencyRequestReposatory, EmergencyRequestReposatory>();
+            Services.AddScoped<IConnectionIdsRepository, ConnectionIdsRepository>();
             return Services;
         }
     }

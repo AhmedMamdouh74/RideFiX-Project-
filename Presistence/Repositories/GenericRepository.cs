@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts;
@@ -8,6 +9,7 @@ using Domain.Contracts.SpecificationContracts;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Presistence.Data;
+using Services.Specification_Implementation;
 //using Service.Specification_Implementation;
 
 namespace Presistence.Repositories
@@ -55,6 +57,8 @@ namespace Presistence.Repositories
         }
         #endregion
 
+        #region Specification ToList
+
         public async Task<IEnumerable<T>> GetAllAsync(ISpecification<T, TK> specification)
         {
             var query = _context.Set<T>().AsQueryable();
@@ -74,6 +78,28 @@ namespace Presistence.Repositories
             var query = _context.Set<T>().AsQueryable();
             query = SpecificationEvaluation.ApplySpecification(query, specification);
             return await query.CountAsync();
+        }
+
+        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+        public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T, TK> spec)
+        {
+            var query = _context.Set<T>().AsQueryable();
+            query = SpecificationEvaluation.ApplySpecification(query, spec);
+            return await query.ToListAsync();
+        }
+
+        #endregion
+
+        public IQueryable<T> GetAllQueryable(ISpecification<T, TK> spec)
+        {
+            {
+                var query = _context.Set<T>().AsQueryable();
+                query = SpecificationEvaluation.ApplySpecification(query, spec);
+                return query;
+            }
         }
     }
 }

@@ -14,22 +14,20 @@ namespace Presistence.Data.Configurations
         public void Configure(EntityTypeBuilder<EmergencyRequest> builder)
         {
 
-            builder.Property(er => er.CallState)
-              .IsRequired()
-              .HasMaxLength(50);
-
             builder.Property(er => er.IsCompleted)
                    .IsRequired();
 
-            builder.HasOne(er => er.Technician)
-                   .WithMany(er=>er.EmergencyRequests)
-                   .HasForeignKey(er => er.TechnicainId)
+            builder.HasMany(e => e.EmergencyRequestTechnicians)
+                    .WithOne(er => er.EmergencyRequests)
+                    .HasForeignKey(er => er.EmergencyRequestId)
                    .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(er => er.CarOwner)
                    .WithMany(er=>er.EmergencyRequests)
                    .HasForeignKey(er => er.CarOwnerId)
                    .OnDelete(DeleteBehavior.NoAction);
+
+            //builder.
         }
     }
 }
